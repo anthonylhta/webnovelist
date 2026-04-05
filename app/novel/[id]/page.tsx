@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { BookOpen, User, Layers, Globe, Calendar, Clock } from "lucide-react";
 import AddToListButton from "@/components/AddToListButton";
+import NovelAdminActions from "@/components/NovelAdminActions";
 
 export default async function NovelPage({
   params,
@@ -34,6 +35,7 @@ export default async function NovelPage({
             novelTitle={novel.title}
             totalChapters={novel.totalChapters}
           />
+          <NovelAdminActions novelId={novel.id} novelTitle={novel.title} />
         </div>
 
         {/* Novel Info */}
@@ -74,7 +76,7 @@ export default async function NovelPage({
               <BookOpen className="w-5 h-5 text-blue-500" />
               Description
             </h3>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-300 leading-relaxed whitespace-pre-line">
               {novel.description || "No description available."}
             </p>
           </div>

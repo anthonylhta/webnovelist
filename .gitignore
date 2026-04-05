@@ -43,3 +43,4 @@ next-env.d.ts
 
 /app/generated/prisma
 prisma/make-admin.ts
+.env.prod
