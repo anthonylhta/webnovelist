@@ -1,5 +1,4 @@
 // components/Footer.tsx
-import { SiGithub } from "lucide-react";
 
 // components/Footer.tsx
 export default function Footer() {
