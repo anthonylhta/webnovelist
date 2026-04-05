@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 NovelTracker
+
+A web application for tracking your Chinese webnovel reading journey. Rate, organize, and never lose your place again.
+
+## ✨ Features
+
+### For Users
+- Browse a growing database of Chinese webnovels
+- Search & filter by title, author, or genre
+- Personal list with status tracking (Reading, Completed, On Hold, Dropped, Plan to Read)
+- Rate novels out of 10
+- Chapter progress tracking with visual progress bars
+- Date tracking for when you started and finished reading
+- Reading links to quickly jump to where you're reading
+- Re-read counter
+- Statistics dashboard with rating distribution, genre breakdown, and highlights
+- Personal notes on each novel
+
+### For Admins & Moderators
+- Add novels to the database
+- Edit novel information and cover images
+- Delete novels (admin only)
+- Image upload via Cloudinary
+- Admin panel to manage users and assign roles
+- Role-based access control (Admin, Moderator, User)
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- PostgreSQL (Supabase)
+- Prisma ORM
+- NextAuth.js
+- Cloudinary
+- Vercel
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repo
+2. Run `npm install`
+3. Copy `.env.example` to `.env` and fill in your credentials
+4. Run `npx prisma migrate dev`
+5. Run `npx prisma db seed`
+6. Run `npm run dev`
+7. Open http://localhost:3000
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## User Roles
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Role | Browse | Personal List | Add Novels | Edit Novels | Delete Novels | Admin Panel |
+|---|---|---|---|---|---|---|
+| User | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Moderator | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contact
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Discord: https://discord.com/users/362585609610461185
+- GitHub: https://github.com/kayniss
