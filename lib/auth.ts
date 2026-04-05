@@ -3,6 +3,13 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
+// Rate limiter for login attempts: 5 per minute per email
+const loginLimiter = new RateLimiterMemory({
+  points: 5,
+  duration: 60,
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,12 +24,19 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter email and password");
         }
 
+        // Rate limit by email
+        try {
+          await loginLimiter.consume(credentials.email.toLowerCase());
+        } catch {
+          throw new Error("Too many login attempts. Please try again later.");
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: credentials.email.toLowerCase().trim() },
         });
 
         if (!user) {
-          throw new Error("No account found with this email");
+          throw new Error("Invalid email or password");
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -31,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordValid) {
-          throw new Error("Invalid password");
+          throw new Error("Invalid email or password");
         }
 
         return {

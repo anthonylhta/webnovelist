@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: "NovelTracker",
+  title: "WebNovelist",
   description: "Track your Chinese webnovel reading",
 };
 

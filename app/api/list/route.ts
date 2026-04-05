@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getIP } from "@/lib/rate-limit";
 
 // GET current user's list
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -35,6 +36,9 @@ export async function GET() {
 
 // POST — add a novel to the user's list
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await rateLimit(getIP(request), "general");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -44,6 +48,25 @@ export async function POST(request: NextRequest) {
 
     const userId = (session.user as any).id;
     const body = await request.json();
+
+    // Validate novelId
+    if (!body.novelId || typeof body.novelId !== "number") {
+      return NextResponse.json({ error: "Invalid novel ID" }, { status: 400 });
+    }
+
+    // Validate status
+    const validStatuses = ["reading", "completed", "on_hold", "dropped", "plan_to_read"];
+    if (body.status && !validStatuses.includes(body.status)) {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+
+    // Validate rating
+    if (body.rating !== null && body.rating !== undefined) {
+      const rating = parseFloat(body.rating);
+      if (isNaN(rating) || rating < 0 || rating > 10) {
+        return NextResponse.json({ error: "Rating must be between 0 and 10" }, { status: 400 });
+      }
+    }
 
     // Check if already in list
     const existing = await prisma.userNovelList.findUnique({
@@ -62,6 +85,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify novel exists
+    const novel = await prisma.novel.findUnique({
+      where: { id: body.novelId },
+    });
+
+    if (!novel) {
+      return NextResponse.json({ error: "Novel not found" }, { status: 404 });
+    }
+
     const entry = await prisma.userNovelList.create({
       data: {
         userId,
@@ -72,6 +104,8 @@ export async function POST(request: NextRequest) {
         dateStarted: body.dateStarted ? new Date(body.dateStarted) : null,
         dateFinished: body.dateFinished ? new Date(body.dateFinished) : null,
         notes: body.notes || null,
+        readingUrl: body.readingUrl || null,
+        rereadCount: body.rereadCount || 0,
       },
       include: {
         novel: true,

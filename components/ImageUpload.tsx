@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, AlertCircle } from "lucide-react";
 
 interface ImageUploadProps {
   currentUrl: string;
@@ -13,23 +13,24 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(currentUrl);
   const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (file: File) => {
+    setError("");
+
     if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file");
+      setError("Please upload an image file (JPG, PNG, WebP, or GIF)");
       return;
     }
 
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be under 5MB");
+      setError("Image must be under 5MB");
       return;
     }
 
     setUploading(true);
 
-    // Show local preview immediately
     const localPreview = URL.createObjectURL(file);
     setPreview(localPreview);
 
@@ -45,15 +46,14 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error);
+        throw new Error(data.error || "Upload failed");
       }
 
       setPreview(data.url);
       onUpload(data.url);
-    } catch (error) {
-      console.error("Upload failed:", error);
+    } catch (err: any) {
+      setError(err.message || "Upload failed. Please try again.");
       setPreview(currentUrl);
-      alert("Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -62,17 +62,20 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
+    setError("");
     const file = e.dataTransfer.files[0];
     if (file) handleUpload(file);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError("");
     const file = e.target.files?.[0];
     if (file) handleUpload(file);
   };
 
   const clearImage = () => {
     setPreview("");
+    setError("");
     onUpload("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -83,12 +86,23 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
     <div>
       <label className="block text-sm text-gray-400 mb-2">Cover Image</label>
 
+      {/* Error Message */}
+      {error && (
+        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg p-3 mb-3 text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
+      )}
+
       {preview ? (
         <div className="relative inline-block">
           <img
             src={preview}
             alt="Cover preview"
             className="w-32 h-44 object-cover rounded-lg border border-gray-700"
+            onError={() => {
+              setError("Failed to load image preview");
+            }}
           />
           <button
             type="button"
@@ -129,7 +143,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
                 Drag & drop an image or click to browse
               </p>
               <p className="text-gray-600 text-xs mt-1">
-                Max 5MB · JPG, PNG, WebP
+                Max 5MB · JPG, PNG, WebP, GIF
               </p>
             </>
           )}
@@ -144,7 +158,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
         className="hidden"
       />
 
-      {/* Still allow manual URL input */}
+      {/* Manual URL input */}
       <div className="mt-3">
         <div className="flex items-center gap-2 mb-1">
           <ImageIcon className="w-3 h-3 text-gray-500" />
@@ -154,6 +168,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
           type="url"
           value={preview}
           onChange={(e) => {
+            setError("");
             setPreview(e.target.value);
             onUpload(e.target.value);
           }}

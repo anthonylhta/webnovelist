@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Left: Branding */}
           <div className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} NovelTracker. Built by{" "}
+            © {new Date().getFullYear()} WebNovelist. Built by{" "}
             <span className="text-gray-300">:)</span>
           </div>
 

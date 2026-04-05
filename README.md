@@ -1,4 +1,4 @@
-# 📚 NovelTracker
+# 📚 WebNovelist
 
 A web application for tracking your Chinese webnovel reading journey. Rate, organize, and never lose your place again.
 

@@ -40,7 +40,7 @@ export default function Navbar() {
           onClick={closeMenu}
         >
           <BookOpen className="w-6 h-6 text-blue-500" />
-          <span>NovelTracker</span>
+          <span>WebNovelist</span>
         </Link>
 
         {/* Desktop Nav */}

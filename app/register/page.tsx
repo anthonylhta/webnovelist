@@ -116,10 +116,13 @@ export default function RegisterPage() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+                        text-gray-100 focus:outline-none focus:border-blue-500"
               required
-              minLength={6}
+              minLength={8}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              At least 8 characters with uppercase, lowercase, and a number
+            </p>
           </div>
 
           <div>

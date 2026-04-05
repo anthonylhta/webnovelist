@@ -1,9 +1,14 @@
 // app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getIP } from "@/lib/rate-limit";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
+  // Rate limit check
+  const rateLimitResponse = await rateLimit(getIP(request), "auth");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body = await request.json();
     const { username, email, password } = body;
@@ -16,16 +21,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    // Username validation
+    if (username.length < 3 || username.length > 30) {
       return NextResponse.json(
-        { error: "Password must be at least 6 characters" },
+        { error: "Username must be 3-30 characters" },
         { status: 400 }
       );
     }
 
-    // Check if email already exists
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return NextResponse.json(
+        { error: "Username can only contain letters, numbers, hyphens, and underscores" },
+        { status: 400 }
+      );
+    }
+
+    // Email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email address" },
+        { status: 400 }
+      );
+    }
+
+    // Password validation
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters" },
+        { status: 400 }
+      );
+    }
+
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return NextResponse.json(
+        { error: "Password must contain at least one uppercase letter, one lowercase letter, and one number" },
+        { status: 400 }
+      );
+    }
+
+    // Check existing
     const existingEmail = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase().trim() },
     });
 
     if (existingEmail) {
@@ -35,9 +71,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if username already exists
     const existingUsername = await prisma.user.findUnique({
-      where: { username },
+      where: { username: username.trim() },
     });
 
     if (existingUsername) {
@@ -47,13 +82,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password and create user
+    // Hash password with strong salt rounds
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
-        username,
-        email,
+        username: username.trim(),
+        email: email.toLowerCase().trim(),
         passwordHash,
       },
     });

@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
+import { rateLimit, getIP } from "@/lib/rate-limit";
+import { sanitizeString, isValidUrl, containsSuspiciousContent } from "@/lib/sanitize";
 
 // GET all novels — anyone can browse
 export async function GET(request: NextRequest) {
@@ -42,6 +44,9 @@ export async function GET(request: NextRequest) {
 
 // POST — only admins and moderators can add novels
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await rateLimit(getIP(request), "general");
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -58,19 +63,49 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // Validate required fields
+    if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+
+    if (body.title.length > 500) {
+      return NextResponse.json({ error: "Title is too long" }, { status: 400 });
+    }
+
+    // Check for suspicious content
+    const fieldsToCheck = [
+      body.title, body.titleChinese, body.author,
+      body.description, body.originalSource
+    ].filter(Boolean);
+
+    for (const field of fieldsToCheck) {
+      if (containsSuspiciousContent(field)) {
+        return NextResponse.json(
+          { error: "Input contains invalid characters" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate URL if provided
+    if (body.coverImageUrl && !isValidUrl(body.coverImageUrl)) {
+      return NextResponse.json({ error: "Invalid cover image URL" }, { status: 400 });
+    }
+
+    // Sanitize all string inputs
     const novel = await prisma.novel.create({
       data: {
-        title: body.title,
-        titleChinese: body.titleChinese || null,
-        author: body.author || null,
-        description: body.description || null,
+        title: sanitizeString(body.title),
+        titleChinese: body.titleChinese ? sanitizeString(body.titleChinese) : null,
+        author: body.author ? sanitizeString(body.author) : null,
+        description: body.description ? sanitizeString(body.description) : null,
         coverImageUrl: body.coverImageUrl || null,
-        totalChapters: body.totalChapters || null,
-        status: body.status || null,
-        genres: body.genres || [],
-        tags: body.tags || [],
-        originalSource: body.originalSource || null,
-        yearPublished: body.yearPublished || null,
+        totalChapters: body.totalChapters ? parseInt(body.totalChapters) : null,
+        status: body.status ? sanitizeString(body.status) : null,
+        genres: Array.isArray(body.genres) ? body.genres.map(sanitizeString) : [],
+        tags: Array.isArray(body.tags) ? body.tags.map(sanitizeString) : [],
+        originalSource: body.originalSource ? sanitizeString(body.originalSource) : null,
+        yearPublished: body.yearPublished ? parseInt(body.yearPublished) : null,
       },
     });
 
