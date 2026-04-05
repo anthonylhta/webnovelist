@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============== USERS ==============
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  novelList    UserNovelList[]
+
+  @@map("users")
+}
+
+// ============== NOVELS ==============
+model Novel {
+  id             Int       @id @default(autoincrement())
+  title          String
+  titleChinese   String?   @map("title_chinese")
+  author         String?
+  description    String?   @db.Text
+  coverImageUrl  String?   @map("cover_image_url")
+  totalChapters  Int?      @map("total_chapters")
+  status         String?
+  genres         String[]
+  tags           String[]
+  originalSource String?   @map("original_source")
+  yearPublished  Int?      @map("year_published")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  userEntries    UserNovelList[]
+
+  @@map("novels")
+}
+
+// ============== USER'S NOVEL LIST ==============
+model UserNovelList {
+  id             Int       @id @default(autoincrement())
+  userId         String    @map("user_id")
+  novelId        Int       @map("novel_id")
+  status         String
+  rating         Float?
+  currentChapter Int       @default(0) @map("current_chapter")
+  dateStarted    DateTime? @map("date_started")
+  dateFinished   DateTime? @map("date_finished")
+  notes          String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  novel          Novel     @relation(fields: [novelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, novelId])
+  @@map("user_novel_list")
+}
