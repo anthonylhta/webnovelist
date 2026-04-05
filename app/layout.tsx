@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "NovelTracker",
@@ -27,8 +28,9 @@ export default function RootLayout({
           <Footer />
         </SessionProvider>
 
-        {/* ✅ Add this */}
+        {/* Vercel Monitoring */}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
