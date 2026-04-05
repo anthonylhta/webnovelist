@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Pencil, ShieldX } from "lucide-react";
 import Link from "next/link";
+import ImageUpload from "@/components/ImageUpload";
+
 
 const GENRE_OPTIONS = [
   "Xianxia", "Xuanhuan", "Wuxia", "Fantasy", "Sci-Fi", "Romance",
@@ -224,28 +226,11 @@ export default function EditNovelPage() {
           </div>
 
           {/* Cover Image URL */}
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Cover Image URL</label>
-            <input
-              type="url"
-              value={form.coverImageUrl}
-              onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+            {/* Cover Image */}
+            <ImageUpload
+            currentUrl={form.coverImageUrl}
+            onUpload={(url) => setForm({ ...form, coverImageUrl: url })}
             />
-            {form.coverImageUrl && (
-              <div className="mt-2">
-                <img
-                  src={form.coverImageUrl}
-                  alt="Cover preview"
-                  className="w-24 h-32 object-cover rounded-lg border border-gray-700"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </div>
-            )}
-          </div>
 
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">

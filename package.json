@@ -3,20 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "eslint",
-  "prod:migrate": "dotenv -e .env.prod -- npx prisma migrate deploy",
-  "prod:studio": "dotenv -e .env.prod -- npx prisma studio",
-  "prod:seed": "dotenv -e .env.prod -- npx prisma db seed"
-},
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "prod:migrate": "dotenv -e .env.prod -- npx prisma migrate deploy",
+    "prod:studio": "dotenv -e .env.prod -- npx prisma studio",
+    "prod:seed": "dotenv -e .env.prod -- npx prisma db seed"
+  },
   "prisma": {
     "seed": "npx tsx --tsconfig tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^1.7.0",
     "next": "16.2.2",
