@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionProvider from "@/components/SessionProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "NovelTracker",
@@ -25,6 +26,9 @@ export default function RootLayout({
           </main>
           <Footer />
         </SessionProvider>
+
+        {/* ✅ Add this */}
+        <Analytics />
       </body>
     </html>
   );
