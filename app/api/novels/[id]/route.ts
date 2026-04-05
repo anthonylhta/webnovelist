@@ -1,8 +1,11 @@
 // app/api/novels/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canManageNovels } from "@/lib/roles";
 
-// GET a single novel by ID
+// GET — anyone can view a novel
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -28,12 +31,25 @@ export async function GET(
   }
 }
 
-// PUT (update) a novel
+// PUT — only admins and moderators can edit novels
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+    }
+
+    if (!canManageNovels(session.user.role)) {
+      return NextResponse.json(
+        { error: "You don't have permission to edit novels" },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -64,12 +80,25 @@ export async function PUT(
   }
 }
 
-// DELETE a novel
+// DELETE — only admins can delete novels
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+    }
+
+    if (session.user.role !== "admin") {
+      return NextResponse.json(
+        { error: "Only admins can delete novels" },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
 
     await prisma.novel.delete({

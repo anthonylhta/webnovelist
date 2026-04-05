@@ -1,8 +1,11 @@
 // app/api/novels/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { canManageNovels } from "@/lib/roles";
 
-// GET all novels (with optional search)
+// GET all novels — anyone can browse
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -37,9 +40,22 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST a new novel
+// POST — only admins and moderators can add novels
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+    }
+
+    if (!canManageNovels(session.user.role)) {
+      return NextResponse.json(
+        { error: "You don't have permission to add novels" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
 
     const novel = await prisma.novel.create({

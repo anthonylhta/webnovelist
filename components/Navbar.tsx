@@ -3,7 +3,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, LogOut, User, Menu, X, Plus, BarChart3 } from "lucide-react";
+import {
+  BookOpen, LogOut, User, Menu, X, Plus,
+  BarChart3, Shield, Crown, ShieldCheck,
+} from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
@@ -11,6 +14,21 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const closeMenu = () => setMobileMenuOpen(false);
+
+  const userRole = (session?.user as any)?.role;
+  const canManageNovels = userRole === "admin" || userRole === "moderator";
+  const isAdmin = userRole === "admin";
+
+  const getRoleIcon = () => {
+    switch (userRole) {
+      case "admin":
+        return <Crown className="w-4 h-4 text-red-400" />;
+      case "moderator":
+        return <ShieldCheck className="w-4 h-4 text-blue-400" />;
+      default:
+        return <User className="w-4 h-4 text-gray-400" />;
+    }
+  };
 
   return (
     <nav className="bg-gray-900 border-b border-gray-800">
@@ -41,13 +59,24 @@ export default function Navbar() {
               <Link href="/stats" className="hover:text-blue-400 transition">
                 Stats
               </Link>
-              <Link href="/add-novel" className="hover:text-blue-400 transition">
-                <Plus className="w-4 h-4 inline mr-1" />
-                Add Novel
-              </Link>
+
+              {canManageNovels && (
+                <Link href="/add-novel" className="hover:text-blue-400 transition">
+                  <Plus className="w-4 h-4 inline mr-1" />
+                  Add Novel
+                </Link>
+              )}
+
+              {isAdmin && (
+                <Link href="/admin" className="hover:text-red-400 transition">
+                  <Shield className="w-4 h-4 inline mr-1" />
+                  Admin
+                </Link>
+              )}
+
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <User className="w-4 h-4 text-blue-500" />
+                  {getRoleIcon()}
                   <span>{session.user?.name}</span>
                 </div>
                 <button
@@ -74,16 +103,12 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
+        {/* Mobile Hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="md:hidden text-gray-400 hover:text-white transition"
         >
-          {mobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -91,49 +116,41 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-800 bg-gray-900">
           <div className="px-4 py-4 space-y-3">
-            <Link
-              href="/browse"
-              onClick={closeMenu}
-              className="block py-2 hover:text-blue-400 transition"
-            >
+            <Link href="/browse" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
               Browse
             </Link>
 
             {session ? (
               <>
-                <Link
-                  href="/list"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-blue-400 transition"
-                >
+                <Link href="/list" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
                   My List
                 </Link>
-                <Link
-                  href="/stats"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-blue-400 transition"
-                >
+                <Link href="/stats" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
                   <BarChart3 className="w-4 h-4 inline mr-2" />
                   Stats
                 </Link>
-                <Link
-                  href="/add-novel"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-blue-400 transition"
-                >
-                  <Plus className="w-4 h-4 inline mr-2" />
-                  Add Novel
-                </Link>
+
+                {canManageNovels && (
+                  <Link href="/add-novel" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
+                    <Plus className="w-4 h-4 inline mr-2" />
+                    Add Novel
+                  </Link>
+                )}
+
+                {isAdmin && (
+                  <Link href="/admin" onClick={closeMenu} className="block py-2 hover:text-red-400 transition">
+                    <Shield className="w-4 h-4 inline mr-2" />
+                    Admin Panel
+                  </Link>
+                )}
+
                 <div className="flex items-center justify-between pt-3 border-t border-gray-800">
                   <div className="flex items-center gap-2 text-sm">
-                    <User className="w-4 h-4 text-blue-500" />
+                    {getRoleIcon()}
                     <span>{session.user?.name}</span>
                   </div>
                   <button
-                    onClick={() => {
-                      signOut();
-                      closeMenu();
-                    }}
+                    onClick={() => { signOut(); closeMenu(); }}
                     className="text-red-400 text-sm flex items-center gap-1"
                   >
                     <LogOut className="w-4 h-4" />
@@ -143,18 +160,10 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex gap-3 pt-3 border-t border-gray-800">
-                <Link
-                  href="/login"
-                  onClick={closeMenu}
-                  className="flex-1 text-center py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition"
-                >
+                <Link href="/login" onClick={closeMenu} className="flex-1 text-center py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
                   Login
                 </Link>
-                <Link
-                  href="/register"
-                  onClick={closeMenu}
-                  className="flex-1 text-center py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition"
-                >
+                <Link href="/register" onClick={closeMenu} className="flex-1 text-center py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
                   Sign Up
                 </Link>
               </div>

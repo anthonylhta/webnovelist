@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// PUT — update a list entry
+// PUT — update a list entry (supports partial updates)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -20,7 +20,6 @@ export async function PUT(
     const userId = (session.user as any).id;
     const body = await request.json();
 
-    // Make sure the entry belongs to this user
     const existing = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },
     });
@@ -29,16 +28,25 @@ export async function PUT(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    // Only update fields that are provided
+    const updateData: any = {};
+
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.rating !== undefined) updateData.rating = body.rating;
+    if (body.currentChapter !== undefined) updateData.currentChapter = body.currentChapter;
+    if (body.readingUrl !== undefined) updateData.readingUrl = body.readingUrl;
+    if (body.rereadCount !== undefined) updateData.rereadCount = body.rereadCount;
+    if (body.notes !== undefined) updateData.notes = body.notes;
+    if (body.dateStarted !== undefined) {
+      updateData.dateStarted = body.dateStarted ? new Date(body.dateStarted) : null;
+    }
+    if (body.dateFinished !== undefined) {
+      updateData.dateFinished = body.dateFinished ? new Date(body.dateFinished) : null;
+    }
+
     const entry = await prisma.userNovelList.update({
       where: { id: parseInt(id) },
-      data: {
-        status: body.status,
-        rating: body.rating,
-        currentChapter: body.currentChapter,
-        dateStarted: body.dateStarted ? new Date(body.dateStarted) : null,
-        dateFinished: body.dateFinished ? new Date(body.dateFinished) : null,
-        notes: body.notes,
-      },
+      data: updateData,
       include: {
         novel: true,
       },

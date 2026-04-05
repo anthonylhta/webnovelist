@@ -21,6 +21,7 @@ model User {
   email        String    @unique
   passwordHash String    @map("password_hash")
   avatarUrl    String?   @map("avatar_url")
+  role         String    @default("user") // "admin", "moderator", "user"
   createdAt    DateTime  @default(now()) @map("created_at")
 
   novelList    UserNovelList[]
@@ -61,6 +62,8 @@ model UserNovelList {
   dateStarted    DateTime? @map("date_started")
   dateFinished   DateTime? @map("date_finished")
   notes          String?   @db.Text
+  readingUrl     String?   @map("reading_url")
+  rereadCount    Int       @default(0) @map("reread_count")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 

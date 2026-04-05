@@ -24,7 +24,6 @@ export default function AddToListButton({
   const [existingEntry, setExistingEntry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if novel is already in user's list
   useEffect(() => {
     if (!session) {
       setLoading(false);
@@ -53,7 +52,6 @@ export default function AddToListButton({
 
   const handleSuccess = () => {
     setShowModal(false);
-    // Refresh the page to update the button state
     window.location.reload();
   };
 
@@ -112,6 +110,8 @@ export default function AddToListButton({
                   dateStarted: existingEntry.dateStarted,
                   dateFinished: existingEntry.dateFinished,
                   notes: existingEntry.notes,
+                  readingUrl: existingEntry.readingUrl,
+                  rereadCount: existingEntry.rereadCount,
                 }
               : undefined
           }
