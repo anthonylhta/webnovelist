@@ -19,6 +19,8 @@ interface AddToListModalProps {
     dateStarted: string | null;
     dateFinished: string | null;
     notes: string | null;
+    readingUrl?: string | null;
+    rereadCount?: number;
   };
 }
 
@@ -37,6 +39,8 @@ export default function AddToListModal({
     dateStarted: existingEntry?.dateStarted?.split("T")[0] || "",
     dateFinished: existingEntry?.dateFinished?.split("T")[0] || "",
     notes: existingEntry?.notes || "",
+    readingUrl: existingEntry?.readingUrl || "",
+    rereadCount: existingEntry?.rereadCount || 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -64,6 +68,8 @@ export default function AddToListModal({
           dateStarted: form.dateStarted || null,
           dateFinished: form.dateFinished || null,
           notes: form.notes || null,
+          readingUrl: form.readingUrl || null,
+          rereadCount: parseInt(form.rereadCount as any) || 0,
         }),
       });
 
@@ -141,66 +147,96 @@ export default function AddToListModal({
               </select>
             </div>
 
-            {/* Rating */}
+            {/* Rating and Chapter on same row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Rating (0-10)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.5"
+                  value={form.rating}
+                  onChange={(e) => setForm({ ...form, rating: e.target.value })}
+                  placeholder="—"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
+                             text-gray-100 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Chapter{totalChapters ? ` (of ${totalChapters})` : ""}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max={totalChapters || undefined}
+                  value={form.currentChapter}
+                  onChange={(e) =>
+                    setForm({ ...form, currentChapter: parseInt(e.target.value) || 0 })
+                  }
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
+                             text-gray-100 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Reading URL */}
             <div>
               <label className="block text-sm text-gray-400 mb-1">
-                Rating (0-10)
+                Reading Link
+              </label>
+              <input
+                type="url"
+                value={form.readingUrl}
+                onChange={(e) => setForm({ ...form, readingUrl: e.target.value })}
+                placeholder="https://www.novelupdates.com/..."
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
+                           text-gray-100 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            {/* Dates on same row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Date Started
+                </label>
+                <input
+                  type="date"
+                  value={form.dateStarted}
+                  onChange={(e) => setForm({ ...form, dateStarted: e.target.value })}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
+                             text-gray-100 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  Date Finished
+                </label>
+                <input
+                  type="date"
+                  value={form.dateFinished}
+                  onChange={(e) => setForm({ ...form, dateFinished: e.target.value })}
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
+                             text-gray-100 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Reread Count */}
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">
+                Times Re-read
               </label>
               <input
                 type="number"
                 min="0"
-                max="10"
-                step="0.5"
-                value={form.rating}
-                onChange={(e) => setForm({ ...form, rating: e.target.value })}
-                placeholder="No rating"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Chapter Progress */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Chapter Progress{totalChapters ? ` (of ${totalChapters})` : ""}
-              </label>
-              <input
-                type="number"
-                min="0"
-                max={totalChapters || undefined}
-                value={form.currentChapter}
+                value={form.rereadCount}
                 onChange={(e) =>
-                  setForm({ ...form, currentChapter: parseInt(e.target.value) || 0 })
-                }
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Date Started */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Date Started
-              </label>
-              <input
-                type="date"
-                value={form.dateStarted}
-                onChange={(e) => setForm({ ...form, dateStarted: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Date Finished */}
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Date Finished
-              </label>
-              <input
-                type="date"
-                value={form.dateFinished}
-                onChange={(e) =>
-                  setForm({ ...form, dateFinished: e.target.value })
+                  setForm({ ...form, rereadCount: parseInt(e.target.value) || 0 })
                 }
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
                            text-gray-100 focus:outline-none focus:border-blue-500"
@@ -228,11 +264,7 @@ export default function AddToListModal({
                 className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50
                            text-white font-semibold py-3 rounded-lg transition"
               >
-                {loading
-                  ? "Saving..."
-                  : isEditing
-                  ? "Update"
-                  : "Add to List"}
+                {loading ? "Saving..." : isEditing ? "Update" : "Add to List"}
               </button>
 
               {isEditing && (
@@ -251,7 +283,6 @@ export default function AddToListModal({
         </div>
       </div>
 
-      {/* Confirm Delete Modal */}
       {showConfirmDelete && (
         <ConfirmModal
           title="Remove Novel"

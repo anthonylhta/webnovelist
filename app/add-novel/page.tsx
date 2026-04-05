@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, X } from "lucide-react";
+import { Plus, ShieldX } from "lucide-react";
+import Link from "next/link";
 
 const GENRE_OPTIONS = [
   "Xianxia", "Xuanhuan", "Wuxia", "Fantasy", "Sci-Fi", "Romance",
@@ -35,9 +36,37 @@ export default function AddNovelPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  if (authStatus === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
   if (authStatus === "unauthenticated") {
     router.push("/login");
     return null;
+  }
+
+  // Check role — only admin and moderator can add novels
+  const userRole = (session?.user as any)?.role;
+  if (userRole !== "admin" && userRole !== "moderator") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <ShieldX className="w-16 h-16 text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+        <p className="text-gray-400 mb-6">
+          Only admins and moderators can add novels to the database.
+        </p>
+        <Link
+          href="/browse"
+          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition"
+        >
+          Browse Novels
+        </Link>
+      </div>
+    );
   }
 
   const toggleGenre = (genre: string) => {
@@ -112,7 +141,6 @@ export default function AddNovelPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title */}
           <div>
             <label className="block text-sm text-gray-400 mb-1">
               Title (English) <span className="text-red-500">*</span>
@@ -128,11 +156,8 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Chinese Title */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
-              Title (Chinese)
-            </label>
+            <label className="block text-sm text-gray-400 mb-1">Title (Chinese)</label>
             <input
               type="text"
               value={form.titleChinese}
@@ -143,7 +168,6 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Author */}
           <div>
             <label className="block text-sm text-gray-400 mb-1">Author</label>
             <input
@@ -156,11 +180,8 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
-              Description
-            </label>
+            <label className="block text-sm text-gray-400 mb-1">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -171,11 +192,8 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Cover Image URL */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
-              Cover Image URL
-            </label>
+            <label className="block text-sm text-gray-400 mb-1">Cover Image URL</label>
             <input
               type="url"
               value={form.coverImageUrl}
@@ -186,39 +204,27 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Total Chapters */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Total Chapters
-              </label>
+              <label className="block text-sm text-gray-400 mb-1">Total Chapters</label>
               <input
                 type="number"
                 min="0"
                 value={form.totalChapters}
-                onChange={(e) =>
-                  setForm({ ...form, totalChapters: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
                 placeholder="e.g., 1394"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
                            text-gray-100 focus:outline-none focus:border-blue-500"
               />
             </div>
-
-            {/* Year Published */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Year Published
-              </label>
+              <label className="block text-sm text-gray-400 mb-1">Year Published</label>
               <input
                 type="number"
                 min="1990"
                 max="2030"
                 value={form.yearPublished}
-                onChange={(e) =>
-                  setForm({ ...form, yearPublished: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, yearPublished: e.target.value })}
                 placeholder="e.g., 2018"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
                            text-gray-100 focus:outline-none focus:border-blue-500"
@@ -226,13 +232,9 @@ export default function AddNovelPage() {
             </div>
           </div>
 
-          {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Novel Status */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Novel Status
-              </label>
+              <label className="block text-sm text-gray-400 mb-1">Novel Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -244,18 +246,12 @@ export default function AddNovelPage() {
                 <option value="Hiatus">Hiatus</option>
               </select>
             </div>
-
-            {/* Original Source */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Original Source
-              </label>
+              <label className="block text-sm text-gray-400 mb-1">Original Source</label>
               <input
                 type="text"
                 value={form.originalSource}
-                onChange={(e) =>
-                  setForm({ ...form, originalSource: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
                 placeholder="e.g., Qidian"
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
                            text-gray-100 focus:outline-none focus:border-blue-500"
@@ -263,7 +259,6 @@ export default function AddNovelPage() {
             </div>
           </div>
 
-          {/* Genres */}
           <div>
             <label className="block text-sm text-gray-400 mb-2">Genres</label>
             <div className="flex flex-wrap gap-2">
@@ -285,7 +280,6 @@ export default function AddNovelPage() {
             </div>
           </div>
 
-          {/* Tags */}
           <div>
             <label className="block text-sm text-gray-400 mb-1">
               Tags (comma separated)
@@ -300,7 +294,6 @@ export default function AddNovelPage() {
             />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}

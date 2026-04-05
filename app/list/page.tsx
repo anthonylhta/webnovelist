@@ -5,9 +5,13 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, BookOpen, Edit, Trash2 } from "lucide-react";
+import {
+  Star, BookOpen, Edit, Trash2,
+  ArrowUpDown, ExternalLink,
+} from "lucide-react";
 import AddToListModal from "@/components/AddToListModal";
 import ConfirmModal from "@/components/ConfirmModal";
+import QuickChapterUpdate from "@/components/QuickChapterUpdate";
 
 const STATUS_TABS = [
   { key: "all", label: "All", icon: "📚" },
@@ -18,6 +22,9 @@ const STATUS_TABS = [
   { key: "plan_to_read", label: "Plan to Read", icon: "📋" },
 ];
 
+type SortKey = "title" | "rating" | "progress" | "updated";
+type SortDir = "asc" | "desc";
+
 export default function ListPage() {
   const { data: session, status: authStatus } = useSession();
   const router = useRouter();
@@ -27,6 +34,8 @@ export default function ListPage() {
   const [editingEntry, setEditingEntry] = useState<any>(null);
   const [deletingEntry, setDeletingEntry] = useState<any>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>("updated");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
@@ -72,8 +81,48 @@ export default function ListPage() {
     }
   };
 
+  const handleChapterUpdate = (entryId: number, newChapter: number) => {
+    setList(
+      list.map((e) =>
+        e.id === entryId ? { ...e, currentChapter: newChapter } : e
+      )
+    );
+  };
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir(key === "title" ? "asc" : "desc");
+    }
+  };
+
   const filteredList =
     activeTab === "all" ? list : list.filter((e) => e.status === activeTab);
+
+  const sortedList = [...filteredList].sort((a, b) => {
+    const dir = sortDir === "asc" ? 1 : -1;
+
+    switch (sortKey) {
+      case "title":
+        return dir * a.novel.title.localeCompare(b.novel.title);
+      case "rating":
+        return dir * ((a.rating || 0) - (b.rating || 0));
+      case "progress":
+        const aProgress = a.novel.totalChapters
+          ? a.currentChapter / a.novel.totalChapters
+          : a.currentChapter;
+        const bProgress = b.novel.totalChapters
+          ? b.currentChapter / b.novel.totalChapters
+          : b.currentChapter;
+        return dir * (aProgress - bProgress);
+      case "updated":
+        return dir * (new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+      default:
+        return 0;
+    }
+  });
 
   const getStatusCounts = () => {
     const counts: Record<string, number> = { all: list.length };
@@ -92,6 +141,18 @@ export default function ListPage() {
       </div>
     );
   }
+
+  const SortButton = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (
+    <button
+      onClick={() => toggleSort(sortKeyName)}
+      className="flex items-center gap-1 hover:text-blue-400 transition"
+    >
+      {label}
+      {sortKey === sortKeyName && (
+        <ArrowUpDown className="w-3 h-3 text-blue-400" />
+      )}
+    </button>
+  );
 
   return (
     <div>
@@ -127,7 +188,7 @@ export default function ListPage() {
       </div>
 
       {/* List */}
-      {filteredList.length === 0 ? (
+      {sortedList.length === 0 ? (
         <div className="text-center py-16">
           <BookOpen className="w-12 h-12 text-gray-600 mx-auto mb-4" />
           <p className="text-gray-500 text-lg">No novels in this category</p>
@@ -143,41 +204,63 @@ export default function ListPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-800 text-gray-400 text-sm">
-                <th className="text-left p-4">Novel</th>
-                <th className="text-left p-4 hidden md:table-cell">Progress</th>
-                <th className="text-left p-4">Rating</th>
-                <th className="text-left p-4 hidden lg:table-cell">Started</th>
-                <th className="text-left p-4 hidden lg:table-cell">Finished</th>
+                <th className="text-left p-4">
+                  <SortButton label="Novel" sortKeyName="title" />
+                </th>
+                <th className="text-left p-4 hidden md:table-cell">
+                  <SortButton label="Progress" sortKeyName="progress" />
+                </th>
+                <th className="text-left p-4">
+                  <SortButton label="Rating" sortKeyName="rating" />
+                </th>
+                <th className="text-left p-4 hidden lg:table-cell">
+                  <SortButton label="Updated" sortKeyName="updated" />
+                </th>
                 <th className="text-right p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredList.map((entry) => (
+              {sortedList.map((entry) => (
                 <tr
                   key={entry.id}
                   className="border-b border-gray-800/50 hover:bg-gray-800/30 transition"
                 >
+                  {/* Novel Title */}
                   <td className="p-4">
-                    <Link
-                      href={`/novel/${entry.novel.id}`}
-                      className="hover:text-blue-400 transition"
-                    >
-                      <div className="font-medium">{entry.novel.title}</div>
-                      {entry.novel.titleChinese && (
-                        <div className="text-gray-500 text-sm">
-                          {entry.novel.titleChinese}
-                        </div>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/novel/${entry.novel.id}`}
+                        className="hover:text-blue-400 transition"
+                      >
+                        <div className="font-medium">{entry.novel.title}</div>
+                        {entry.novel.titleChinese && (
+                          <div className="text-gray-500 text-sm">
+                            {entry.novel.titleChinese}
+                          </div>
+                        )}
+                      </Link>
+                      {entry.readingUrl && (
+                        <a
+                          href={entry.readingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-500 hover:text-blue-400 transition"
+                          title="Open reading link"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
                       )}
-                    </Link>
+                    </div>
                   </td>
 
+                  {/* Progress with Quick Update */}
                   <td className="p-4 hidden md:table-cell">
-                    <div className="text-sm">
-                      {entry.currentChapter}
-                      {entry.novel.totalChapters
-                        ? ` / ${entry.novel.totalChapters}`
-                        : ""}
-                    </div>
+                    <QuickChapterUpdate
+                      entryId={entry.id}
+                      currentChapter={entry.currentChapter}
+                      totalChapters={entry.novel.totalChapters}
+                      onUpdate={(newCh) => handleChapterUpdate(entry.id, newCh)}
+                    />
                     {entry.novel.totalChapters && (
                       <div className="w-24 bg-gray-700 rounded-full h-1.5 mt-1">
                         <div
@@ -193,6 +276,7 @@ export default function ListPage() {
                     )}
                   </td>
 
+                  {/* Rating */}
                   <td className="p-4">
                     {entry.rating ? (
                       <div className="flex items-center gap-1">
@@ -204,18 +288,12 @@ export default function ListPage() {
                     )}
                   </td>
 
+                  {/* Last Updated */}
                   <td className="p-4 text-sm text-gray-400 hidden lg:table-cell">
-                    {entry.dateStarted
-                      ? new Date(entry.dateStarted).toLocaleDateString()
-                      : "—"}
+                    {new Date(entry.updatedAt).toLocaleDateString()}
                   </td>
 
-                  <td className="p-4 text-sm text-gray-400 hidden lg:table-cell">
-                    {entry.dateFinished
-                      ? new Date(entry.dateFinished).toLocaleDateString()
-                      : "—"}
-                  </td>
-
+                  {/* Actions */}
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
@@ -255,6 +333,8 @@ export default function ListPage() {
             dateStarted: editingEntry.dateStarted,
             dateFinished: editingEntry.dateFinished,
             notes: editingEntry.notes,
+            readingUrl: editingEntry.readingUrl,
+            rereadCount: editingEntry.rereadCount,
           }}
           onClose={() => setEditingEntry(null)}
           onSuccess={() => {

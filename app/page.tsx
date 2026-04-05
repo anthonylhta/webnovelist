@@ -1,15 +1,15 @@
-// src/app/page.tsx
+// app/page.tsx
 import Link from "next/link";
-import { BookOpen, List, Star } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
-      <BookOpen className="w-16 h-16 text-blue-500 mb-6" />
+      <div className="text-6xl mb-6">📚</div>
       <h1 className="text-5xl font-bold mb-4">NovelTracker</h1>
       <p className="text-xl text-gray-400 mb-8 max-w-lg">
-        Track your Chinese webnovel reading journey. Rate, organize,
-        and never lose your place again.
+        Track your Webnovel reading journey. Rate, organize, and
+        never lose your place again.
       </p>
 
       <div className="flex gap-4">
@@ -30,21 +30,21 @@ export default function Home() {
       {/* Feature Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 w-full max-w-3xl">
         <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
-          <List className="w-8 h-8 text-blue-500 mb-3" />
+          <div className="text-4xl mb-3">📂</div>
           <h3 className="font-semibold mb-2">Organize</h3>
           <p className="text-gray-400 text-sm">
             Sort novels into reading, completed, dropped, and more.
           </p>
         </div>
         <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
-          <Star className="w-8 h-8 text-yellow-500 mb-3" />
+          <div className="text-4xl mb-3">⭐</div>
           <h3 className="font-semibold mb-2">Rate</h3>
           <p className="text-gray-400 text-sm">
             Rate novels out of 10 and keep personal notes.
           </p>
         </div>
         <div className="bg-gray-900 p-6 rounded-xl border border-gray-800">
-          <BookOpen className="w-8 h-8 text-green-500 mb-3" />
+          <div className="text-4xl mb-3">📖</div>
           <h3 className="font-semibold mb-2">Track</h3>
           <p className="text-gray-400 text-sm">
             Track your chapter progress and reading dates.

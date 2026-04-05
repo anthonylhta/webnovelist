@@ -1,0 +1,90 @@
+// components/QuickChapterUpdate.tsx
+"use client";
+
+import { useState } from "react";
+import { Minus, Plus } from "lucide-react";
+
+interface QuickChapterUpdateProps {
+  entryId: number;
+  currentChapter: number;
+  totalChapters: number | null;
+  onUpdate: (newChapter: number) => void;
+}
+
+export default function QuickChapterUpdate({
+  entryId,
+  currentChapter,
+  totalChapters,
+  onUpdate,
+}: QuickChapterUpdateProps) {
+  const [chapter, setChapter] = useState(currentChapter);
+  const [saving, setSaving] = useState(false);
+
+  const updateChapter = async (newChapter: number) => {
+    if (newChapter < 0) return;
+    if (totalChapters && newChapter > totalChapters) return;
+
+    setChapter(newChapter);
+    setSaving(true);
+
+    try {
+      await fetch(`/api/list/${entryId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentChapter: newChapter }),
+      });
+      onUpdate(newChapter);
+    } catch (error) {
+      console.error("Failed to update:", error);
+      setChapter(currentChapter);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        onClick={() => updateChapter(chapter - 1)}
+        disabled={saving || chapter <= 0}
+        className="p-1 text-gray-500 hover:text-white disabled:opacity-30 transition"
+      >
+        <Minus className="w-3 h-3" />
+      </button>
+
+      <input
+        type="number"
+        value={chapter}
+        onChange={(e) => {
+          const val = parseInt(e.target.value) || 0;
+          setChapter(val);
+        }}
+        onBlur={() => {
+          if (chapter !== currentChapter) {
+            updateChapter(chapter);
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            updateChapter(chapter);
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+        className="w-14 bg-transparent border border-gray-700 rounded px-1 py-0.5 
+                   text-center text-sm focus:outline-none focus:border-blue-500"
+      />
+
+      <span className="text-gray-500 text-sm">
+        {totalChapters ? `/ ${totalChapters}` : ""}
+      </span>
+
+      <button
+        onClick={() => updateChapter(chapter + 1)}
+        disabled={saving || (totalChapters !== null && chapter >= totalChapters)}
+        className="p-1 text-gray-500 hover:text-white disabled:opacity-30 transition"
+      >
+        <Plus className="w-3 h-3" />
+      </button>
+    </div>
+  );
+}
