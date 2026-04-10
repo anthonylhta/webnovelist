@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get("search") || "";
     const genre = searchParams.get("genre") || "";
+    const recent = searchParams.get("recent") === "true";
 
     const novels = await prisma.novel.findMany({
       where: {
@@ -29,7 +30,8 @@ export async function GET(request: NextRequest) {
           genre ? { genres: { has: genre } } : {},
         ],
       },
-      orderBy: { title: "asc" },
+      orderBy: recent ? { createdAt: "desc" } : { title: "asc" },
+      take: recent ? 10 : undefined,
     });
 
     return NextResponse.json(novels);

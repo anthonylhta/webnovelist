@@ -14,3 +14,13 @@
   background: #333;
   border-radius: 4px;
 }
+
+/* Hide scrollbar on horizontal scroll sections */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
