@@ -79,55 +79,62 @@ export default function LoggedInHome({ userName }: { userName: string }) {
   return (
     <div>
       {/* Welcome */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">
           Welcome back, {userName}! 👋
         </h1>
-        <p className="text-gray-400 mt-1">Here&apos;s your reading overview.</p>
+        <p className="text-gray-400 mt-1 text-sm sm:text-base">
+          Here&apos;s your reading overview.
+        </p>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 mb-8 sm:mb-10">
           <StatCard
-            icon={<BookOpen className="w-5 h-5" />}
+            icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />}
             label="Total"
             value={stats.totalNovels.toString()}
             color="text-blue-500"
           />
           <StatCard
-            icon={<BookMarked className="w-5 h-5" />}
+            icon={<BookMarked className="w-4 h-4 sm:w-5 sm:h-5" />}
             label="Reading"
             value={stats.readingCount.toString()}
             color="text-green-500"
           />
           <StatCard
-            icon={<CheckCircle className="w-5 h-5" />}
+            icon={<CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />}
             label="Completed"
             value={stats.completedCount.toString()}
             color="text-emerald-500"
           />
-          <StatCard
-            icon={<TrendingUp className="w-5 h-5" />}
-            label="Chapters"
-            value={stats.totalChapters.toLocaleString()}
-            color="text-blue-400"
-          />
-          <StatCard
-            icon={<Star className="w-5 h-5 fill-yellow-500" />}
-            label="Avg Rating"
-            value={stats.avgRating || "—"}
-            color="text-yellow-500"
-          />
+          {/* Hide these two on very small screens, show on sm+ */}
+          <div className="hidden sm:block">
+            <StatCard
+              icon={<TrendingUp className="w-5 h-5" />}
+              label="Chapters"
+              value={stats.totalChapters.toLocaleString()}
+              color="text-blue-400"
+            />
+          </div>
+          <div className="hidden sm:block">
+            <StatCard
+              icon={<Star className="w-5 h-5 fill-yellow-500" />}
+              label="Avg Rating"
+              value={stats.avgRating || "—"}
+              color="text-yellow-500"
+            />
+          </div>
         </div>
       )}
 
       {/* Continue Reading */}
       {reading.length > 0 && (
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <BookMarked className="w-6 h-6 text-green-500" />
+        <section className="mb-8 sm:mb-10">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <BookMarked className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
               Continue Reading
             </h2>
             <Link
@@ -138,14 +145,26 @@ export default function LoggedInHome({ userName }: { userName: string }) {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Mobile: Horizontal scroll / Desktop: Grid */}
+          {/* Desktop Grid */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {reading.map((entry) => (
+              <ReadingCard
+                key={entry.id}
+                entry={entry}
+                onChapterUpdate={handleChapterUpdate}
+              />
+            ))}
+          </div>
+
+          {/* Mobile: Stacked cards */}
+          <div className="md:hidden space-y-3">
             {reading.map((entry) => (
               <div
                 key={entry.id}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-4
-                           hover:border-gray-700 transition"
+                className="bg-gray-900 border border-gray-800 rounded-xl p-3"
               >
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   {/* Cover */}
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                     <img
@@ -154,7 +173,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                         "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
                       }
                       alt={entry.novel.title}
-                      className="w-16 h-22 object-cover rounded-lg"
+                      className="w-12 h-16 object-cover rounded-lg"
                     />
                   </Link>
 
@@ -162,18 +181,13 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/novel/${entry.novel.id}`}
-                      className="font-semibold truncate block hover:text-blue-400 transition"
+                      className="font-semibold text-sm truncate block hover:text-blue-400 transition"
                     >
                       {entry.novel.title}
                     </Link>
-                    {entry.novel.author && (
-                      <p className="text-sm text-gray-500 truncate">
-                        {entry.novel.author}
-                      </p>
-                    )}
 
                     {/* Chapter Progress */}
-                    <div className="mt-2">
+                    <div className="mt-1.5">
                       <QuickChapterUpdate
                         entryId={entry.id}
                         currentChapter={entry.currentChapter}
@@ -181,9 +195,9 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                         onUpdate={(ch) => handleChapterUpdate(entry.id, ch)}
                       />
                       {entry.novel.totalChapters && (
-                        <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+                        <div className="w-full bg-gray-700 rounded-full h-1 mt-1.5">
                           <div
-                            className="bg-blue-500 rounded-full h-1.5"
+                            className="bg-blue-500 rounded-full h-1"
                             style={{
                               width: `${Math.min(
                                 (entry.currentChapter / entry.novel.totalChapters) * 100,
@@ -202,13 +216,13 @@ export default function LoggedInHome({ userName }: { userName: string }) {
         </section>
       )}
 
-      {/* Empty state if not reading anything */}
+      {/* Empty state */}
       {reading.length === 0 && (
-        <section className="mb-10">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 text-center">
-            <BookMarked className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-            <h3 className="font-semibold mb-1">Nothing in progress</h3>
-            <p className="text-gray-500 text-sm mb-4">
+        <section className="mb-8 sm:mb-10">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 sm:p-8 text-center">
+            <BookMarked className="w-8 h-8 sm:w-10 sm:h-10 text-gray-600 mx-auto mb-3" />
+            <h3 className="font-semibold mb-1 text-sm sm:text-base">Nothing in progress</h3>
+            <p className="text-gray-500 text-xs sm:text-sm mb-4">
               Start reading a novel and it&apos;ll show up here.
             </p>
             <Link
@@ -221,12 +235,12 @@ export default function LoggedInHome({ userName }: { userName: string }) {
         </section>
       )}
 
-      {/* Recently Added to Site */}
+      {/* Recently Added */}
       {recentNovels.length > 0 && (
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-blue-500" />
+        <section className="mb-8 sm:mb-10">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
               Recently Added
             </h2>
             <Link
@@ -237,12 +251,12 @@ export default function LoggedInHome({ userName }: { userName: string }) {
             </Link>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-4">
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
             {recentNovels.map((novel) => (
               <Link
                 key={novel.id}
                 href={`/novel/${novel.id}`}
-                className="shrink-0 w-36 group"
+                className="shrink-0 w-28 sm:w-36 group"
               >
                 <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                   <img
@@ -254,7 +268,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>
-                <h3 className="font-medium text-sm truncate group-hover:text-blue-400 transition">
+                <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">
                   {novel.title}
                 </h3>
                 <p className="text-xs text-gray-500 truncate">{novel.author}</p>
@@ -263,6 +277,68 @@ export default function LoggedInHome({ userName }: { userName: string }) {
           </div>
         </section>
       )}
+    </div>
+  );
+}
+
+// Desktop reading card
+function ReadingCard({
+  entry,
+  onChapterUpdate,
+}: {
+  entry: ReadingEntry;
+  onChapterUpdate: (entryId: number, newChapter: number) => void;
+}) {
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition">
+      <div className="flex gap-4">
+        <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
+          <img
+            src={
+              entry.novel.coverImageUrl ||
+              "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
+            }
+            alt={entry.novel.title}
+            className="w-16 h-22 object-cover rounded-lg"
+          />
+        </Link>
+
+        <div className="flex-1 min-w-0">
+          <Link
+            href={`/novel/${entry.novel.id}`}
+            className="font-semibold truncate block hover:text-blue-400 transition"
+          >
+            {entry.novel.title}
+          </Link>
+          {entry.novel.author && (
+            <p className="text-sm text-gray-500 truncate">
+              {entry.novel.author}
+            </p>
+          )}
+
+          <div className="mt-2">
+            <QuickChapterUpdate
+              entryId={entry.id}
+              currentChapter={entry.currentChapter}
+              totalChapters={entry.novel.totalChapters}
+              onUpdate={(ch) => onChapterUpdate(entry.id, ch)}
+            />
+            {entry.novel.totalChapters && (
+              <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+                <div
+                  className="bg-blue-500 rounded-full h-1.5"
+                  style={{
+                    width: `${Math.min(
+                      (entry.currentChapter / entry.novel.totalChapters) * 100,
+                      100
+                    )}%`,
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -279,10 +355,10 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-      <div className={`flex justify-center mb-2 ${color}`}>{icon}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
+      <div className={`flex justify-center mb-1 sm:mb-2 ${color}`}>{icon}</div>
+      <div className="text-lg sm:text-2xl font-bold">{value}</div>
+      <div className="text-[10px] sm:text-xs text-gray-500">{label}</div>
     </div>
   );
 }

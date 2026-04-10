@@ -12,17 +12,12 @@ import LoggedInHome from "./LoggedInHome";
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  // If logged in, show the dashboard
   if (session) {
     return <LoggedInHome userName={session.user?.name || "Reader"} />;
   }
 
-  // ===== LOGGED OUT HOMEPAGE =====
-
-  // Fetch data for the public homepage
   const [trendingNovels, recentNovels, allNovels, userCount, entryCount] =
     await Promise.all([
-      // "Trending" = most tracked by users
       prisma.novel.findMany({
         include: {
           _count: { select: { userEntries: true } },
@@ -30,22 +25,17 @@ export default async function Home() {
         orderBy: { userEntries: { _count: "desc" } },
         take: 10,
       }),
-      // Recently added
       prisma.novel.findMany({
         orderBy: { createdAt: "desc" },
         take: 10,
       }),
-      // All novels for genre counts
       prisma.novel.findMany({
         select: { genres: true },
       }),
-      // User count
       prisma.user.count(),
-      // Total list entries
       prisma.userNovelList.count(),
     ]);
 
-  // Genre counts
   const genreCounts: Record<string, number> = {};
   allNovels.forEach((novel) => {
     novel.genres.forEach((genre) => {
@@ -61,44 +51,43 @@ export default async function Home() {
   return (
     <div className="-mt-8 -mx-4">
       {/* Hero Section */}
-      <section className="relative px-4 pt-16 pb-20 flex flex-col items-center text-center">
-        {/* Subtle gradient background */}
+      <section className="relative px-4 pt-12 sm:pt-16 pb-16 sm:pb-20 flex flex-col items-center text-center">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-600/5 via-transparent to-transparent pointer-events-none" />
 
-        <div className="relative z-10">
-          <div className="text-5xl mb-4">📚</div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+        <div className="relative z-10 w-full">
+          <div className="text-4xl sm:text-5xl mb-4">📚</div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
             WebNovelist
           </h1>
-          <p className="text-xl text-gray-400 mb-8 max-w-lg mx-auto">
+          <p className="text-lg sm:text-xl text-gray-400 mb-6 sm:mb-8 max-w-lg mx-auto px-4">
             Track your webnovel reading journey. Never lose your place again.
           </p>
 
           {/* Search Bar */}
-          <form action="/browse" className="w-full max-w-lg mx-auto mb-6">
+          <form action="/browse" className="w-full max-w-lg mx-auto mb-6 px-4">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 name="search"
                 placeholder="Search for a novel..."
-                className="w-full bg-gray-900/80 border border-gray-700 rounded-xl pl-12 pr-4 py-4
+                className="w-full bg-gray-900/80 border border-gray-700 rounded-xl pl-12 pr-4 py-3 sm:py-4
                            text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500
-                           backdrop-blur-sm text-lg"
+                           backdrop-blur-sm text-base sm:text-lg"
               />
             </div>
           </form>
 
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
             <Link
               href="/browse"
-              className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg font-semibold transition"
+              className="bg-gray-800 hover:bg-gray-700 px-6 py-3 rounded-lg font-semibold transition text-center"
             >
               Browse Novels
             </Link>
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition"
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition text-center"
             >
               Sign Up Free
             </Link>
@@ -108,11 +97,11 @@ export default async function Home() {
 
       {/* Trending Novels */}
       {trendingNovels.length > 0 && (
-        <section className="px-4 mb-12">
+        <section className="px-4 mb-10 sm:mb-12">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-blue-500" />
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
                 Trending
               </h2>
               <Link
@@ -123,12 +112,12 @@ export default async function Home() {
               </Link>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
               {trendingNovels.map((novel) => (
                 <Link
                   key={novel.id}
                   href={`/novel/${novel.id}`}
-                  className="shrink-0 w-36 group"
+                  className="shrink-0 w-28 sm:w-36 group"
                 >
                   <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                     <img
@@ -140,7 +129,7 @@ export default async function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>
-                  <h3 className="font-medium text-sm truncate group-hover:text-blue-400 transition">
+                  <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">
                     {novel.title}
                   </h3>
                   <div className="flex items-center gap-1 mt-0.5">
@@ -158,11 +147,11 @@ export default async function Home() {
 
       {/* Recently Added */}
       {recentNovels.length > 0 && (
-        <section className="px-4 mb-12">
+        <section className="px-4 mb-10 sm:mb-12">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <BookOpen className="w-6 h-6 text-green-500" />
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-green-500" />
                 Recently Added
               </h2>
               <Link
@@ -173,12 +162,12 @@ export default async function Home() {
               </Link>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
               {recentNovels.map((novel) => (
                 <Link
                   key={novel.id}
                   href={`/novel/${novel.id}`}
-                  className="shrink-0 w-36 group"
+                  className="shrink-0 w-28 sm:w-36 group"
                 >
                   <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                     <img
@@ -190,7 +179,7 @@ export default async function Home() {
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>
-                  <h3 className="font-medium text-sm truncate group-hover:text-blue-400 transition">
+                  <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">
                     {novel.title}
                   </h3>
                   <p className="text-xs text-gray-500 truncate">{novel.author}</p>
@@ -203,21 +192,21 @@ export default async function Home() {
 
       {/* Browse by Genre */}
       {topGenres.length > 0 && (
-        <section className="px-4 mb-12">
+        <section className="px-4 mb-10 sm:mb-12">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Browse by Genre</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Browse by Genre</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {topGenres.map(([genre, count]) => (
                 <Link
                   key={genre}
                   href={`/browse?genre=${genre}`}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4
+                  className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4
                              hover:border-blue-500/50 hover:bg-gray-900/80 transition group"
                 >
-                  <div className="font-semibold group-hover:text-blue-400 transition">
+                  <div className="font-semibold text-sm sm:text-base group-hover:text-blue-400 transition">
                     {genre}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-gray-500">
                     {count} novel{count !== 1 ? "s" : ""}
                   </div>
                 </Link>
@@ -228,27 +217,27 @@ export default async function Home() {
       )}
 
       {/* Site Stats */}
-      <section className="px-4 mb-12">
+      <section className="px-4 mb-10 sm:mb-12">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-8">
-            <div className="grid grid-cols-3 gap-8 text-center">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 sm:p-8">
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-blue-400">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-400">
                   {totalNovels}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Novels</div>
+                <div className="text-xs sm:text-sm text-gray-500 mt-1">Novels</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-400">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-400">
                   {userCount}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Users</div>
+                <div className="text-xs sm:text-sm text-gray-500 mt-1">Users</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-400">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-400">
                   {entryCount.toLocaleString()}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Novels Tracked</div>
+                <div className="text-xs sm:text-sm text-gray-500 mt-1">Tracked</div>
               </div>
             </div>
           </div>
@@ -257,15 +246,15 @@ export default async function Home() {
 
       {/* Bottom CTA */}
       <section className="px-4 mb-8">
-        <div className="max-w-7xl mx-auto text-center py-12">
-          <h2 className="text-3xl font-bold mb-3">Ready to start tracking?</h2>
-          <p className="text-gray-400 mb-6">
+        <div className="max-w-7xl mx-auto text-center py-8 sm:py-12">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to start tracking?</h2>
+          <p className="text-gray-400 mb-6 text-sm sm:text-base">
             Join the community and keep track of every chapter.
           </p>
           <Link
             href="/register"
-            className="inline-block bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-xl 
-                       font-semibold text-lg transition"
+            className="inline-block bg-blue-600 hover:bg-blue-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl 
+                       font-semibold text-base sm:text-lg transition"
           >
             Create Free Account
           </Link>
