@@ -1,17 +1,25 @@
 // lib/email.ts
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM_EMAIL = process.env.EMAIL_FROM || "onboarding@resend.dev";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const APP_NAME = "NovelTracker";
+
+// Lazy init — only creates the client when actually called
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not set. Email sending is disabled.");
+  }
+  return new Resend(apiKey);
+}
 
 export async function sendVerificationEmail(
   email: string,
   token: string,
   username: string
 ) {
+  const resend = getResend();
   const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
 
   await resend.emails.send({
@@ -47,6 +55,7 @@ export async function sendPasswordResetEmail(
   token: string,
   username: string
 ) {
+  const resend = getResend();
   const resetUrl = `${APP_URL}/reset-password?token=${token}`;
 
   await resend.emails.send({
