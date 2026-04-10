@@ -11,6 +11,8 @@ import type { Metadata } from "next";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

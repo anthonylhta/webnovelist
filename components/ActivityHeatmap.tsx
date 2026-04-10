@@ -1,7 +1,7 @@
 // components/ActivityHeatmap.tsx
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 
 interface Activity {
   createdAt: string | Date;
@@ -12,8 +12,10 @@ interface ActivityHeatmapProps {
 }
 
 export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleWeeks, setVisibleWeeks] = useState(52);
+
   const { weeks, totalActivities, maxCount } = useMemo(() => {
-    // Build a map of date → count for the last 52 weeks
     const counts: Record<string, number> = {};
     let total = 0;
 
@@ -23,14 +25,11 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
       total++;
     });
 
-    // Generate all days for the last 52 weeks
     const today = new Date();
     const days: { date: string; count: number; dayOfWeek: number }[] = [];
 
-    // Start from the beginning of the week 52 weeks ago
     const start = new Date(today);
-    start.setDate(start.getDate() - 363); // ~52 weeks
-    // Align to start of week (Sunday)
+    start.setDate(start.getDate() - 363);
     start.setDate(start.getDate() - start.getDay());
 
     const current = new Date(start);
@@ -44,7 +43,6 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
       current.setDate(current.getDate() + 1);
     }
 
-    // Group into weeks
     const weekGroups: typeof days[] = [];
     for (let i = 0; i < days.length; i += 7) {
       weekGroups.push(days.slice(i, i + 7));
@@ -55,6 +53,23 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
     return { weeks: weekGroups, totalActivities: total, maxCount: max };
   }, [activities]);
 
+  useEffect(() => {
+    const calculate = () => {
+      if (containerRef.current) {
+        const width = containerRef.current.offsetWidth;
+        const colWidth = 13; // 11px box + 2px gap
+        const maxCols = Math.floor(width / colWidth);
+        setVisibleWeeks(Math.min(maxCols, weeks.length));
+      }
+    };
+
+    calculate();
+    window.addEventListener("resize", calculate);
+    return () => window.removeEventListener("resize", calculate);
+  }, [weeks.length]);
+
+  const displayWeeks = weeks.slice(-visibleWeeks);
+
   const getColor = (count: number) => {
     if (count === 0) return "bg-gray-800/50";
     const intensity = count / maxCount;
@@ -64,80 +79,24 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
     return "bg-green-400";
   };
 
-  const getMonthLabels = () => {
-    const labels: { text: string; index: number }[] = [];
-    let lastMonth = -1;
-
-    weeks.forEach((week, weekIndex) => {
-      if (week.length === 0) return;
-      const firstDay = new Date(week[0].date);
-      const month = firstDay.getMonth();
-      if (month !== lastMonth) {
-        labels.push({
-          text: firstDay.toLocaleString("en-US", { month: "short" }),
-          index: weekIndex,
-        });
-        lastMonth = month;
-      }
-    });
-
-    return labels;
-  };
-
-  const monthLabels = getMonthLabels();
-
   return (
     <div>
-      {/* Month labels */}
-      <div className="flex mb-1 ml-8">
-        {monthLabels.map((label, i) => (
-          <div
-            key={i}
-            className="text-xs text-gray-500"
-            style={{
-              position: "relative",
-              left: `${label.index * 13}px`,
-              marginRight: i < monthLabels.length - 1
-                ? `${((monthLabels[i + 1]?.index || 0) - label.index) * 13 - 30}px`
-                : "0px",
-            }}
-          >
-            {label.text}
+      <div ref={containerRef} className="flex gap-0.5 justify-end">
+        {displayWeeks.map((week, weekIndex) => (
+          <div key={weekIndex} className="flex flex-col gap-0.5">
+            {week.map((day) => (
+              <div
+                key={day.date}
+                className={`w-[11px] h-[11px] rounded-sm ${getColor(day.count)} transition-colors`}
+                title={`${day.date}: ${day.count} update${day.count !== 1 ? "s" : ""}`}
+              />
+            ))}
+            {week.length < 7 &&
+              Array.from({ length: 7 - week.length }).map((_, i) => (
+                <div key={`pad-${i}`} className="w-[11px] h-[11px]" />
+              ))}
           </div>
         ))}
-      </div>
-
-      <div className="flex gap-0.5">
-        {/* Day labels */}
-        <div className="flex flex-col gap-0.5 mr-1 shrink-0">
-          <div className="h-[11px]" /> {/* Empty for alignment */}
-          <div className="h-[11px] text-[10px] text-gray-500 leading-[11px]">Mon</div>
-          <div className="h-[11px]" />
-          <div className="h-[11px] text-[10px] text-gray-500 leading-[11px]">Wed</div>
-          <div className="h-[11px]" />
-          <div className="h-[11px] text-[10px] text-gray-500 leading-[11px]">Fri</div>
-          <div className="h-[11px]" />
-        </div>
-
-        {/* Heatmap grid */}
-        <div className="flex gap-0.5 overflow-x-auto scrollbar-hide">
-          {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="flex flex-col gap-0.5">
-              {week.map((day) => (
-                <div
-                  key={day.date}
-                  className={`w-[11px] h-[11px] rounded-sm ${getColor(day.count)} transition-colors`}
-                  title={`${day.date}: ${day.count} update${day.count !== 1 ? "s" : ""}`}
-                />
-              ))}
-              {/* Pad incomplete weeks */}
-              {week.length < 7 &&
-                Array.from({ length: 7 - week.length }).map((_, i) => (
-                  <div key={`pad-${i}`} className="w-[11px] h-[11px]" />
-                ))}
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Legend */}
