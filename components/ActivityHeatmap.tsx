@@ -4,7 +4,7 @@
 import { useMemo } from "react";
 
 interface Activity {
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface ActivityHeatmapProps {
