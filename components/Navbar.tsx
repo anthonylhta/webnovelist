@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   BookOpen, LogOut, User, Menu, X, Plus,
-  BarChart3, Shield, Crown, ShieldCheck,
+  BarChart3, Shield, Crown, ShieldCheck, UserCircle,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -16,6 +16,7 @@ export default function Navbar() {
   const closeMenu = () => setMobileMenuOpen(false);
 
   const userRole = (session?.user as any)?.role;
+  const userName = session?.user?.name;
   const canManageNovels = userRole === "admin" || userRole === "moderator";
   const isAdmin = userRole === "admin";
 
@@ -75,10 +76,13 @@ export default function Navbar() {
               )}
 
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm">
+                <Link
+                  href={`/user/${userName}`}
+                  className="flex items-center gap-2 text-sm hover:text-blue-400 transition"
+                >
                   {getRoleIcon()}
-                  <span>{session.user?.name}</span>
-                </div>
+                  <span>{userName}</span>
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className="text-gray-400 hover:text-red-400 transition"
@@ -129,6 +133,14 @@ export default function Navbar() {
                   <BarChart3 className="w-4 h-4 inline mr-2" />
                   Stats
                 </Link>
+                <Link
+                  href={`/user/${userName}`}
+                  onClick={closeMenu}
+                  className="block py-2 hover:text-blue-400 transition"
+                >
+                  <UserCircle className="w-4 h-4 inline mr-2" />
+                  My Profile
+                </Link>
 
                 {canManageNovels && (
                   <Link href="/add-novel" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
@@ -147,7 +159,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between pt-3 border-t border-gray-800">
                   <div className="flex items-center gap-2 text-sm">
                     {getRoleIcon()}
-                    <span>{session.user?.name}</span>
+                    <span>{userName}</span>
                   </div>
                   <button
                     onClick={() => { signOut(); closeMenu(); }}
