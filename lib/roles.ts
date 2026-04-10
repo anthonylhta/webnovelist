@@ -18,6 +18,16 @@ export function canManageUsers(role: string | undefined): boolean {
   return role === ROLES.ADMIN;
 }
 
+// Check if a user with `actorRole` can delete a user with `targetRole`
+export function canDeleteUser(
+  actorRole: string | undefined,
+  targetRole: string
+): boolean {
+  if (actorRole === "admin") return true;
+  if (actorRole === "moderator" && targetRole !== "admin") return true;
+  return false;
+}
+
 // Get a display-friendly role name
 export function getRoleLabel(role: string): string {
   switch (role) {

@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 
-// Rate limiter for login attempts: 5 per minute per email
 const loginLimiter = new RateLimiterMemory({
   points: 5,
   duration: 60,
@@ -24,7 +23,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Please enter email and password");
         }
 
-        // Rate limit by email
         try {
           await loginLimiter.consume(credentials.email.toLowerCase());
         } catch {
@@ -46,6 +44,10 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
+        }
+
+        if (!user.emailVerified) {
+          throw new Error("UNVERIFIED_EMAIL");
         }
 
         return {

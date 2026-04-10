@@ -12,8 +12,9 @@ export async function GET() {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    if (session.user.role !== "admin") {
-      return NextResponse.json({ error: "Admin only" }, { status: 403 });
+    const role = (session.user as any).role;
+    if (role !== "admin" && role !== "moderator") {
+      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
     const users = await prisma.user.findMany({

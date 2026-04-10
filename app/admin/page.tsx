@@ -4,7 +4,9 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Shield, ShieldX, Users, BookOpen, Crown, ShieldCheck, User } from "lucide-react";
+import {
+  Shield, Users, BookOpen, Crown, ShieldCheck, User, Trash2,
+} from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 
 interface UserData {
@@ -28,6 +30,11 @@ export default function AdminPage() {
     newRole: string;
   } | null>(null);
   const [roleLoading, setRoleLoading] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<UserData | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const currentRole = (session?.user as any)?.role;
+  const currentUserId = (session?.user as any)?.id;
 
   useEffect(() => {
     if (authStatus === "unauthenticated") {
@@ -37,7 +44,7 @@ export default function AdminPage() {
 
     if (authStatus === "authenticated") {
       const role = (session?.user as any)?.role;
-      if (role !== "admin") {
+      if (role !== "admin" && role !== "moderator") {
         router.push("/");
         return;
       }
@@ -85,6 +92,38 @@ export default function AdminPage() {
       setRoleLoading(false);
       setChangingRole(null);
     }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return;
+
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users/${deletingUser.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setUsers(users.filter((u) => u.id !== deletingUser.id));
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      alert("Something went wrong");
+    } finally {
+      setDeleteLoading(false);
+      setDeletingUser(null);
+    }
+  };
+
+  // Permission: can this actor delete this target?
+  const canDelete = (targetUser: UserData): boolean => {
+    if (targetUser.id === currentUserId) return false;
+    if (currentRole === "admin") return true;
+    if (currentRole === "moderator" && targetUser.role !== "admin") return true;
+    return false;
   };
 
   const getRoleIcon = (role: string) => {
@@ -163,7 +202,7 @@ export default function AdminPage() {
               <th className="text-left p-4">Role</th>
               <th className="text-left p-4 hidden md:table-cell">Novels</th>
               <th className="text-left p-4 hidden lg:table-cell">Joined</th>
-              <th className="text-right p-4">Change Role</th>
+              <th className="text-right p-4">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -193,21 +232,37 @@ export default function AdminPage() {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-4 text-right">
-                  {user.id === (session?.user as any)?.id ? (
+                  {user.id === currentUserId ? (
                     <span className="text-gray-600 text-sm">You</span>
                   ) : (
-                    <select
-                      value={user.role}
-                      onChange={(e) =>
-                        setChangingRole({ user, newRole: e.target.value })
-                      }
-                      className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 
-                                 text-sm text-gray-100 focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="user">User</option>
-                      <option value="moderator">Moderator</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    <div className="flex items-center justify-end gap-2">
+                      {/* Role Change — Admin Only */}
+                      {currentRole === "admin" && (
+                        <select
+                          value={user.role}
+                          onChange={(e) =>
+                            setChangingRole({ user, newRole: e.target.value })
+                          }
+                          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 
+                                     text-sm text-gray-100 focus:outline-none focus:border-blue-500"
+                        >
+                          <option value="user">User</option>
+                          <option value="moderator">Moderator</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      )}
+
+                      {/* Delete Button */}
+                      {canDelete(user) && (
+                        <button
+                          onClick={() => setDeletingUser(user)}
+                          className="p-2 text-gray-400 hover:text-red-400 transition"
+                          title={`Delete ${user.username}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   )}
                 </td>
               </tr>
@@ -227,6 +282,20 @@ export default function AdminPage() {
           loading={roleLoading}
           onConfirm={handleRoleChange}
           onCancel={() => setChangingRole(null)}
+        />
+      )}
+
+      {/* Confirm Delete User Modal */}
+      {deletingUser && (
+        <ConfirmModal
+          title="Delete User"
+          message={`Are you sure you want to delete "${deletingUser.username}"? This will permanently remove their account and all their list data. This action cannot be undone.`}
+          confirmText="Delete User"
+          cancelText="Cancel"
+          danger={true}
+          loading={deleteLoading}
+          onConfirm={handleDeleteUser}
+          onCancel={() => setDeletingUser(null)}
         />
       )}
     </div>

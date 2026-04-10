@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
@@ -30,7 +29,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Register
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,20 +47,9 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto-login after registration
-      const loginResult = await signIn("credentials", {
-        email: form.email,
-        password: form.password,
-        redirect: false,
-      });
-
-      if (loginResult?.error) {
-        setError("Account created but login failed. Please login manually.");
-        router.push("/login");
-      } else {
-        router.push("/browse");
-        router.refresh();
-      }
+      // Redirect to verify email page instead of auto-login
+      router.push("/login?registered=true");
+      // router.push("/verify-email");
     } catch {
       setError("Something went wrong");
     } finally {
@@ -94,6 +81,8 @@ export default function RegisterPage() {
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
                          text-gray-100 focus:outline-none focus:border-blue-500"
               required
+              minLength={3}
+              maxLength={30}
             />
           </div>
 
@@ -116,7 +105,7 @@ export default function RegisterPage() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                        text-gray-100 focus:outline-none focus:border-blue-500"
+                         text-gray-100 focus:outline-none focus:border-blue-500"
               required
               minLength={8}
             />
@@ -157,3 +146,6 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+// When you get a paid Resend plan later, just flip email Verified back to false, 
+// uncomment the two lines, and change requires Verification back to true. 🔄

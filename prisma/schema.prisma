@@ -16,15 +16,17 @@ datasource db {
 
 // ============== USERS ==============
 model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  email        String    @unique
-  passwordHash String    @map("password_hash")
-  avatarUrl    String?   @map("avatar_url")
-  role         String    @default("user") // "admin", "moderator", "user"
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  avatarUrl     String?   @map("avatar_url")
+  role          String    @default("user")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
-  novelList    UserNovelList[]
+  novelList     UserNovelList[]
+  tokens        Token[]
 
   @@map("users")
 }
@@ -72,4 +74,18 @@ model UserNovelList {
 
   @@unique([userId, novelId])
   @@map("user_novel_list")
+}
+
+model Token {
+  id        String   @id @default(cuid())
+  type      String   // "email_verification" or "password_reset"
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tokens")
 }

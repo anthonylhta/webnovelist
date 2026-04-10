@@ -56,3 +56,71 @@ export async function PUT(
     );
   }
 }
+
+// DELETE — admins can delete anyone, mods can delete mods + users
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+    }
+
+    const currentRole = (session.user as any).role;
+    const currentUserId = (session.user as any).id;
+
+    // Only admins and moderators can delete users
+    if (currentRole !== "admin" && currentRole !== "moderator") {
+      return NextResponse.json(
+        { error: "You don't have permission to delete users" },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Can't delete yourself
+    if (id === currentUserId) {
+      return NextResponse.json(
+        { error: "You cannot delete your own account" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch the target user
+    const targetUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, username: true, role: true },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Permission checks based on role hierarchy
+    if (currentRole === "moderator" && targetUser.role === "admin") {
+      return NextResponse.json(
+        { error: "Moderators cannot delete admins" },
+        { status: 403 }
+      );
+    }
+
+    // Delete the user (cascades will handle novelList and tokens)
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({
+      message: `User "${targetUser.username}" has been deleted`,
+    });
+  } catch (error) {
+    console.error("Failed to delete user:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
+  }
+}
