@@ -1,59 +1,76 @@
-# 📚 WebNovelist
+# WebNovelist 📚
 
-A web application for tracking your Chinese webnovel reading journey. Rate, organize, and never lose your place again.
+AniList-style webnovel tracker. Track your reading, rate novels, manage your list.
 
-## ✨ Features
+**Tech:** Next.js 14 (App Router), Prisma, PostgreSQL, NextAuth, Cloudinary, Tailwind CSS
 
-### For Users
-- Browse a growing database of Chinese webnovels
-- Search & filter by title, author, or genre
-- Personal list with status tracking (Reading, Completed, On Hold, Dropped, Plan to Read)
-- Rate novels out of 10
-- Chapter progress tracking with visual progress bars
-- Date tracking for when you started and finished reading
-- Reading links to quickly jump to where you're reading
-- Re-read counter
-- Statistics dashboard with rating distribution, genre breakdown, and highlights
-- Personal notes on each novel
+---
 
-### For Admins & Moderators
-- Add novels to the database
-- Edit novel information and cover images
-- Delete novels (admin only)
-- Image upload via Cloudinary
-- Admin panel to manage users and assign roles
-- Role-based access control (Admin, Moderator, User)
+## Quick Start
 
-## Tech Stack
+```bash
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+```
 
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- PostgreSQL (Supabase)
-- Prisma ORM
-- NextAuth.js
-- Cloudinary
-- Vercel
+---
 
-## Getting Started
+## Scripts
 
-1. Clone the repo
-2. Run `npm install`
-3. Copy `.env.example` to `.env` and fill in your credentials
-4. Run `npx prisma migrate dev`
-5. Run `npx prisma db seed`
-6. Run `npm run dev`
-7. Open http://localhost:3000
+| Command | What it does |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run dev:clean` | Clean cache + start dev server |
+| `npm run build` | Production build |
+| `npx prisma migrate dev --name name` | Create migration on dev |
+| `npm run prod:migrate` | Apply migrations to prod |
+| `npx prisma studio` | Database GUI (dev) |
+| `./scripts/prod.sh "any command"` | Run any command with prod env vars |
+| `./commit.sh "message"` | Git add + commit + push |
+| `npx repomix` | Export codebase for LLM chats |
 
-## User Roles
+---
 
-| Role | Browse | Personal List | Add Novels | Edit Novels | Delete Novels | Admin Panel |
-|---|---|---|---|---|---|---|
-| User | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Moderator | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+## Workflow
 
-## Contact
+```bash
+# Start dev
+./dev.sh
 
-- Discord: https://discord.com/users/362585609610461185
-- GitHub: https://github.com/kayniss
+# If schema changed
+npx prisma migrate dev --name what-changed
+npm run prod:migrate
+
+# Commit
+./commit.sh "feat(scope): description"
+```
+
+---
+
+## Environment Variables
+
+```env
+DATABASE_URL=
+DIRECT_URL=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
+NEXT_PUBLIC_APP_URL=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+# RESEND_API_KEY=        # Disabled for now
+# EMAIL_FROM=            # Enable with paid Resend plan
+```
+
+---
+
+## Roles
+
+| Role | Permissions |
+|------|------------|
+| **Admin** | Everything — novels, users, no cooldowns |
+| **Moderator** | Add/edit novels, delete mods + users |
+| **User** | Browse, manage own list, stats |
+
