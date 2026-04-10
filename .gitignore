@@ -45,3 +45,6 @@ next-env.d.ts
 prisma/make-admin.ts
 .env.prod
 scripts/novels-backup.json
+
+repomix-output.xml
+.repomixignore

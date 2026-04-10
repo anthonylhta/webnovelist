@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -28,6 +26,7 @@ model User {
 
   novelList         UserNovelList[]
   tokens            Token[]
+  activities        Activity[]
 
   @@map("users")
 }
@@ -75,6 +74,20 @@ model UserNovelList {
 
   @@unique([userId, novelId])
   @@map("user_novel_list")
+}
+
+// ============== ACTIVITY LOG ==============
+model Activity {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  type      String   // "add", "status_change", "chapter_update", "rating", "remove"
+  novelId   Int?     @map("novel_id")
+  detail    String?  // e.g., "Chapter 45 → 46", "Rated 8.5"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
 }
 
 model Token {

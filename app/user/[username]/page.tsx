@@ -3,45 +3,32 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  BookOpen, Star, TrendingUp, CheckCircle, Clock,
-  XCircle, Pause, BookMarked, Calendar, Crown,
-  ShieldCheck, User, Share2, ExternalLink,
+  BookOpen, Star, TrendingUp, CheckCircle,
+  Calendar, Crown, ShieldCheck, User, Heart,
+  Users, BookMarked,
 } from "lucide-react";
 import type { Metadata } from "next";
 import CopyLinkButton from "@/components/CopyLinkButton";
+import ActivityHeatmap from "@/components/ActivityHeatmap";
 
-
-
-// Dynamic metadata for SEO / link previews
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-
   const user = await prisma.user.findUnique({
     where: { username },
     select: { username: true },
   });
 
-  if (!user) {
-    return { title: "User Not Found — WebNovelist" };
-  }
+  if (!user) return { title: "User Not Found — WebNovelist" };
 
   return {
     title: `${user.username}'s Profile — WebNovelist`,
     description: `Check out ${user.username}'s webnovel reading list on WebNovelist.`,
   };
 }
-
-const STATUS_CONFIG = [
-  { key: "reading", label: "Reading", icon: BookMarked, color: "text-green-500", bg: "bg-green-500/10 border-green-500/30" },
-  { key: "completed", label: "Completed", icon: CheckCircle, color: "text-emerald-500", bg: "bg-emerald-500/10 border-emerald-500/30" },
-  { key: "on_hold", label: "On Hold", icon: Pause, color: "text-yellow-500", bg: "bg-yellow-500/10 border-yellow-500/30" },
-  { key: "dropped", label: "Dropped", icon: XCircle, color: "text-red-500", bg: "bg-red-500/10 border-red-500/30" },
-  { key: "plan_to_read", label: "Plan to Read", icon: Clock, color: "text-gray-400", bg: "bg-gray-500/10 border-gray-500/30" },
-];
 
 export default async function PublicProfilePage({
   params,
@@ -58,309 +45,344 @@ export default async function PublicProfilePage({
       role: true,
       avatarUrl: true,
       createdAt: true,
-      novelList: {
-        include: {
-          novel: true,
-        },
-        orderBy: { updatedAt: "desc" },
-      },
     },
   });
 
-  if (!user) {
-    notFound();
-  }
+  if (!user) notFound();
 
-  const list = user.novelList;
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  const [list, activities] = await Promise.all([
+    prisma.userNovelList.findMany({
+      where: { userId: user.id },
+      include: { novel: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.activity.findMany({
+      where: {
+        userId: user.id,
+        createdAt: { gte: oneYearAgo },
+      },
+      select: { createdAt: true, type: true, detail: true, novelId: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
   // Stats
   const totalNovels = list.length;
-  const readingCount = list.filter((e) => e.status === "reading").length;
-  const completedCount = list.filter((e) => e.status === "completed").length;
-  const onHoldCount = list.filter((e) => e.status === "on_hold").length;
-  const droppedCount = list.filter((e) => e.status === "dropped").length;
-  const planToReadCount = list.filter((e) => e.status === "plan_to_read").length;
-
+  const totalChaptersRead = list.reduce((sum, e) => sum + e.currentChapter, 0);
   const ratedNovels = list.filter((e) => e.rating !== null);
-  const averageRating =
+  const meanScore =
     ratedNovels.length > 0
       ? (ratedNovels.reduce((sum, e) => sum + (e.rating || 0), 0) / ratedNovels.length).toFixed(1)
       : "—";
 
-  const totalChaptersRead = list.reduce((sum, e) => sum + e.currentChapter, 0);
+  // Genre breakdown
+  const genreCounts: Record<string, number> = {};
+  list.forEach((entry) => {
+    entry.novel.genres.forEach((genre) => {
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+    });
+  });
+  const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+  const maxGenreCount = sortedGenres.length > 0 ? sortedGenres[0][1] : 0;
+
+  // Recent activities
+  const recentActivities = activities.slice(0, 25);
 
   const getRoleIcon = () => {
     switch (user.role) {
-      case "admin":
-        return <Crown className="w-5 h-5 text-red-400" />;
-      case "moderator":
-        return <ShieldCheck className="w-5 h-5 text-blue-400" />;
-      default:
-        return <User className="w-5 h-5 text-gray-400" />;
+      case "admin": return <Crown className="w-4 h-4 text-red-400" />;
+      case "moderator": return <ShieldCheck className="w-4 h-4 text-blue-400" />;
+      default: return null;
     }
   };
 
   const getRoleBadge = () => {
     switch (user.role) {
-      case "admin":
-        return "bg-red-500/20 text-red-400 border border-red-500/50";
-      case "moderator":
-        return "bg-blue-500/20 text-blue-400 border border-blue-500/50";
-      default:
-        return "bg-gray-500/20 text-gray-400 border border-gray-500/50";
+      case "admin": return "bg-red-500/20 text-red-400 border border-red-500/50";
+      case "moderator": return "bg-blue-500/20 text-blue-400 border border-blue-500/50";
+      default: return "";
     }
   };
 
-  // Group list by status
-  const listByStatus = STATUS_CONFIG.map((status) => ({
-    ...status,
-    entries: list.filter((e) => e.status === status.key),
-  })).filter((group) => group.entries.length > 0);
-
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Profile Header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-          {/* Avatar */}
-          <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center text-3xl shrink-0">
-            {user.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.username}
-                className="w-full h-full rounded-full object-cover"
-              />
-            ) : (
-              user.username[0].toUpperCase()
-            )}
-          </div>
+    <div className="max-w-6xl mx-auto -mt-8 -mx-4 sm:mx-auto">
+      {/* ===== BANNER + PROFILE HEADER ===== */}
+      <div className="relative mb-16 sm:mb-20">
+        {/* Banner Gradient */}
+        <div className="h-32 sm:h-44 bg-gradient-to-r from-blue-600/40 via-purple-600/30 to-blue-800/40 rounded-b-2xl sm:rounded-b-3xl" />
 
-          {/* User Info */}
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{user.username}</h1>
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${getRoleBadge()}`}
-              >
-                {getRoleIcon()}
-                {user.role}
-              </span>
+        {/* Profile Info — overlaps banner */}
+        <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-5">
+            {/* Avatar */}
+            <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0">
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.username}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                user.username[0].toUpperCase()
+              )}
             </div>
-            <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-500 text-sm">
-              <Calendar className="w-4 h-4" />
-              Joined {new Date(user.createdAt).toLocaleDateString("en-US", {
-                month: "long",
-                year: "numeric",
-              })}
-            </div>
-          </div>
 
-          {/* Share Button */}
-          <CopyLinkButton username={user.username} />
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          icon={<BookOpen className="w-5 h-5" />}
-          label="Total Novels"
-          value={totalNovels.toString()}
-          color="text-blue-500"
-        />
-        <StatCard
-          icon={<Star className="w-5 h-5 fill-yellow-500" />}
-          label="Avg Rating"
-          value={averageRating}
-          color="text-yellow-500"
-        />
-        <StatCard
-          icon={<TrendingUp className="w-5 h-5" />}
-          label="Chapters Read"
-          value={totalChaptersRead.toLocaleString()}
-          color="text-blue-500"
-        />
-        <StatCard
-          icon={<CheckCircle className="w-5 h-5" />}
-          label="Completed"
-          value={completedCount.toString()}
-          color="text-emerald-500"
-        />
-      </div>
-
-      {/* Status Breakdown Bar */}
-      {totalNovels > 0 && (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-8">
-          <div className="flex items-center gap-4 mb-3 text-sm flex-wrap">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-green-500" />
-              Reading {readingCount}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              Completed {completedCount}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-yellow-500" />
-              On Hold {onHoldCount}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500" />
-              Dropped {droppedCount}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-gray-500" />
-              Plan to Read {planToReadCount}
-            </span>
-          </div>
-          <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-800">
-            {readingCount > 0 && (
-              <div
-                className="bg-green-500 h-full"
-                style={{ width: `${(readingCount / totalNovels) * 100}%` }}
-              />
-            )}
-            {completedCount > 0 && (
-              <div
-                className="bg-emerald-500 h-full"
-                style={{ width: `${(completedCount / totalNovels) * 100}%` }}
-              />
-            )}
-            {onHoldCount > 0 && (
-              <div
-                className="bg-yellow-500 h-full"
-                style={{ width: `${(onHoldCount / totalNovels) * 100}%` }}
-              />
-            )}
-            {droppedCount > 0 && (
-              <div
-                className="bg-red-500 h-full"
-                style={{ width: `${(droppedCount / totalNovels) * 100}%` }}
-              />
-            )}
-            {planToReadCount > 0 && (
-              <div
-                className="bg-gray-500 h-full"
-                style={{ width: `${(planToReadCount / totalNovels) * 100}%` }}
-              />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Novel Lists by Status */}
-      {totalNovels === 0 ? (
-        <div className="text-center py-16">
-          <BookOpen className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">
-            {user.username} hasn&apos;t added any novels yet.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {listByStatus.map((group) => {
-            const StatusIcon = group.icon;
-            return (
-              <div key={group.key}>
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <StatusIcon className={`w-5 h-5 ${group.color}`} />
-                  {group.label}
-                  <span className="text-gray-500 text-sm font-normal">
-                    ({group.entries.length})
+            {/* Name + Meta */}
+            <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h1 className="text-2xl sm:text-3xl font-bold">{user.username}</h1>
+                {user.role !== "user" && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${getRoleBadge()}`}>
+                    {getRoleIcon()}
+                    {user.role}
                   </span>
-                </h2>
-
-                <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-800 text-gray-400 text-sm">
-                        <th className="text-left p-4">Novel</th>
-                        <th className="text-left p-4 hidden md:table-cell">Progress</th>
-                        <th className="text-left p-4">Rating</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.entries.map((entry) => (
-                        <tr
-                          key={entry.id}
-                          className="border-b border-gray-800/50 hover:bg-gray-800/30 transition"
-                        >
-                          <td className="p-4">
-                            <Link
-                              href={`/novel/${entry.novel.id}`}
-                              className="hover:text-blue-400 transition"
-                            >
-                              <div className="font-medium">{entry.novel.title}</div>
-                              {entry.novel.titleChinese && (
-                                <div className="text-gray-500 text-sm">
-                                  {entry.novel.titleChinese}
-                                </div>
-                              )}
-                            </Link>
-                          </td>
-                          <td className="p-4 hidden md:table-cell">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">
-                                {entry.currentChapter}
-                                {entry.novel.totalChapters
-                                  ? ` / ${entry.novel.totalChapters}`
-                                  : ""}
-                              </span>
-                              {entry.novel.totalChapters && (
-                                <div className="w-20 bg-gray-700 rounded-full h-1.5">
-                                  <div
-                                    className="bg-blue-500 rounded-full h-1.5"
-                                    style={{
-                                      width: `${Math.min(
-                                        (entry.currentChapter / entry.novel.totalChapters) * 100,
-                                        100
-                                      )}%`,
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            {entry.rating ? (
-                              <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span>{entry.rating}</span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-600">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                )}
               </div>
-            );
-          })}
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-500 text-xs sm:text-sm mt-1">
+                <Calendar className="w-3 h-3" />
+                Joined {new Date(user.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              </div>
+            </div>
+
+            {/* Share Button */}
+            <div className="hidden sm:block pb-2">
+              <CopyLinkButton username={user.username} />
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Mobile Share Button */}
+      <div className="sm:hidden flex justify-center mb-6 px-4">
+        <CopyLinkButton username={user.username} />
+      </div>
+
+  {/* ===== TWO COLUMN LAYOUT ===== */}
+      <div className="px-4 sm:px-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+
+          {/* ===== LEFT COLUMN ===== */}
+          <div className="lg:w-[55%] space-y-6">
+
+            {/* Heatmap */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 overflow-x-auto scrollbar-hide">
+              <ActivityHeatmap activities={activities} />
+            </div>
+
+            {/* Genre Overview */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-4">Genre Overview</h2>
+              {sortedGenres.length === 0 ? (
+                <p className="text-gray-500 text-sm">No genre data yet.</p>
+              ) : (
+                <div className="space-y-2.5">
+                  {sortedGenres.slice(0, 10).map(([genre, count]) => (
+                    <div key={genre} className="flex items-center gap-3">
+                      <span className="w-20 sm:w-24 text-xs sm:text-sm text-gray-400 truncate shrink-0">
+                        {genre}
+                      </span>
+                      <div className="flex-1 bg-gray-800 rounded-full h-3 overflow-hidden">
+                        <div
+                          className="bg-blue-500/70 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${(count / maxGenreCount) * 100}%` }}
+                        />
+                      </div>
+                      <span className="w-6 text-xs sm:text-sm text-gray-500 text-right shrink-0">
+                        {count}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Favorite Novels — Placeholder */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+                Favorite Novels
+              </h2>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className="shrink-0 w-20 sm:w-24 aspect-[3/4] bg-gray-800 rounded-lg border border-gray-700 border-dashed
+                               flex items-center justify-center"
+                  >
+                    <span className="text-gray-600 text-xs">Soon</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Favorite Characters — Placeholder */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+                Favorite Characters
+              </h2>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700 border-dashed
+                               flex items-center justify-center"
+                  >
+                    <span className="text-gray-600 text-[10px]">Soon</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Favorite Authors — Placeholder */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+                <BookMarked className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+                Favorite Authors
+              </h2>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="shrink-0 bg-gray-800 rounded-lg border border-gray-700 border-dashed
+                               px-6 py-4 flex items-center justify-center"
+                  >
+                    <span className="text-gray-600 text-xs">Coming soon</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ===== RIGHT COLUMN ===== */}
+          <div className="lg:w-[45%] space-y-6">
+
+            {/* Mini Stats — Horizontal Row */}
+            <div className="grid grid-cols-3 gap-3">
+              <MiniStat
+                icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />}
+                label="Total Novels"
+                value={totalNovels.toString()}
+              />
+              <MiniStat
+                icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />}
+                label="Chapters Read"
+                value={totalChaptersRead.toLocaleString()}
+              />
+              <MiniStat
+                icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500" />}
+                label="Mean Score"
+                value={meanScore}
+              />
+            </div>
+
+            {/* Activity Feed */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5 lg:sticky lg:top-24">
+              <h2 className="text-base sm:text-lg font-semibold mb-4">Activity</h2>
+
+              {recentActivities.length === 0 ? (
+                <div className="text-center py-8">
+                  <BookOpen className="w-8 h-8 text-gray-700 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm">No activity yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-1 max-h-[600px] overflow-y-auto scrollbar-hide">
+                  {recentActivities.map((activity, i) => {
+                    const prevActivity = recentActivities[i - 1];
+                    const currentDate = new Date(activity.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                    const prevDate = prevActivity
+                      ? new Date(prevActivity.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : null;
+                    const showDateHeader = currentDate !== prevDate;
+
+                    return (
+                      <div key={i}>
+                        {showDateHeader && (
+                          <div className="text-xs text-gray-500 font-medium pt-3 pb-1 first:pt-0">
+                            {currentDate}
+                          </div>
+                        )}
+
+                        <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-gray-800/50 transition">
+                          <div className="mt-0.5 shrink-0">
+                            {activity.type === "chapter_update" && (
+                              <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                              </div>
+                            )}
+                            {activity.type === "status_change" && (
+                              <div className="w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
+                                <BookMarked className="w-3.5 h-3.5 text-green-400" />
+                              </div>
+                            )}
+                            {activity.type === "rating" && (
+                              <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                                <Star className="w-3.5 h-3.5 text-yellow-400" />
+                              </div>
+                            )}
+                            {activity.type === "add" && (
+                              <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                              </div>
+                            )}
+                            {activity.type === "remove" && (
+                              <div className="w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center">
+                                <span className="text-red-400 text-xs">✕</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-300 leading-snug">
+                              {activity.detail}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-0.5">
+                              {new Date(activity.createdAt).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function StatCard({
+function MiniStat({
   icon,
   label,
   value,
-  color,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
-  color: string;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-      <div className={`flex justify-center mb-2 ${color}`}>{icon}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-xs text-gray-500">{label}</div>
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
+      <div className="flex justify-center mb-1">{icon}</div>
+      <div className="text-lg sm:text-xl font-bold">{value}</div>
+      <div className="text-[10px] sm:text-xs text-gray-500">{label}</div>
     </div>
   );
 }

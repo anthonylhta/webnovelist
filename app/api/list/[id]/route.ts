@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logActivity } from "@/lib/activity";
 
-// PUT — update a list entry (supports partial updates)
+// PUT — update a list entry
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -22,15 +23,15 @@ export async function PUT(
 
     const existing = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },
+      include: { novel: true },
     });
 
     if (!existing || existing.userId !== userId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Only update fields that are provided
+    // Build update data
     const updateData: any = {};
-
     if (body.status !== undefined) updateData.status = body.status;
     if (body.rating !== undefined) updateData.rating = body.rating;
     if (body.currentChapter !== undefined) updateData.currentChapter = body.currentChapter;
@@ -47,10 +48,43 @@ export async function PUT(
     const entry = await prisma.userNovelList.update({
       where: { id: parseInt(id) },
       data: updateData,
-      include: {
-        novel: true,
-      },
+      include: { novel: true },
     });
+
+    // Log activities based on what changed
+    const novelTitle = existing.novel.title;
+
+    if (body.currentChapter !== undefined && body.currentChapter !== existing.currentChapter) {
+      await logActivity(
+        userId,
+        "chapter_update",
+        existing.novelId,
+        `${novelTitle} — Chapter ${existing.currentChapter} → ${body.currentChapter}`
+      );
+    }
+
+    if (body.status !== undefined && body.status !== existing.status) {
+      const statusLabels: Record<string, string> = {
+        reading: "Reading",
+        completed: "Completed",
+        on_hold: "On Hold",
+        dropped: "Dropped",
+        plan_to_read: "Plan to Read",
+      };
+      await logActivity(
+        userId,
+        "status_change",
+        existing.novelId,
+        `${novelTitle} — ${statusLabels[existing.status]} → ${statusLabels[body.status]}`
+      );
+    }
+
+    if (body.rating !== undefined && body.rating !== existing.rating) {
+      const ratingText = body.rating === null
+        ? `Removed rating from ${novelTitle}`
+        : `Rated ${novelTitle} — ${body.rating}/10`;
+      await logActivity(userId, "rating", existing.novelId, ratingText);
+    }
 
     return NextResponse.json(entry);
   } catch (error) {
@@ -79,6 +113,7 @@ export async function DELETE(
 
     const existing = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },
+      include: { novel: true },
     });
 
     if (!existing || existing.userId !== userId) {
@@ -88,6 +123,14 @@ export async function DELETE(
     await prisma.userNovelList.delete({
       where: { id: parseInt(id) },
     });
+
+    // Log activity
+    await logActivity(
+      userId,
+      "remove",
+      existing.novelId,
+      `Removed ${existing.novel.title} from list`
+    );
 
     return NextResponse.json({ message: "Removed from list" });
   } catch (error) {

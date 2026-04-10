@@ -4,31 +4,20 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  BookOpen, Star, TrendingUp, CheckCircle,
-  ChevronRight, BookMarked, Loader2,
+  BookOpen, ChevronRight, BookMarked, Loader2,
 } from "lucide-react";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
 
 interface ReadingEntry {
   id: number;
   currentChapter: number;
-  updatedAt: string;
   novel: {
     id: number;
     title: string;
-    titleChinese: string | null;
     coverImageUrl: string | null;
     totalChapters: number | null;
     author: string | null;
   };
-}
-
-interface HomeStats {
-  totalNovels: number;
-  readingCount: number;
-  completedCount: number;
-  totalChapters: number;
-  avgRating: string | null;
 }
 
 interface RecentNovel {
@@ -36,13 +25,10 @@ interface RecentNovel {
   title: string;
   author: string | null;
   coverImageUrl: string | null;
-  genres: string[];
-  createdAt: string;
 }
 
 export default function LoggedInHome({ userName }: { userName: string }) {
   const [reading, setReading] = useState<ReadingEntry[]>([]);
-  const [stats, setStats] = useState<HomeStats | null>(null);
   const [recentNovels, setRecentNovels] = useState<RecentNovel[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +39,6 @@ export default function LoggedInHome({ userName }: { userName: string }) {
     ])
       .then(([homeData, novels]) => {
         if (homeData.reading) setReading(homeData.reading);
-        if (homeData.stats) setStats(homeData.stats);
         if (Array.isArray(novels)) setRecentNovels(novels.slice(0, 10));
         setLoading(false);
       })
@@ -84,45 +69,11 @@ export default function LoggedInHome({ userName }: { userName: string }) {
           Welcome back, {userName}! 👋
         </h1>
         <p className="text-gray-400 mt-1 text-sm sm:text-base">
-          Here&apos;s your reading overview.
+          <Link href={`/user/${userName}`} className="text-blue-400 hover:underline">
+            View your profile →
+          </Link>
         </p>
       </div>
-
-      {/* Stats Cards */}
-      {stats && (
-        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 mb-8 sm:mb-10">
-          <StatCard
-            icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />}
-            label="Total"
-            value={stats.totalNovels.toString()}
-            color="text-blue-500"
-          />
-          <StatCard
-            icon={<BookMarked className="w-4 h-4 sm:w-5 sm:h-5" />}
-            label="Reading"
-            value={stats.readingCount.toString()}
-            color="text-green-500"
-          />
-          <StatCard
-            icon={<CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />}
-            label="Completed"
-            value={stats.completedCount.toString()}
-            color="text-emerald-500"
-          />
-          <StatCard
-            icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
-            label="Chapters"
-            value={stats.totalChapters.toLocaleString()}
-            color="text-blue-400"
-          />
-          <StatCard
-            icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-500" />}
-            label="Avg Rating"
-            value={stats.avgRating || "—"}
-            color="text-yellow-500"
-          />
-        </div>
-      )}
 
       {/* Continue Reading */}
       {reading.length > 0 && (
@@ -140,48 +91,80 @@ export default function LoggedInHome({ userName }: { userName: string }) {
             </Link>
           </div>
 
-          {/* Mobile: Horizontal scroll / Desktop: Grid */}
           {/* Desktop Grid */}
           <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {reading.map((entry) => (
-              <ReadingCard
+              <div
                 key={entry.id}
-                entry={entry}
-                onChapterUpdate={handleChapterUpdate}
-              />
+                className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition"
+              >
+                <div className="flex gap-4">
+                  <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
+                    <img
+                      src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                      alt={entry.novel.title}
+                      className="w-16 h-22 object-cover rounded-lg"
+                    />
+                  </Link>
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      href={`/novel/${entry.novel.id}`}
+                      className="font-semibold truncate block hover:text-blue-400 transition"
+                    >
+                      {entry.novel.title}
+                    </Link>
+                    {entry.novel.author && (
+                      <p className="text-sm text-gray-500 truncate">{entry.novel.author}</p>
+                    )}
+                    <div className="mt-2">
+                      <QuickChapterUpdate
+                        entryId={entry.id}
+                        currentChapter={entry.currentChapter}
+                        totalChapters={entry.novel.totalChapters}
+                        onUpdate={(ch) => handleChapterUpdate(entry.id, ch)}
+                      />
+                      {entry.novel.totalChapters && (
+                        <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
+                          <div
+                            className="bg-blue-500 rounded-full h-1.5"
+                            style={{
+                              width: `${Math.min(
+                                (entry.currentChapter / entry.novel.totalChapters) * 100,
+                                100
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Mobile: Stacked cards */}
+          {/* Mobile Stacked */}
           <div className="md:hidden space-y-3">
             {reading.map((entry) => (
               <div
                 key={entry.id}
                 className="bg-gray-900 border border-gray-800 rounded-xl p-3"
               >
-                <div className="flex gap-3">
-                  {/* Cover */}
+                <div className="flex gap-3 min-w-0">
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                     <img
-                      src={
-                        entry.novel.coverImageUrl ||
-                        "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
-                      }
+                      src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                       alt={entry.novel.title}
                       className="w-12 h-16 object-cover rounded-lg"
                     />
                   </Link>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <Link
                       href={`/novel/${entry.novel.id}`}
                       className="font-semibold text-sm truncate block hover:text-blue-400 transition"
                     >
                       {entry.novel.title}
                     </Link>
-
-                    {/* Chapter Progress */}
                     <div className="mt-1.5">
                       <QuickChapterUpdate
                         entryId={entry.id}
@@ -211,7 +194,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
         </section>
       )}
 
-      {/* Empty state */}
+      {/* Empty reading state */}
       {reading.length === 0 && (
         <section className="mb-8 sm:mb-10">
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 sm:p-8 text-center">
@@ -230,7 +213,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
         </section>
       )}
 
-      {/* Recently Added */}
+      {/* Recently Added to Site */}
       {recentNovels.length > 0 && (
         <section className="mb-8 sm:mb-10">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -255,10 +238,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
               >
                 <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                   <img
-                    src={
-                      novel.coverImageUrl ||
-                      "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
-                    }
+                    src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                     alt={novel.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
@@ -272,88 +252,6 @@ export default function LoggedInHome({ userName }: { userName: string }) {
           </div>
         </section>
       )}
-    </div>
-  );
-}
-
-// Desktop reading card
-function ReadingCard({
-  entry,
-  onChapterUpdate,
-}: {
-  entry: ReadingEntry;
-  onChapterUpdate: (entryId: number, newChapter: number) => void;
-}) {
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition">
-      <div className="flex gap-4">
-        <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-          <img
-            src={
-              entry.novel.coverImageUrl ||
-              "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
-            }
-            alt={entry.novel.title}
-            className="w-16 h-22 object-cover rounded-lg"
-          />
-        </Link>
-
-        <div className="flex-1 min-w-0">
-          <Link
-            href={`/novel/${entry.novel.id}`}
-            className="font-semibold truncate block hover:text-blue-400 transition"
-          >
-            {entry.novel.title}
-          </Link>
-          {entry.novel.author && (
-            <p className="text-sm text-gray-500 truncate">
-              {entry.novel.author}
-            </p>
-          )}
-
-          <div className="mt-2">
-            <QuickChapterUpdate
-              entryId={entry.id}
-              currentChapter={entry.currentChapter}
-              totalChapters={entry.novel.totalChapters}
-              onUpdate={(ch) => onChapterUpdate(entry.id, ch)}
-            />
-            {entry.novel.totalChapters && (
-              <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-blue-500 rounded-full h-1.5"
-                  style={{
-                    width: `${Math.min(
-                      (entry.currentChapter / entry.novel.totalChapters) * 100,
-                      100
-                    )}%`,
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  color: string;
-}) {
-  return (
-    <div className="shrink-0 w-28 sm:w-auto sm:flex-1 bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
-      <div className={`flex justify-center mb-1 sm:mb-2 ${color}`}>{icon}</div>
-      <div className="text-lg sm:text-2xl font-bold">{value}</div>
-      <div className="text-[10px] sm:text-xs text-gray-500">{label}</div>
     </div>
   );
 }

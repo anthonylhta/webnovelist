@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getIP } from "@/lib/rate-limit";
+import { logActivity } from "@/lib/activity";
 
 // GET current user's list
 export async function GET(request: NextRequest) {
@@ -111,6 +112,21 @@ export async function POST(request: NextRequest) {
         novel: true,
       },
     });
+
+    // Log activity
+    const statusLabels: Record<string, string> = {
+      reading: "Started reading",
+      completed: "Completed",
+      on_hold: "Put on hold",
+      dropped: "Dropped",
+      plan_to_read: "Plans to read",
+    };
+    await logActivity(
+      userId,
+      "add",
+      novel.id,
+      `${statusLabels[entry.status] || "Added"} ${novel.title}`
+    );
 
     return NextResponse.json(entry, { status: 201 });
   } catch (error) {
