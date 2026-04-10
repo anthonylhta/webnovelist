@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   BookOpen, LogOut, User, Menu, X, Plus,
-  BarChart3, Shield, Crown, ShieldCheck, UserCircle,
+  BarChart3, Shield, Crown, ShieldCheck, UserCircle, Settings,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -83,6 +83,13 @@ export default function Navbar() {
                   {getRoleIcon()}
                   <span>{userName}</span>
                 </Link>
+                <Link
+                  href="/settings"
+                  className="text-gray-400 hover:text-blue-400 transition"
+                  title="Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </Link>
                 <button
                   onClick={() => signOut()}
                   className="text-gray-400 hover:text-red-400 transition"
@@ -140,6 +147,10 @@ export default function Navbar() {
                 >
                   <UserCircle className="w-4 h-4 inline mr-2" />
                   My Profile
+                </Link>
+                <Link href="/settings" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
+                  <Settings className="w-4 h-4 inline mr-2" />
+                  Settings
                 </Link>
 
                 {canManageNovels && (
