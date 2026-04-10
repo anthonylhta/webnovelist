@@ -90,7 +90,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 mb-8 sm:mb-10">
+        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 mb-8 sm:mb-10">
           <StatCard
             icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />}
             label="Total"
@@ -109,23 +109,18 @@ export default function LoggedInHome({ userName }: { userName: string }) {
             value={stats.completedCount.toString()}
             color="text-emerald-500"
           />
-          {/* Hide these two on very small screens, show on sm+ */}
-          <div className="hidden sm:block">
-            <StatCard
-              icon={<TrendingUp className="w-5 h-5" />}
-              label="Chapters"
-              value={stats.totalChapters.toLocaleString()}
-              color="text-blue-400"
-            />
-          </div>
-          <div className="hidden sm:block">
-            <StatCard
-              icon={<Star className="w-5 h-5 fill-yellow-500" />}
-              label="Avg Rating"
-              value={stats.avgRating || "—"}
-              color="text-yellow-500"
-            />
-          </div>
+          <StatCard
+            icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
+            label="Chapters"
+            value={stats.totalChapters.toLocaleString()}
+            color="text-blue-400"
+          />
+          <StatCard
+            icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-500" />}
+            label="Avg Rating"
+            value={stats.avgRating || "—"}
+            color="text-yellow-500"
+          />
         </div>
       )}
 
@@ -355,7 +350,7 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
+    <div className="shrink-0 w-28 sm:w-auto sm:flex-1 bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
       <div className={`flex justify-center mb-1 sm:mb-2 ${color}`}>{icon}</div>
       <div className="text-lg sm:text-2xl font-bold">{value}</div>
       <div className="text-[10px] sm:text-xs text-gray-500">{label}</div>
