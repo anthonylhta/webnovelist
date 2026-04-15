@@ -19,6 +19,7 @@ model User {
   email             String    @unique
   passwordHash      String    @map("password_hash")
   avatarUrl         String?   @map("avatar_url")
+  bannerColor       String?   @map("banner_color")
   role              String    @default("user")
   emailVerified     Boolean   @default(false) @map("email_verified")
   usernameChangedAt DateTime? @map("username_changed_at")

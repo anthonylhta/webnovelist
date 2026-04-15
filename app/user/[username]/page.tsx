@@ -1,4 +1,3 @@
-// app/user/[username]/page.tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -8,11 +7,14 @@ import {
   Users, BookMarked,
 } from "lucide-react";
 import type { Metadata } from "next";
-import CopyLinkButton from "@/components/CopyLinkButton";
-import ActivityHeatmap from "@/components/ActivityHeatmap";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import ActivityHeatmap from "@/components/ActivityHeatmap";
+import ProfileImageUpload from "@/components/ProfileImageUpload";
+import BannerColorPicker from "@/components/BannerColorPicker";
 import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
+import { getBannerGradient } from "@/lib/banner-colors";
 
 export const dynamic = "force-dynamic";
 
@@ -49,11 +51,15 @@ export default async function PublicProfilePage({
       username: true,
       role: true,
       avatarUrl: true,
+      bannerColor: true,
       createdAt: true,
     },
   });
 
   if (!user) notFound();
+
+  const session = await getServerSession(authOptions);
+  const isOwner = session?.user && (session.user as any).id === user.id;
 
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
@@ -74,32 +80,6 @@ export default async function PublicProfilePage({
     }),
   ]);
 
-  // Check if viewer is the profile owner
-  const session = await getServerSession(authOptions);
-  const isOwner = session?.user && (session.user as any).id === user.id;
-
-  // Favorite novels
-  const favoriteNovels = list
-    .filter((entry) => entry.isFavorite)
-    .slice(0, 5)
-    .map((entry) => entry.novel);
-
-  // Favorite authors
-  const favoriteAuthors = await prisma.userFavoriteAuthor.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "asc" },
-  });
-  const favoriteAuthorNames = favoriteAuthors.map((a) => a.authorName);
-
-  // Available authors (from user's novels, for the picker)
-  const availableAuthors = [
-    ...new Set(
-      list
-        .map((entry) => entry.novel.author)
-        .filter((a): a is string => a !== null && a !== undefined && a.trim() !== "")
-    ),
-  ].sort();
-
   // Fetch novel covers for activity feed
   const activityNovelIds = [
     ...new Set(
@@ -116,6 +96,27 @@ export default async function PublicProfilePage({
   activityNovels.forEach((n) => {
     novelCovers[n.id] = n.coverImageUrl;
   });
+
+  // Favorite novels
+  const favoriteNovels = list
+    .filter((entry) => entry.isFavorite)
+    .slice(0, 5)
+    .map((entry) => entry.novel);
+
+  // Favorite authors
+  const favoriteAuthors = await prisma.userFavoriteAuthor.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "asc" },
+  });
+  const favoriteAuthorNames = favoriteAuthors.map((a) => a.authorName);
+
+  const availableAuthors = [
+    ...new Set(
+      list
+        .map((entry) => entry.novel.author)
+        .filter((a): a is string => a !== null && a !== undefined && a.trim() !== "")
+    ),
+  ].sort();
 
   // Stats
   const totalNovels = list.length;
@@ -159,24 +160,33 @@ export default async function PublicProfilePage({
     <div className="max-w-6xl mx-auto -mt-8 -mx-4 sm:mx-auto">
       {/* ===== BANNER + PROFILE HEADER ===== */}
       <div className="relative mb-16 sm:mb-20">
-        {/* Banner Gradient */}
-        <div className="h-32 sm:h-44 bg-gradient-to-r from-blue-600/40 via-purple-600/30 to-blue-800/40 rounded-b-2xl sm:rounded-b-3xl" />
+        {/* Banner */}
+        <div className={`relative h-32 sm:h-44 bg-gradient-to-r ${getBannerGradient(user.bannerColor)} rounded-b-2xl sm:rounded-b-3xl`}>
+          <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
+        </div>
 
         {/* Profile Info — overlaps banner */}
         <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 sm:gap-5">
             {/* Avatar */}
-            <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0">
-              {user.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.username}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                user.username[0].toUpperCase()
-              )}
-            </div>
+            <ProfileImageUpload
+              type="avatar"
+              currentUrl={user.avatarUrl}
+              isOwner={!!isOwner}
+              username={user.username}
+            >
+              <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0 overflow-hidden">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.username}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  user.username[0].toUpperCase()
+                )}
+              </div>
+            </ProfileImageUpload>
 
             {/* Name + Meta */}
             <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
@@ -211,7 +221,7 @@ export default async function PublicProfilePage({
         <CopyLinkButton username={user.username} />
       </div>
 
-  {/* ===== TWO COLUMN LAYOUT ===== */}
+      {/* ===== TWO COLUMN LAYOUT ===== */}
       <div className="px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row gap-6">
 
@@ -314,7 +324,7 @@ export default async function PublicProfilePage({
           {/* ===== RIGHT COLUMN ===== */}
           <div className="lg:w-[45%] space-y-6">
 
-            {/* Mini Stats — Horizontal Row */}
+            {/* Mini Stats */}
             <div className="grid grid-cols-3 gap-3">
               <MiniStat
                 icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />}
@@ -367,7 +377,6 @@ export default async function PublicProfilePage({
                         )}
 
                         <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-gray-800/50 transition">
-                          {/* Novel cover or type icon */}
                           <div className="mt-0.5 shrink-0">
                             {activity.novelId && novelCovers[activity.novelId] ? (
                               <img
