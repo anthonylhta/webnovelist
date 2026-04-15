@@ -1,7 +1,7 @@
 // components/QuickChapterUpdate.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Minus, Plus } from "lucide-react";
 
 interface QuickChapterUpdateProps {
@@ -19,10 +19,13 @@ export default function QuickChapterUpdate({
 }: QuickChapterUpdateProps) {
   const [chapter, setChapter] = useState(currentChapter);
   const [saving, setSaving] = useState(false);
+  const justSubmitted = useRef(false);
 
   const updateChapter = async (newChapter: number) => {
+    if (saving) return;
     if (newChapter < 0) return;
     if (totalChapters && newChapter > totalChapters) return;
+    if (newChapter === currentChapter) return;
 
     setChapter(newChapter);
     setSaving(true);
@@ -60,12 +63,17 @@ export default function QuickChapterUpdate({
           setChapter(val);
         }}
         onBlur={() => {
+          if (justSubmitted.current) {
+            justSubmitted.current = false;
+            return;
+          }
           if (chapter !== currentChapter) {
             updateChapter(chapter);
           }
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
+            justSubmitted.current = true;
             updateChapter(chapter);
             (e.target as HTMLInputElement).blur();
           }
