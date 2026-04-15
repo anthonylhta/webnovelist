@@ -1,8 +1,8 @@
-// app/novel/[id]/page.tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { BookOpen, User, Layers, Globe, Calendar, Clock } from "lucide-react";
 import AddToListButton from "@/components/AddToListButton";
+import FavoriteNovelButton from "@/components/FavoriteNovelButton";
 import NovelAdminActions from "@/components/NovelAdminActions";
 
 export default async function NovelPage({
@@ -35,6 +35,7 @@ export default async function NovelPage({
             novelTitle={novel.title}
             totalChapters={novel.totalChapters}
           />
+          <FavoriteNovelButton novelId={novel.id} />
           <NovelAdminActions novelId={novel.id} novelTitle={novel.title} />
         </div>
 

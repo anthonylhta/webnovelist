@@ -10,6 +10,9 @@ import {
 import type { Metadata } from "next";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +73,32 @@ export default async function PublicProfilePage({
       orderBy: { createdAt: "desc" },
     }),
   ]);
+
+  // Check if viewer is the profile owner
+  const session = await getServerSession(authOptions);
+  const isOwner = session?.user && (session.user as any).id === user.id;
+
+  // Favorite novels
+  const favoriteNovels = list
+    .filter((entry) => entry.isFavorite)
+    .slice(0, 5)
+    .map((entry) => entry.novel);
+
+  // Favorite authors
+  const favoriteAuthors = await prisma.userFavoriteAuthor.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "asc" },
+  });
+  const favoriteAuthorNames = favoriteAuthors.map((a) => a.authorName);
+
+  // Available authors (from user's novels, for the picker)
+  const availableAuthors = [
+    ...new Set(
+      list
+        .map((entry) => entry.novel.author)
+        .filter((a): a is string => a !== null && a !== undefined && a.trim() !== "")
+    ),
+  ].sort();
 
   // Fetch novel covers for activity feed
   const activityNovelIds = [
@@ -221,23 +250,38 @@ export default async function PublicProfilePage({
               )}
             </div>
 
-            {/* Favorite Novels — Placeholder */}
+            {/* Favorite Novels */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
               <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                 <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
                 Favorite Novels
               </h2>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div
-                    key={i}
-                    className="shrink-0 w-20 sm:w-24 aspect-[3/4] bg-gray-800 rounded-lg border border-gray-700 border-dashed
-                               flex items-center justify-center"
-                  >
-                    <span className="text-gray-600 text-xs">Soon</span>
-                  </div>
-                ))}
-              </div>
+              {favoriteNovels.length === 0 ? (
+                <p className="text-gray-500 text-sm">
+                  {isOwner ? "Add favorites from any novel page." : "No favorite novels yet."}
+                </p>
+              ) : (
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                  {favoriteNovels.map((novel) => (
+                    <Link
+                      key={novel.id}
+                      href={`/novel/${novel.id}`}
+                      className="shrink-0 w-20 sm:w-24 group"
+                    >
+                      <div className="aspect-[3/4] rounded-lg overflow-hidden border border-gray-700 group-hover:border-pink-500/50 transition">
+                        <img
+                          src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                          alt={novel.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1 truncate group-hover:text-pink-400 transition">
+                        {novel.title}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Favorite Characters — Placeholder */}
@@ -259,24 +303,12 @@ export default async function PublicProfilePage({
               </div>
             </div>
 
-            {/* Favorite Authors — Placeholder */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-                <BookMarked className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-                Favorite Authors
-              </h2>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="shrink-0 bg-gray-800 rounded-lg border border-gray-700 border-dashed
-                               px-6 py-4 flex items-center justify-center"
-                  >
-                    <span className="text-gray-600 text-xs">Coming soon</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Favorite Authors */}
+            <FavoriteAuthorsEditor
+              initialFavorites={favoriteAuthorNames}
+              availableAuthors={availableAuthors}
+              isOwner={!!isOwner}
+            />
           </div>
 
           {/* ===== RIGHT COLUMN ===== */}

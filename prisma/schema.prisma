@@ -27,6 +27,7 @@ model User {
   novelList         UserNovelList[]
   tokens            Token[]
   activities        Activity[]
+  favoriteAuthors   UserFavoriteAuthor[]
 
   @@map("users")
 }
@@ -61,6 +62,7 @@ model UserNovelList {
   status         String
   rating         Float?
   currentChapter Int       @default(0) @map("current_chapter")
+  isFavorite     Boolean   @default(false) @map("is_favorite")
   dateStarted    DateTime? @map("date_started")
   dateFinished   DateTime? @map("date_finished")
   notes          String?   @db.Text
@@ -102,4 +104,16 @@ model Token {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("tokens")
+}
+
+model UserFavoriteAuthor {
+  id         Int      @id @default(autoincrement())
+  userId     String   @map("user_id")
+  authorName String   @map("author_name")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, authorName])
+  @@map("user_favorite_authors")
 }
