@@ -71,6 +71,23 @@ export default async function PublicProfilePage({
     }),
   ]);
 
+  // Fetch novel covers for activity feed
+  const activityNovelIds = [
+    ...new Set(
+      activities
+        .map((a) => a.novelId)
+        .filter((id): id is number => id !== null)
+    ),
+  ];
+  const activityNovels = await prisma.novel.findMany({
+    where: { id: { in: activityNovelIds } },
+    select: { id: true, coverImageUrl: true },
+  });
+  const novelCovers: Record<number, string | null> = {};
+  activityNovels.forEach((n) => {
+    novelCovers[n.id] = n.coverImageUrl;
+  });
+
   // Stats
   const totalNovels = list.length;
   const totalChaptersRead = list.reduce((sum, e) => sum + e.currentChapter, 0);
@@ -318,31 +335,42 @@ export default async function PublicProfilePage({
                         )}
 
                         <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-gray-800/50 transition">
+                          {/* Novel cover or type icon */}
                           <div className="mt-0.5 shrink-0">
-                            {activity.type === "chapter_update" && (
-                              <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
-                                <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
-                              </div>
-                            )}
-                            {activity.type === "status_change" && (
-                              <div className="w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
-                                <BookMarked className="w-3.5 h-3.5 text-green-400" />
-                              </div>
-                            )}
-                            {activity.type === "rating" && (
-                              <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                                <Star className="w-3.5 h-3.5 text-yellow-400" />
-                              </div>
-                            )}
-                            {activity.type === "add" && (
-                              <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                              </div>
-                            )}
-                            {activity.type === "remove" && (
-                              <div className="w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center">
-                                <span className="text-red-400 text-xs">✕</span>
-                              </div>
+                            {activity.novelId && novelCovers[activity.novelId] ? (
+                              <img
+                                src={novelCovers[activity.novelId]!}
+                                alt=""
+                                className="w-9 h-12 rounded object-cover"
+                              />
+                            ) : (
+                              <>
+                                {activity.type === "chapter_update" && (
+                                  <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                    <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                                  </div>
+                                )}
+                                {activity.type === "status_change" && (
+                                  <div className="w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
+                                    <BookMarked className="w-3.5 h-3.5 text-green-400" />
+                                  </div>
+                                )}
+                                {activity.type === "rating" && (
+                                  <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                                    <Star className="w-3.5 h-3.5 text-yellow-400" />
+                                  </div>
+                                )}
+                                {activity.type === "add" && (
+                                  <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                                  </div>
+                                )}
+                                {activity.type === "remove" && (
+                                  <div className="w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center">
+                                    <span className="text-red-400 text-xs">✕</span>
+                                  </div>
+                                )}
+                              </>
                             )}
                           </div>
 

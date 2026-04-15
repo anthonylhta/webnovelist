@@ -116,4 +116,4 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
       </div>
     </div>
   );
-}
+} 

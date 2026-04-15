@@ -1,4 +1,3 @@
-// app/api/list/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -55,12 +54,21 @@ export async function PUT(
     const novelTitle = existing.novel.title;
 
     if (body.currentChapter !== undefined && body.currentChapter !== existing.currentChapter) {
-      await logActivity(
-        userId,
-        "chapter_update",
-        existing.novelId,
-        `${novelTitle} — Chapter ${existing.currentChapter} → ${body.currentChapter}`
-      );
+      if (body.currentChapter > existing.currentChapter) {
+        await logActivity(
+          userId,
+          "chapter_update",
+          existing.novelId,
+          `${novelTitle} — Chapter ${existing.currentChapter} → ${body.currentChapter}`
+        );
+      } else {
+        await logActivity(
+          userId,
+          "chapter_update",
+          existing.novelId,
+          `${novelTitle} — Corrected chapter to ${body.currentChapter}`
+        );
+      }
     }
 
     if (body.status !== undefined && body.status !== existing.status) {
@@ -124,7 +132,6 @@ export async function DELETE(
       where: { id: parseInt(id) },
     });
 
-    // Log activity
     await logActivity(
       userId,
       "remove",
