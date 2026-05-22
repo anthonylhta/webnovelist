@@ -48,3 +48,6 @@ scripts/novels-backup.json
 
 repomix-output.xml
 .repomixignore
+
+# claude code local settings
+.claude/settings.local.json

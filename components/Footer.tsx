@@ -29,7 +29,7 @@ export default function Footer() {
 
             {/* GitHub */}
             <a
-              href="https://github.com/kayniss"
+              href="https://github.com/anthonylhta"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition text-sm"
