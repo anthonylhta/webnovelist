@@ -12,7 +12,8 @@
     "prod:studio": "dotenv -e .env.prod -- npx prisma studio",
     "prod:seed": "dotenv -e .env.prod -- npx prisma db seed",
     "prod:export": "dotenv -e .env.prod -- npx tsx scripts/export-novels.ts",
-    "dev:import": "npx tsx scripts/import-novels.ts"
+    "dev:import": "npx tsx scripts/import-novels.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "npx tsx --tsconfig tsconfig.json prisma/seed.ts"
