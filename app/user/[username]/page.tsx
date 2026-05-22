@@ -15,6 +15,8 @@ import ProfileImageUpload from "@/components/ProfileImageUpload";
 import BannerColorPicker from "@/components/BannerColorPicker";
 import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
 import { getBannerGradient } from "@/lib/banner-colors";
+import FavoriteCharactersEditor from "@/components/FavoriteCharactersEditor";
+
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +119,39 @@ export default async function PublicProfilePage({
         .filter((a): a is string => a !== null && a !== undefined && a.trim() !== "")
     ),
   ].sort();
+
+  // Favorite characters
+  const userFavoriteCharacters = await prisma.userFavoriteCharacter.findMany({
+    where: { userId: user.id },
+    include: {
+      character: {
+        include: { novel: { select: { id: true, title: true } } },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  const favoriteChars = userFavoriteCharacters.map((f) => ({
+    id: f.character.id,
+    name: f.character.name,
+    role: f.character.role,
+    imageUrl: f.character.imageUrl,
+    novel: f.character.novel,
+  }));
+
+  // Available characters (from novels in user's list)
+  const userNovelIds = list.map((entry) => entry.novelId);
+  const availableCharactersRaw = await prisma.character.findMany({
+    where: { novelId: { in: userNovelIds } },
+    include: { novel: { select: { id: true, title: true } } },
+    orderBy: [{ novel: { title: "asc" } }, { name: "asc" }],
+  });
+  const availableCharacters = availableCharactersRaw.map((c) => ({
+    id: c.id,
+    name: c.name,
+    role: c.role,
+    imageUrl: c.imageUrl,
+    novel: c.novel,
+  }));
 
   // Stats
   const totalNovels = list.length;
@@ -294,24 +329,12 @@ export default async function PublicProfilePage({
               )}
             </div>
 
-            {/* Favorite Characters — Placeholder */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-                Favorite Characters
-              </h2>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div
-                    key={i}
-                    className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700 border-dashed
-                               flex items-center justify-center"
-                  >
-                    <span className="text-gray-600 text-[10px]">Soon</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Favorite Characters */}
+            <FavoriteCharactersEditor
+              initialFavorites={favoriteChars}
+              availableCharacters={availableCharacters}
+              isOwner={!!isOwner}
+            />
 
             {/* Favorite Authors */}
             <FavoriteAuthorsEditor

@@ -30,6 +30,8 @@ model User {
   activities        Activity[]
   favoriteAuthors   UserFavoriteAuthor[]
 
+  favoriteCharacters UserFavoriteCharacter[]
+
   @@map("users")
 }
 
@@ -50,6 +52,7 @@ model Novel {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
+  characters     Character[]
   userEntries    UserNovelList[]
 
   @@map("novels")
@@ -117,4 +120,32 @@ model UserFavoriteAuthor {
 
   @@unique([userId, authorName])
   @@map("user_favorite_authors")
+}
+
+model Character {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String?  // "Protagonist", "Main Character", "Antagonist", "Supporting"
+  novelId   Int      @map("novel_id")
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  novel     Novel    @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  favorites UserFavoriteCharacter[]
+
+  @@unique([name, novelId])
+  @@map("characters")
+}
+
+model UserFavoriteCharacter {
+  id          Int      @id @default(autoincrement())
+  userId      String   @map("user_id")
+  characterId Int      @map("character_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, characterId])
+  @@map("user_favorite_characters")
 }

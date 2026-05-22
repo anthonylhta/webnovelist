@@ -87,13 +87,13 @@ export async function POST(request: NextRequest) {
         username: username.trim(),
         email: normalizedEmail,
         passwordHash,
-        emailVerified: true, // ← Auto-verify
+        emailVerified: false, // ← Auto-verify
       },
     });
 
     // TODO: Re-enable email verification when you have a paid Resend plan
-    // const token = await createToken(user.id, "email_verification");
-    // await sendVerificationEmail(normalizedEmail, token, username.trim());
+    const token = await createToken(user.id, "email_verification");
+    await sendVerificationEmail(normalizedEmail, token, username.trim());
 
     return NextResponse.json(
       {
