@@ -14,14 +14,11 @@
 
 ---
 
-<!--
-SCREENSHOTS — add a few here, recruiters look at these first.
-Drop images in docs/screenshots/ and uncomment:
+## Screenshots
 
 | Home | Profile | Stats |
 |------|---------|-------|
 | ![Home](docs/screenshots/home.png) | ![Profile](docs/screenshots/profile.png) | ![Stats](docs/screenshots/stats.png) |
--->
 
 ## Features
 
@@ -53,61 +50,6 @@ Drop images in docs/screenshots/ and uncomment:
 - **Authorization enforced on the server.** A single `getCurrentUser()` helper resolves the database user per request, and every API route verifies roles server-side (e.g. `canManageNovels`, admin-only checks) — the UI never gates security on its own.
 - **Edge protection & security headers.** Route protection and hardening headers (`X-Frame-Options`, `Strict-Transport-Security`, etc.) run in a single Next.js 16 Proxy (`proxy.ts`).
 - **Abuse resistance.** Rate limiting on sensitive endpoints (`rate-limiter-flexible`) plus Zod-based input validation and sanitization.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- A PostgreSQL database (e.g. [Supabase](https://supabase.com))
-- A [Clerk](https://clerk.com) application
-- A [Cloudinary](https://cloudinary.com) account (for image uploads)
-
-### Setup
-
-```bash
-git clone https://github.com/anthonylhta/webnovelist.git
-cd webnovelist
-npm install
-cp .env.example .env      # then fill in your values
-npx prisma migrate dev    # apply the schema
-npm run dev
-```
-
-The app runs at [http://localhost:3000](http://localhost:3000).
-
-### Environment Variables
-
-```env
-# Database
-DATABASE_URL=
-DIRECT_URL=
-
-# Clerk (https://dashboard.clerk.com → API keys)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-CLERK_WEBHOOK_SIGNING_SECRET=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/browse
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/browse
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-```
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start the development server |
-| `npm run build` | Production build |
-| `npm run start` | Run the production build |
-| `npm run lint` | Lint with ESLint |
-| `npx prisma migrate dev --name <name>` | Create & apply a migration (dev) |
-| `npx prisma studio` | Open the database GUI |
 
 ## Roles
 
