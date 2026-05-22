@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@clerk/nextjs";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter, useParams } from "next/navigation";
 import { Pencil, ShieldX } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +19,8 @@ const GENRE_OPTIONS = [
 ];
 
 export default function EditNovelPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
+  const currentUser = useCurrentUser();
   const router = useRouter();
   const params = useParams();
   const novelId = params.id as string;
@@ -70,7 +72,7 @@ export default function EditNovelPage() {
       });
   }, [novelId]);
 
-  if (authStatus === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading...</div>
@@ -78,12 +80,12 @@ export default function EditNovelPage() {
     );
   }
 
-  if (authStatus === "unauthenticated") {
-    router.push("/login");
+  if (!isSignedIn) {
+    router.push("/sign-in");
     return null;
   }
 
-  const userRole = (session?.user as any)?.role;
+  const userRole = currentUser?.role;
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">

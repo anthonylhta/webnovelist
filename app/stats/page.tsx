@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
@@ -33,18 +33,18 @@ interface ListEntry {
 }
 
 export default function StatsPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const [list, setList] = useState<ListEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authStatus === "unauthenticated") {
-      router.push("/login");
+    if (isLoaded && !isSignedIn) {
+      router.push("/sign-in");
       return;
     }
 
-    if (authStatus === "authenticated") {
+    if (isLoaded && isSignedIn) {
       fetch("/api/list")
         .then((res) => res.json())
         .then((data) => {
@@ -53,9 +53,9 @@ export default function StatsPage() {
         })
         .catch(() => setLoading(false));
     }
-  }, [authStatus]);
+  }, [isLoaded, isSignedIn]);
 
-  if (authStatus === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading stats...</div>

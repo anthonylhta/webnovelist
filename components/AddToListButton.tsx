@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import { Plus, Edit } from "lucide-react";
 import AddToListModal from "./AddToListModal";
@@ -18,14 +18,14 @@ export default function AddToListButton({
   novelTitle,
   totalChapters,
 }: AddToListButtonProps) {
-  const { data: session } = useSession();
+  const currentUser = useCurrentUser();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [existingEntry, setExistingEntry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!session) {
+    if (!currentUser) {
       setLoading(false);
       return;
     }
@@ -40,11 +40,11 @@ export default function AddToListButton({
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [session, novelId]);
+  }, [currentUser, novelId]);
 
   const handleClick = () => {
-    if (!session) {
-      router.push("/login");
+    if (!currentUser) {
+      router.push("/sign-in");
       return;
     }
     setShowModal(true);

@@ -1,18 +1,17 @@
 // app/api/user/home/route.ts
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
 
     // Get user's currently reading novels
     const reading = await prisma.userNovelList.findMany({

@@ -2,10 +2,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import { Settings, User, Clock, AlertCircle, CheckCircle, Crown, ShieldCheck } from "lucide-react";
-import { signOut } from "next-auth/react";
 
 interface UserSettings {
   id: string;
@@ -19,7 +19,9 @@ interface UserSettings {
 }
 
 export default function SettingsPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signOut } = useClerk();
+  const currentUser = useCurrentUser();
   const router = useRouter();
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
@@ -30,15 +32,15 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (authStatus === "unauthenticated") {
-      router.push("/login");
+    if (isLoaded && !isSignedIn) {
+      router.push("/sign-in");
       return;
     }
 
-    if (authStatus === "authenticated") {
+    if (isLoaded && isSignedIn) {
       fetchSettings();
     }
-  }, [authStatus]);
+  }, [isLoaded, isSignedIn]);
 
   const fetchSettings = async () => {
     try {
@@ -101,7 +103,7 @@ export default function SettingsPage() {
 
       // Sign out after 3 seconds so the session refreshes with new username
       setTimeout(() => {
-        signOut({ callbackUrl: "/login" });
+        signOut({ redirectUrl: "/sign-in" });
       }, 3000);
     } catch {
       setError("Something went wrong");
@@ -110,7 +112,7 @@ export default function SettingsPage() {
     }
   };
 
-  const isAdmin = (session?.user as any)?.role === "admin";
+  const isAdmin = currentUser?.role === "admin";
   const canChange = isAdmin || !settings?.daysUntilChange;
 
   const getRoleIcon = (role: string) => {
@@ -135,7 +137,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (authStatus === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading settings...</div>

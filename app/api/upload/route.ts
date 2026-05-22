@@ -1,7 +1,6 @@
 // app/api/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { canManageNovels } from "@/lib/roles";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { v2 as cloudinary } from "cloudinary";
@@ -20,13 +19,13 @@ export async function POST(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    if (!canManageNovels(session.user.role)) {
+    if (!canManageNovels(user.role)) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 

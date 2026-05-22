@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@clerk/nextjs";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import {
   Shield, Users, BookOpen, Crown, ShieldCheck, User, Trash2,
@@ -21,7 +22,8 @@ interface UserData {
 }
 
 export default function AdminPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
+  const currentUser = useCurrentUser();
   const router = useRouter();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,24 +35,23 @@ export default function AdminPage() {
   const [deletingUser, setDeletingUser] = useState<UserData | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const currentRole = (session?.user as any)?.role;
-  const currentUserId = (session?.user as any)?.id;
+  const currentRole = currentUser?.role;
+  const currentUserId = currentUser?.id;
 
   useEffect(() => {
-    if (authStatus === "unauthenticated") {
-      router.push("/login");
+    if (isLoaded && !isSignedIn) {
+      router.push("/sign-in");
       return;
     }
 
-    if (authStatus === "authenticated") {
-      const role = (session?.user as any)?.role;
-      if (role !== "admin" && role !== "moderator") {
+    if (isLoaded && isSignedIn) {
+      if (currentRole !== "admin" && currentRole !== "moderator") {
         router.push("/");
         return;
       }
       fetchUsers();
     }
-  }, [authStatus]);
+  }, [isLoaded, isSignedIn, currentRole]);
 
   const fetchUsers = async () => {
     try {
@@ -148,7 +149,7 @@ export default function AdminPage() {
     }
   };
 
-  if (authStatus === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading...</div>

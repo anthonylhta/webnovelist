@@ -15,18 +15,16 @@ datasource db {
 // ============== USERS ==============
 model User {
   id                String    @id @default(cuid())
+  clerkId           String?   @unique @map("clerk_id")
   username          String    @unique
   email             String    @unique
-  passwordHash      String    @map("password_hash")
   avatarUrl         String?   @map("avatar_url")
   bannerColor       String?   @map("banner_color")
   role              String    @default("user")
-  emailVerified     Boolean   @default(false) @map("email_verified")
   usernameChangedAt DateTime? @map("username_changed_at")
   createdAt         DateTime  @default(now()) @map("created_at")
 
   novelList         UserNovelList[]
-  tokens            Token[]
   activities        Activity[]
   favoriteAuthors   UserFavoriteAuthor[]
 
@@ -94,20 +92,6 @@ model Activity {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("activities")
-}
-
-model Token {
-  id        String   @id @default(cuid())
-  type      String   // "email_verification" or "password_reset"
-  token     String   @unique
-  userId    String   @map("user_id")
-  expiresAt DateTime @map("expires_at")
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("tokens")
 }
 
 model UserFavoriteAuthor {

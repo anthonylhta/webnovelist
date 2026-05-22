@@ -1,7 +1,6 @@
 // app/api/user/settings/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { containsSuspiciousContent } from "@/lib/sanitize";
@@ -10,13 +9,13 @@ const USERNAME_COOLDOWN_DAYS = 30;
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const me = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!me) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = me.id;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -66,14 +65,14 @@ export async function PUT(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const session = await getServerSession(authOptions);
+    const me = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!me) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
-    const userRole = (session.user as any).role;
+    const userId = me.id;
+    const userRole = me.role;
     const body = await request.json();
     const { username } = body;
 

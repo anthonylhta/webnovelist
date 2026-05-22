@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { logActivity } from "@/lib/activity";
 
@@ -10,14 +9,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
     const { id } = await params;
-    const userId = (session.user as any).id;
+    const userId = user.id;
     const body = await request.json();
 
     const existing = await prisma.userNovelList.findUnique({
@@ -110,14 +109,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
     const { id } = await params;
-    const userId = (session.user as any).id;
+    const userId = user.id;
 
     const existing = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },

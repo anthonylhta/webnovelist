@@ -1,7 +1,7 @@
 // app/api/admin/users/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { clerkClient } from "@clerk/nextjs/server";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 
 export async function PUT(
@@ -9,13 +9,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const me = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!me) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    if (session.user.role !== "admin") {
+    if (me.role !== "admin") {
       return NextResponse.json({ error: "Admin only" }, { status: 403 });
     }
 
@@ -23,7 +23,7 @@ export async function PUT(
     const body = await request.json();
 
     // Prevent admin from changing their own role
-    if (id === session.user.id) {
+    if (id === me.id) {
       return NextResponse.json(
         { error: "Cannot change your own role" },
         { status: 400 }
@@ -63,14 +63,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const me = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!me) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const currentRole = (session.user as any).role;
-    const currentUserId = (session.user as any).id;
+    const currentRole = me.role;
+    const currentUserId = me.id;
 
     // Only admins and moderators can delete users
     if (currentRole !== "admin" && currentRole !== "moderator") {
@@ -93,7 +93,7 @@ export async function DELETE(
     // Fetch the target user
     const targetUser = await prisma.user.findUnique({
       where: { id },
-      select: { id: true, username: true, role: true },
+      select: { id: true, username: true, role: true, clerkId: true },
     });
 
     if (!targetUser) {
@@ -108,7 +108,13 @@ export async function DELETE(
       );
     }
 
-    // Delete the user (cascades will handle novelList and tokens)
+    // Remove from Clerk first so they can't sign back in, then from our DB
+    // (cascades clean up their list, activities, and favorites).
+    if (targetUser.clerkId) {
+      const client = await clerkClient();
+      await client.users.deleteUser(targetUser.clerkId);
+    }
+
     await prisma.user.delete({
       where: { id },
     });

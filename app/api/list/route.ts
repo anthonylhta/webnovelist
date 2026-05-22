@@ -1,7 +1,6 @@
 // app/api/list/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { logActivity } from "@/lib/activity";
@@ -9,13 +8,13 @@ import { logActivity } from "@/lib/activity";
 // GET current user's list
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
 
     const list = await prisma.userNovelList.findMany({
       where: { userId },
@@ -41,13 +40,13 @@ export async function POST(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
     const body = await request.json();
 
     // Validate novelId

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 
 export async function PUT(
@@ -8,13 +7,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
     const { id } = await params;
-    const userId = (session.user as any).id;
+    const userId = user.id;
 
     const entry = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },

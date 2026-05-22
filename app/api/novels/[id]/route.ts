@@ -1,7 +1,6 @@
 // app/api/novels/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
 
@@ -37,13 +36,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    if (!canManageNovels(session.user.role)) {
+    if (!canManageNovels(user.role)) {
       return NextResponse.json(
         { error: "You don't have permission to edit novels" },
         { status: 403 }
@@ -86,13 +85,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    if (session.user.role !== "admin") {
+    if (user.role !== "admin") {
       return NextResponse.json(
         { error: "Only admins can delete novels" },
         { status: 403 }

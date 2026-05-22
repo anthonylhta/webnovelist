@@ -1,18 +1,17 @@
 // app/api/admin/users/route.ts
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getCurrentUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const role = (session.user as any).role;
+    const role = user.role;
     if (role !== "admin" && role !== "moderator") {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }

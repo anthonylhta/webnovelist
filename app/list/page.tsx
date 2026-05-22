@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -26,7 +26,7 @@ type SortKey = "title" | "rating" | "progress" | "updated";
 type SortDir = "asc" | "desc";
 
 export default function ListPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const [list, setList] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("all");
@@ -38,15 +38,15 @@ export default function ListPage() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   useEffect(() => {
-    if (authStatus === "unauthenticated") {
-      router.push("/login");
+    if (isLoaded && !isSignedIn) {
+      router.push("/sign-in");
       return;
     }
 
-    if (authStatus === "authenticated") {
+    if (isLoaded && isSignedIn) {
       fetchList();
     }
-  }, [authStatus]);
+  }, [isLoaded, isSignedIn]);
 
   const fetchList = async () => {
     try {
@@ -134,7 +134,7 @@ export default function ListPage() {
 
   const counts = getStatusCounts();
 
-  if (authStatus === "loading" || loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading your list...</div>

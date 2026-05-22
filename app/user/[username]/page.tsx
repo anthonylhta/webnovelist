@@ -7,8 +7,7 @@ import {
   Users, BookMarked,
 } from "lucide-react";
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
@@ -60,8 +59,8 @@ export default async function PublicProfilePage({
 
   if (!user) notFound();
 
-  const session = await getServerSession(authOptions);
-  const isOwner = session?.user && (session.user as any).id === user.id;
+  const me = await getCurrentUser();
+  const isOwner = me?.id === user.id;
 
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);

@@ -7,16 +7,18 @@ import {
   BookOpen, LogOut, User, Menu, X, Plus,
   BarChart3, Shield, Crown, ShieldCheck, UserCircle, Settings,
 } from "lucide-react";
-import { useSession, signOut } from "next-auth/react";
+import { useClerk } from "@clerk/nextjs";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
+  const currentUser = useCurrentUser();
+  const { signOut } = useClerk();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const closeMenu = () => setMobileMenuOpen(false);
 
-  const userRole = (session?.user as any)?.role;
-  const userName = session?.user?.name;
+  const userRole = currentUser?.role;
+  const userName = currentUser?.username;
   const canManageNovels = userRole === "admin" || userRole === "moderator";
   const isAdmin = userRole === "admin";
 
@@ -50,9 +52,7 @@ export default function Navbar() {
             Browse
           </Link>
 
-          {status === "loading" ? (
-            <div className="w-20 h-8 bg-gray-800 rounded-lg animate-pulse" />
-          ) : session ? (
+          {currentUser ? (
             <>
               <Link href="/list" className="hover:text-blue-400 transition">
                 My List
@@ -91,7 +91,7 @@ export default function Navbar() {
                   <Settings className="w-4 h-4" />
                 </Link>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ redirectUrl: "/" })}
                   className="text-gray-400 hover:text-red-400 transition"
                   title="Sign out"
                 >
@@ -101,11 +101,11 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="hover:text-blue-400 transition">
+              <Link href="/sign-in" className="hover:text-blue-400 transition">
                 Login
               </Link>
               <Link
-                href="/register"
+                href="/sign-up"
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition"
               >
                 Sign Up
@@ -131,7 +131,7 @@ export default function Navbar() {
               Browse
             </Link>
 
-            {session ? (
+            {currentUser ? (
               <>
                 <Link href="/list" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
                   My List
@@ -173,7 +173,7 @@ export default function Navbar() {
                     <span>{userName}</span>
                   </div>
                   <button
-                    onClick={() => { signOut(); closeMenu(); }}
+                    onClick={() => { signOut({ redirectUrl: "/" }); closeMenu(); }}
                     className="text-red-400 text-sm flex items-center gap-1"
                   >
                     <LogOut className="w-4 h-4" />
@@ -183,10 +183,10 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex gap-3 pt-3 border-t border-gray-800">
-                <Link href="/login" onClick={closeMenu} className="flex-1 text-center py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
+                <Link href="/sign-in" onClick={closeMenu} className="flex-1 text-center py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition">
                   Login
                 </Link>
-                <Link href="/register" onClick={closeMenu} className="flex-1 text-center py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+                <Link href="/sign-up" onClick={closeMenu} className="flex-1 text-center py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
                   Sign Up
                 </Link>
               </div>

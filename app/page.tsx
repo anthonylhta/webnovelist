@@ -1,7 +1,6 @@
 // app/page.tsx
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import Link from "next/link";
 import {
   BookOpen, Star, TrendingUp, CheckCircle,
@@ -10,10 +9,10 @@ import {
 import LoggedInHome from "./LoggedInHome";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const currentUser = await getCurrentUser();
 
-  if (session) {
-    return <LoggedInHome userName={session.user?.name || "Reader"} />;
+  if (currentUser) {
+    return <LoggedInHome userName={currentUser.username || "Reader"} />;
   }
 
   const [trendingNovels, recentNovels, allNovels, userCount, entryCount] =
@@ -86,7 +85,7 @@ export default async function Home() {
               Browse Novels
             </Link>
             <Link
-              href="/register"
+              href="/sign-up"
               className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition text-center"
             >
               Sign Up Free
@@ -252,7 +251,7 @@ export default async function Home() {
             Join the community and keep track of every chapter.
           </p>
           <Link
-            href="/register"
+            href="/sign-up"
             className="inline-block bg-blue-600 hover:bg-blue-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl 
                        font-semibold text-base sm:text-lg transition"
           >

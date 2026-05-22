@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 
 // GET — list favorite characters
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
 
     const favorites = await prisma.userFavoriteCharacter.findMany({
       where: { userId },
@@ -33,12 +32,12 @@ export async function GET() {
 // POST — add a favorite character
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
     const { characterId } = await request.json();
 
     if (!characterId || typeof characterId !== "number") {
@@ -91,12 +90,12 @@ export async function POST(request: NextRequest) {
 // DELETE — remove a favorite character
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: "Not logged in" }, { status: 401 });
     }
 
-    const userId = (session.user as any).id;
+    const userId = user.id;
     const { characterId } = await request.json();
 
     const existing = await prisma.userFavoriteCharacter.findUnique({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { Heart } from "lucide-react";
 
 interface FavoriteNovelButtonProps {
@@ -9,7 +9,7 @@ interface FavoriteNovelButtonProps {
 }
 
 export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProps) {
-  const { data: session } = useSession();
+  const currentUser = useCurrentUser();
   const [entryId, setEntryId] = useState<number | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProp
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!session) {
+    if (!currentUser) {
       setLoading(false);
       return;
     }
@@ -35,7 +35,7 @@ export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProp
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [session, novelId]);
+  }, [currentUser, novelId]);
 
   const toggleFavorite = async () => {
     if (!entryId || toggling) return;
@@ -62,7 +62,7 @@ export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProp
     }
   };
 
-  if (loading || !session || entryId === null) return null;
+  if (loading || !currentUser || entryId === null) return null;
 
   return (
     <div>

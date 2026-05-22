@@ -2,7 +2,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@clerk/nextjs";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import { Plus, ShieldX } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +17,8 @@ const GENRE_OPTIONS = [
 ];
 
 export default function AddNovelPage() {
-  const { data: session, status: authStatus } = useSession();
+  const { isLoaded, isSignedIn } = useAuth();
+  const currentUser = useCurrentUser();
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -36,7 +38,7 @@ export default function AddNovelPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  if (authStatus === "loading") {
+  if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading...</div>
@@ -44,13 +46,13 @@ export default function AddNovelPage() {
     );
   }
 
-  if (authStatus === "unauthenticated") {
-    router.push("/login");
+  if (!isSignedIn) {
+    router.push("/sign-in");
     return null;
   }
 
   // Check role — only admin and moderator can add novels
-  const userRole = (session?.user as any)?.role;
+  const userRole = currentUser?.role;
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">

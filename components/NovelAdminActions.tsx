@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -17,12 +17,12 @@ export default function NovelAdminActions({
   novelId,
   novelTitle,
 }: NovelAdminActionsProps) {
-  const { data: session } = useSession();
+  const currentUser = useCurrentUser();
   const router = useRouter();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const userRole = (session?.user as any)?.role;
+  const userRole = currentUser?.role;
   const canEdit = userRole === "admin" || userRole === "moderator";
   const canDelete = userRole === "admin";
 
