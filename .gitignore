@@ -51,3 +51,5 @@ repomix-output.xml
 
 # claude code local settings
 .claude/settings.local.json
+AGENTS.md
+CLAUDE.md

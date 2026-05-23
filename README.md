@@ -22,14 +22,14 @@
 
 ## Features
 
-- 📖 **Reading list** — track novels across five statuses (Reading, Completed, On Hold, Dropped, Plan to Read), with per-entry rating, current chapter, reread count, notes, and a reading link.
-- 📊 **Stats dashboard** — aggregate metrics across your library: totals by status, chapters read, and average rating.
-- 🔥 **Activity heatmap** — a GitHub-style contribution graph of your reading activity over the past year.
-- 👤 **Public profiles** — shareable `/user/<username>` pages featuring favorite novels, authors, and characters.
-- 🔎 **Browse & search** — find novels by title, author, or genre.
-- 🛡️ **Admin panel** — role-based user management, role assignment, and full novel catalog CRUD.
-- 🔐 **Authentication** — email/password and social-login-ready sign-in via Clerk, with secure sessions.
-- 🖼️ **Image uploads** — avatars and novel covers handled through Cloudinary, plus customizable profile banners.
+- **Reading list** — track novels across five statuses (Reading, Completed, On Hold, Dropped, Plan to Read), with per-entry rating, current chapter, reread count, notes, and a reading link.
+- **Stats dashboard** — aggregate metrics across your library: totals by status, chapters read, and average rating.
+- **Activity heatmap** — a GitHub-style contribution graph of your reading activity over the past year.
+- **Public profiles** — shareable `/user/<username>` pages featuring favorite novels, authors, and characters.
+- **Browse & search** — find novels by title, author, or genre.
+- **Admin panel** — role-based user management, role assignment, and full novel catalog CRUD.
+- **Authentication** — email/password and social-login-ready sign-in via Clerk, with secure sessions.
+- **Image uploads** — avatars and novel covers handled through Cloudinary, plus customizable profile banners.
 
 ## Tech Stack
 
