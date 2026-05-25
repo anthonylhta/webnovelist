@@ -175,6 +175,11 @@ export default async function PublicProfilePage({
   // Recent activities
   const recentActivities = activities.slice(0, 25);
 
+  const bannerCoverUrls = favoriteNovels
+    .map((n) => n.coverImageUrl)
+    .filter((url): url is string => !!url)
+    .slice(0, 4);
+
   const getRoleIcon = () => {
     switch (user.role) {
       case "admin": return <Crown className="w-4 h-4 text-red-400" />;
@@ -196,7 +201,32 @@ export default async function PublicProfilePage({
       {/* ===== BANNER + PROFILE HEADER ===== */}
       <div className="relative mb-16 sm:mb-20">
         {/* Banner */}
-        <div className={`relative h-32 sm:h-44 bg-gradient-to-r ${getBannerGradient(user.bannerColor)} rounded-b-2xl sm:rounded-b-3xl`}>
+        <div className="relative h-32 sm:h-44 overflow-hidden rounded-b-2xl sm:rounded-b-3xl">
+          {/* Blurred favorite covers */}
+          {bannerCoverUrls.length > 0 ? (
+            <div className="absolute inset-0 flex">
+              {bannerCoverUrls.map((url, i) => (
+                <div key={i} className="relative flex-1">
+                  <Image
+                    fill
+                    sizes="25vw"
+                    src={url}
+                    alt=""
+                    aria-hidden="true"
+                    className="object-cover blur-2xl scale-125 opacity-70"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={`absolute inset-0 bg-gradient-to-r ${getBannerGradient(user.bannerColor)}`} />
+          )}
+          {/* Color tint overlay — still lets the color picker do something */}
+          {bannerCoverUrls.length > 0 && (
+            <div className={`absolute inset-0 bg-gradient-to-r ${getBannerGradient(user.bannerColor)} mix-blend-color`} />
+          )}
+          {/* Bottom fade into page background */}
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-transparent to-transparent" />
           <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
         </div>
 
