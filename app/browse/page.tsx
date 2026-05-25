@@ -2,7 +2,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+
+const getAllGenres = unstable_cache(
+  async () => {
+    const rows = await prisma.novel.findMany({ select: { genres: true } });
+    return [...new Set(rows.flatMap((n) => n.genres))].sort();
+  },
+  ["all-genres"],
+  { revalidate: 3600 }
+);
 
 const NOVELS_PER_PAGE = 20;
 
@@ -44,9 +54,7 @@ export default async function BrowsePage({
 
   const totalPages = Math.max(1, Math.ceil(totalCount / NOVELS_PER_PAGE));
 
-  // Get all genres for the filter bar
-  const allNovels = await prisma.novel.findMany({ select: { genres: true } });
-  const allGenres = [...new Set(allNovels.flatMap((n) => n.genres))].sort();
+  const allGenres = await getAllGenres();
 
   // Helper to build pagination URLs preserving search & genre
   const buildPageUrl = (pageNum: number) => {
@@ -155,19 +163,20 @@ export default async function BrowsePage({
         <p className="text-gray-500 text-center py-12">No novels found.</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {novels.map((novel) => (
+          {novels.map((novel, i) => (
             <Link
               key={novel.id}
               href={`/novel/${novel.id}`}
-              className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden 
+              className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden
                          hover:border-blue-500 transition group"
             >
               <div className="relative aspect-[3/4] bg-gray-800 overflow-hidden">
                 <Image
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                  src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                  src={novel.coverImageUrl || "/default-cover.svg"}
                   alt={novel.title}
+                  priority={i < 4}
                   className="object-cover group-hover:scale-105 transition duration-300"
                 />
               </div>

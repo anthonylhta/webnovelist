@@ -14,7 +14,41 @@ export default async function Home() {
   const currentUser = await getCurrentUser();
 
   if (currentUser) {
-    return <LoggedInHome userName={currentUser.username || "Reader"} />;
+    const [readingEntries, recentNovels] = await Promise.all([
+      prisma.userNovelList.findMany({
+        where: { userId: currentUser.id, status: "Reading" },
+        include: {
+          novel: {
+            select: {
+              id: true,
+              title: true,
+              coverImageUrl: true,
+              totalChapters: true,
+              author: true,
+            },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+        take: 6,
+      }),
+      prisma.novel.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: { id: true, title: true, author: true, coverImageUrl: true },
+      }),
+    ]);
+
+    return (
+      <LoggedInHome
+        userName={currentUser.username || "Reader"}
+        initialReading={readingEntries.map((e) => ({
+          id: e.id,
+          currentChapter: e.currentChapter,
+          novel: e.novel,
+        }))}
+        recentNovels={recentNovels}
+      />
+    );
   }
 
   const [trendingNovels, recentNovels, allNovels, userCount, entryCount] =
@@ -114,7 +148,7 @@ export default async function Home() {
             </div>
 
             <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-              {trendingNovels.map((novel) => (
+              {trendingNovels.map((novel, i) => (
                 <Link
                   key={novel.id}
                   href={`/novel/${novel.id}`}
@@ -124,11 +158,9 @@ export default async function Home() {
                     <Image
                       fill
                       sizes="(max-width: 640px) 112px, 144px"
-                      src={
-                        novel.coverImageUrl ||
-                        "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
-                      }
+                      src={novel.coverImageUrl || "/default-cover.svg"}
                       alt={novel.title}
+                      priority={i === 0}
                       className="object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>
@@ -178,7 +210,7 @@ export default async function Home() {
                       sizes="(max-width: 640px) 112px, 144px"
                       src={
                         novel.coverImageUrl ||
-                        "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
+                        "/default-cover.svg"
                       }
                       alt={novel.title}
                       className="object-cover group-hover:scale-105 transition duration-300"

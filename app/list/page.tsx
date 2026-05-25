@@ -258,7 +258,7 @@ export default function ListPage() {
                     <div className="flex items-center gap-3">
                       <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                         <Image
-                          src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                          src={entry.novel.coverImageUrl || "/default-cover.svg"}
                           alt={entry.novel.title}
                           width={36}
                           height={48}
