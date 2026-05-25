@@ -29,7 +29,6 @@ export default function EditNovelPage() {
     title: "",
     titleChinese: "",
     author: "",
-    authorId: null as number | null,
     description: "",
     coverImageUrl: "",
     totalChapters: "",
@@ -43,20 +42,19 @@ export default function EditNovelPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [allAuthors, setAllAuthors] = useState<{ id: number; name: string }[]>([]);
 
-  // Fetch the novel data and author list
+  // Fetch the novel data
   useEffect(() => {
-    Promise.all([
-      fetch(`/api/novels/${novelId}`).then((r) => r.json()),
-      fetch("/api/authors").then((r) => r.json()),
-    ])
-      .then(([novel, authors]) => {
+    fetch(`/api/novels/${novelId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Novel not found");
+        return res.json();
+      })
+      .then((novel) => {
         setForm({
           title: novel.title || "",
           titleChinese: novel.titleChinese || "",
           author: novel.author || "",
-          authorId: novel.authorId ?? null,
           description: novel.description || "",
           coverImageUrl: novel.coverImageUrl || "",
           totalChapters: novel.totalChapters?.toString() || "",
@@ -66,7 +64,6 @@ export default function EditNovelPage() {
           originalSource: novel.originalSource || "",
           yearPublished: novel.yearPublished?.toString() || "",
         });
-        if (Array.isArray(authors)) setAllAuthors(authors);
         setLoading(false);
       })
       .catch(() => {
@@ -135,7 +132,6 @@ export default function EditNovelPage() {
           title: form.title.trim(),
           titleChinese: form.titleChinese.trim() || null,
           author: form.author.trim() || null,
-          authorId: form.authorId,
           description: form.description.trim() || null,
           coverImageUrl: form.coverImageUrl.trim() || null,
           totalChapters: form.totalChapters ? parseInt(form.totalChapters) : null,
@@ -209,7 +205,7 @@ export default function EditNovelPage() {
 
           {/* Author */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Author (display name)</label>
+            <label className="block text-sm text-gray-400 mb-1">Author</label>
             <input
               type="text"
               value={form.author}
@@ -218,31 +214,6 @@ export default function EditNovelPage() {
                          text-gray-100 focus:outline-none focus:border-blue-500"
             />
           </div>
-
-          {/* Link to Author entity */}
-          {allAuthors.length > 0 && (
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">
-                Link to Author page
-                <span className="text-gray-600 ml-1">(optional)</span>
-              </label>
-              <select
-                value={form.authorId ?? ""}
-                onChange={(e) =>
-                  setForm({ ...form, authorId: e.target.value ? parseInt(e.target.value) : null })
-                }
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
-              >
-                <option value="">— None —</option>
-                {allAuthors.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {/* Description */}
           <div>
