@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -254,14 +255,24 @@ export default function ListPage() {
                 >
                   {/* Novel Title */}
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                      <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
+                        <Image
+                          src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                          alt={entry.novel.title}
+                          width={36}
+                          height={48}
+                          className="rounded object-cover"
+                        />
+                      </Link>
+                      <div className="flex items-center gap-2 min-w-0">
                       <Link
                         href={`/novel/${entry.novel.id}`}
-                        className="hover:text-blue-400 transition"
+                        className="hover:text-blue-400 transition min-w-0"
                       >
-                        <div className="font-medium">{entry.novel.title}</div>
+                        <div className="font-medium truncate">{entry.novel.title}</div>
                         {entry.novel.titleChinese && (
-                          <div className="text-gray-500 text-sm">
+                          <div className="text-gray-500 text-sm truncate">
                             {entry.novel.titleChinese}
                           </div>
                         )}
@@ -271,12 +282,13 @@ export default function ListPage() {
                           href={entry.readingUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 hover:text-blue-400 transition"
+                          className="text-gray-500 hover:text-blue-400 transition shrink-0"
                           title="Open reading link"
                         >
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
+                      </div>
                     </div>
                   </td>
 
