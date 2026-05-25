@@ -12,7 +12,7 @@ async function main() {
   console.log(`📦 Found ${data.length} novels to import\n`);
 
   let added = 0;
-  let skipped = 0;
+  const skipped = 0;
   let updated = 0;
 
   for (const novel of data) {

@@ -134,7 +134,7 @@ export default async function Home() {
                   <div className="flex items-center gap-1 mt-0.5">
                     <Users className="w-3 h-3 text-gray-500" />
                     <span className="text-xs text-gray-500">
-                      {(novel as any)._count.userEntries} tracking
+                      {novel._count.userEntries} tracking
                     </span>
                   </div>
                 </Link>

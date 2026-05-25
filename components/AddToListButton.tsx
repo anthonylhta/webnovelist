@@ -21,11 +21,12 @@ export default function AddToListButton({
   const currentUser = useCurrentUser();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [existingEntry, setExistingEntry] = useState<any>(null);
+  const [existingEntry, setExistingEntry] = useState<{ id: number; novelId: number; isFavorite: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!currentUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -34,7 +35,7 @@ export default function AddToListButton({
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          const entry = data.find((e: any) => e.novelId === novelId);
+          const entry = data.find((e: { novelId: number }) => e.novelId === novelId);
           setExistingEntry(entry || null);
         }
         setLoading(false);

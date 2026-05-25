@@ -26,7 +26,7 @@ export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProp
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          const entry = data.find((e: any) => e.novelId === novelId);
+          const entry = data.find((e: { novelId: number }) => e.novelId === novelId);
           if (entry) {
             setEntryId(entry.id);
             setIsFavorite(entry.isFavorite || false);

@@ -29,7 +29,16 @@ export async function PUT(
     }
 
     // Build update data
-    const updateData: any = {};
+    const updateData: {
+      status?: string;
+      rating?: number | null;
+      currentChapter?: number;
+      readingUrl?: string | null;
+      rereadCount?: number;
+      notes?: string | null;
+      dateStarted?: Date | null;
+      dateFinished?: Date | null;
+    } = {};
     if (body.status !== undefined) updateData.status = body.status;
     if (body.rating !== undefined) updateData.rating = body.rating;
     if (body.currentChapter !== undefined) updateData.currentChapter = body.currentChapter;

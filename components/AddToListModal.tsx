@@ -64,12 +64,12 @@ export default function AddToListModal({
           novelId,
           status: form.status,
           rating: form.rating === "" ? null : parseFloat(form.rating as string),
-          currentChapter: parseInt(form.currentChapter as any) || 0,
+          currentChapter: parseInt(String(form.currentChapter)) || 0,
           dateStarted: form.dateStarted || null,
           dateFinished: form.dateFinished || null,
           notes: form.notes || null,
           readingUrl: form.readingUrl || null,
-          rereadCount: parseInt(form.rereadCount as any) || 0,
+          rereadCount: parseInt(String(form.rereadCount)) || 0,
         }),
       });
 

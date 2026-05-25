@@ -12,6 +12,9 @@ import {
 import AddToListModal from "@/components/AddToListModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
+import type { UserNovelList, Novel } from "@prisma/client";
+
+type ListEntry = UserNovelList & { novel: Novel };
 
 const STATUS_TABS = [
   { key: "all", label: "All", icon: "📚" },
@@ -28,11 +31,11 @@ type SortDir = "asc" | "desc";
 export default function ListPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<ListEntry[]>([]);
   const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [editingEntry, setEditingEntry] = useState<any>(null);
-  const [deletingEntry, setDeletingEntry] = useState<any>(null);
+  const [editingEntry, setEditingEntry] = useState<ListEntry | null>(null);
+  const [deletingEntry, setDeletingEntry] = useState<ListEntry | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("updated");
   const [sortDir, setSortDir] = useState<SortDir>("desc");

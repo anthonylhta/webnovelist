@@ -51,8 +51,8 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
 
       setPreview(data.url);
       onUpload(data.url);
-    } catch (err: any) {
-      setError(err.message || "Upload failed. Please try again.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
       setPreview(currentUrl);
     } finally {
       setUploading(false);

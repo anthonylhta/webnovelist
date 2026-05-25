@@ -28,11 +28,13 @@ export function containsSuspiciousContent(input: string): boolean {
 }
 
 // Sanitize an object's string values
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function sanitizeObject<T extends Record<string, any>>(obj: T): T {
   const sanitized = { ...obj };
 
   for (const key in sanitized) {
     if (typeof sanitized[key] === "string") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       sanitized[key] = sanitizeString(sanitized[key]) as any;
     }
   }
