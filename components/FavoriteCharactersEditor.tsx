@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Plus, X, Users } from "lucide-react";
+import Link from "next/link";
 
 interface Character {
   id: number;
@@ -91,28 +92,30 @@ export default function FavoriteCharactersEditor({
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
           {favorites.map((char) => (
             <div key={char.id} className="shrink-0 text-center relative group">
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700
-                            flex items-center justify-center overflow-hidden">
-                {char.imageUrl ? (
-                  <Image
-                    fill
-                    sizes="64px"
-                    src={char.imageUrl}
-                    alt={char.name}
-                    className="object-cover"
-                  />
-                ) : (
-                  <span className="text-lg font-bold text-gray-500">
-                    {char.name[0]}
-                  </span>
-                )}
-              </div>
-              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 max-w-[60px] sm:max-w-[70px] truncate">
-                {char.name}
-              </p>
-              <p className="text-[9px] text-gray-600 truncate max-w-[60px] sm:max-w-[70px]">
-                {char.novel.title}
-              </p>
+              <Link href={`/character/${char.id}`} className="block">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700
+                              flex items-center justify-center overflow-hidden hover:border-purple-500/60 transition">
+                  {char.imageUrl ? (
+                    <Image
+                      fill
+                      sizes="64px"
+                      src={char.imageUrl}
+                      alt={char.name}
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold text-gray-500">
+                      {char.name[0]}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] sm:text-xs text-gray-400 mt-1 max-w-[60px] sm:max-w-[70px] truncate hover:text-purple-400 transition">
+                  {char.name}
+                </p>
+                <p className="text-[9px] text-gray-600 truncate max-w-[60px] sm:max-w-[70px]">
+                  {char.novel.title}
+                </p>
+              </Link>
 
               {isOwner && (
                 <button
@@ -201,7 +204,7 @@ export default function FavoriteCharactersEditor({
 
       {isOwner && remaining.length === 0 && favorites.length < 5 && (
         <p className="text-gray-600 text-xs mt-2">
-          No more characters available. Add novels to your list to see characters.
+          No more characters available.
         </p>
       )}
     </div>

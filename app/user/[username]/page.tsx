@@ -140,10 +140,8 @@ export default async function PublicProfilePage({
     novel: f.character.novel,
   }));
 
-  // Available characters (from novels in user's list)
-  const userNovelIds = list.map((entry) => entry.novelId);
+  // Available characters (all characters system-wide)
   const availableCharactersRaw = await prisma.character.findMany({
-    where: { novelId: { in: userNovelIds } },
     include: { novel: { select: { id: true, title: true } } },
     orderBy: [{ novel: { title: "asc" } }, { name: "asc" }],
   });
