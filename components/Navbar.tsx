@@ -34,7 +34,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800">
+    <nav className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800/60">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -125,7 +125,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-800 bg-gray-900">
+        <div className="md:hidden border-t border-gray-800/60 bg-gray-900/95 backdrop-blur-md">
           <div className="px-4 py-4 space-y-3">
             <Link href="/browse" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
               Browse
