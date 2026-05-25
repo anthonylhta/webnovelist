@@ -7,7 +7,7 @@ import AddToListButton from "@/components/AddToListButton";
 import FavoriteNovelButton from "@/components/FavoriteNovelButton";
 import NovelAdminActions from "@/components/NovelAdminActions";
 
-const PLACEHOLDER = "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover";
+const PLACEHOLDER = "/default-cover.svg";
 
 const STATUS_STYLES: Record<string, string> = {
   Ongoing: "bg-green-600/20 text-green-400 border-green-600/30",
@@ -22,14 +22,30 @@ export default async function NovelPage({
 }) {
   const { id } = await params;
 
-  const novel = await prisma.novel.findUnique({
-    where: { id: parseInt(id) },
-    include: { authorEntity: { select: { id: true, name: true } } },
-  });
+  const novelId = parseInt(id);
+
+  const [novel, characters] = await Promise.all([
+    prisma.novel.findUnique({
+      where: { id: novelId },
+      include: { authorEntity: { select: { id: true, name: true } } },
+    }),
+    prisma.character.findMany({
+      where: { novelId },
+      orderBy: [{ role: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, role: true, imageUrl: true },
+    }),
+  ]);
 
   if (!novel) notFound();
 
   const coverUrl = novel.coverImageUrl || PLACEHOLDER;
+
+  const ROLE_STYLES: Record<string, string> = {
+    Protagonist: "text-purple-400 bg-purple-600/10 border-purple-600/30",
+    "Main Character": "text-blue-400 bg-blue-600/10 border-blue-600/30",
+    Antagonist: "text-red-400 bg-red-600/10 border-red-600/30",
+    Supporting: "text-gray-400 bg-gray-600/10 border-gray-600/30",
+  };
   const statusStyle = STATUS_STYLES[novel.status || ""] ?? "bg-gray-600/20 text-gray-400 border-gray-600/30";
 
   return (
@@ -155,6 +171,45 @@ export default async function NovelPage({
                   {novel.description || "No description available."}
                 </p>
               </div>
+
+              {/* Characters */}
+              {characters.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-gray-800/60">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">
+                    Characters
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {characters.map((char) => (
+                      <Link
+                        key={char.id}
+                        href={`/character/${char.id}`}
+                        className="flex items-center gap-2.5 bg-gray-900 hover:bg-gray-800 border border-gray-800
+                                   hover:border-gray-700 rounded-xl px-3 py-2 transition group"
+                      >
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-800 border border-gray-700 shrink-0">
+                          <Image
+                            fill
+                            sizes="36px"
+                            src={char.imageUrl || "/default-avatar.svg"}
+                            alt={char.name}
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-200 group-hover:text-white transition leading-none mb-1">
+                            {char.name}
+                          </p>
+                          {char.role && (
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${ROLE_STYLES[char.role] ?? ROLE_STYLES.Supporting}`}>
+                              {char.role}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>

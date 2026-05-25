@@ -8,6 +8,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Pencil, ShieldX } from "lucide-react";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
+import NovelCharactersManager from "@/components/NovelCharactersManager";
 
 
 const GENRE_OPTIONS = [
@@ -373,6 +374,7 @@ export default function EditNovelPage() {
           </div>
         </form>
       </div>
+      <NovelCharactersManager novelId={novelId} />
     </div>
   );
 }

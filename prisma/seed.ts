@@ -695,6 +695,125 @@ async function seedAuthors() {
   console.log(`Novel links — Linked: ${linked}, Already linked: ${alreadyLinked}`);
 }
 
+const charactersByNovelTitle: Record<string, { name: string; role: string }[]> = {
+  "Reverend Insanity": [
+    { name: "Fang Yuan", role: "Protagonist" },
+    { name: "Fang Zheng", role: "Supporting" },
+  ],
+  "Lord of the Mysteries": [
+    { name: "Klein Moretti", role: "Protagonist" },
+    { name: "Audrey Hall", role: "Supporting" },
+    { name: "Alger Wilson", role: "Supporting" },
+  ],
+  "I Shall Seal the Heavens": [
+    { name: "Meng Hao", role: "Protagonist" },
+    { name: "Xu Qing", role: "Supporting" },
+  ],
+  "A Will Eternal": [
+    { name: "Bai Xiaochun", role: "Protagonist" },
+    { name: "Song Junwan", role: "Supporting" },
+  ],
+  "Renegade Immortal": [
+    { name: "Wang Lin", role: "Protagonist" },
+  ],
+  "Coiling Dragon": [
+    { name: "Linley Baruch", role: "Protagonist" },
+    { name: "Delia", role: "Supporting" },
+    { name: "Bebe", role: "Supporting" },
+  ],
+  "Battle Through the Heavens": [
+    { name: "Xiao Yan", role: "Protagonist" },
+    { name: "Yao Lao", role: "Supporting" },
+    { name: "Xun Er", role: "Supporting" },
+  ],
+  "Soul Land": [
+    { name: "Tang San", role: "Protagonist" },
+    { name: "Xiao Wu", role: "Supporting" },
+  ],
+  "Tales of Demons and Gods": [
+    { name: "Nie Li", role: "Protagonist" },
+    { name: "Ye Ziyun", role: "Supporting" },
+  ],
+  "Omniscient Reader's Viewpoint": [
+    { name: "Kim Dokja", role: "Protagonist" },
+    { name: "Yoo Joonghyuk", role: "Main Character" },
+    { name: "Han Sooyoung", role: "Supporting" },
+  ],
+  "Martial World": [
+    { name: "Lin Ming", role: "Protagonist" },
+  ],
+  "Against the Gods": [
+    { name: "Yun Che", role: "Protagonist" },
+  ],
+  "Warlock of the Magus World": [
+    { name: "Leylin Farlier", role: "Protagonist" },
+  ],
+  "Shadow Slave": [
+    { name: "Sunny", role: "Protagonist" },
+    { name: "Cassie", role: "Supporting" },
+    { name: "Nephis", role: "Main Character" },
+  ],
+  "Trash of the Count's Family": [
+    { name: "Cale Henituse", role: "Protagonist" },
+    { name: "Choi Han", role: "Supporting" },
+  ],
+  "The Beginning After the End": [
+    { name: "Arthur Leywin", role: "Protagonist" },
+  ],
+  "Second Life Ranker": [
+    { name: "Yeon-woo", role: "Protagonist" },
+  ],
+  "Library of Heaven's Path": [
+    { name: "Zhang Xuan", role: "Protagonist" },
+  ],
+  "The Legendary Mechanic": [
+    { name: "Han Xiao", role: "Protagonist" },
+  ],
+  "Release That Witch": [
+    { name: "Roland Wimbledon", role: "Protagonist" },
+    { name: "Anna", role: "Supporting" },
+  ],
+};
+
+async function seedCharacters() {
+  const dbNovels = await prisma.novel.findMany({
+    where: { title: { in: Object.keys(charactersByNovelTitle) } },
+    select: { id: true, title: true },
+  });
+
+  const novelMap = new Map(dbNovels.map((n) => [n.title, n.id]));
+
+  let created = 0;
+  let skipped = 0;
+
+  for (const [novelTitle, chars] of Object.entries(charactersByNovelTitle)) {
+    const novelId = novelMap.get(novelTitle);
+    if (!novelId) {
+      console.log(`  ⚠️  Novel not found: ${novelTitle}`);
+      continue;
+    }
+
+    for (const char of chars) {
+      const existing = await prisma.character.findUnique({
+        where: { name_novelId: { name: char.name, novelId } },
+      });
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await prisma.character.create({
+        data: { name: char.name, role: char.role, novelId },
+      });
+      console.log(`  ✅ Created: ${char.name} (${novelTitle})`);
+      created++;
+    }
+  }
+
+  console.log(`\nCharacters — Created: ${created}, Skipped: ${skipped}`);
+}
+
 async function main() {
   console.log("🌱 Seeding database...\n");
 
@@ -703,6 +822,9 @@ async function main() {
 
   console.log("\n✍️  Seeding authors...");
   await seedAuthors();
+
+  console.log("\n🧑‍🤝‍🧑 Seeding characters...");
+  await seedCharacters();
 
   console.log("\n🎉 Seeding complete!");
 }

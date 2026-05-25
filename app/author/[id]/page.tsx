@@ -7,8 +7,8 @@ import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import FavoriteAuthorButton from "@/components/FavoriteAuthorButton";
 
-const PLACEHOLDER = "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover";
-const AVATAR_PLACEHOLDER = "https://placehold.co/200x200/1a1a2e/ffffff?text=?";
+const PLACEHOLDER = "/default-cover.svg";
+const AVATAR_PLACEHOLDER = "/default-avatar.svg";
 
 export async function generateMetadata({
   params,

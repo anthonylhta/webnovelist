@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Plus, X, Users } from "lucide-react";
+import Link from "next/link";
 
 interface Character {
   id: number;
@@ -46,16 +47,15 @@ export default function FavoriteCharactersEditor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ characterId: character.id }),
       });
-
       if (res.ok) {
         setFavorites([...favorites, character]);
+        setShowPicker(false);
+        setSearch("");
       }
     } catch (error) {
       console.error("Failed to add character:", error);
     } finally {
       setLoading(false);
-      setShowPicker(false);
-      setSearch("");
     }
   };
 
@@ -67,7 +67,6 @@ export default function FavoriteCharactersEditor({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ characterId }),
       });
-
       if (res.ok) {
         setFavorites(favorites.filter((f) => f.id !== characterId));
       }
@@ -78,131 +77,135 @@ export default function FavoriteCharactersEditor({
     }
   };
 
+  const openPicker = () => {
+    setShowPicker(true);
+    setSearch("");
+  };
+
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-      <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-        Favorite Characters
-      </h2>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+          Favorite Characters
+        </h2>
+        {isOwner && favorites.length < 5 && !showPicker && (
+          <button
+            onClick={openPicker}
+            disabled={loading || remaining.length === 0}
+            className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300
+                       disabled:opacity-40 transition"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add
+          </button>
+        )}
+      </div>
 
-      {favorites.length === 0 && !isOwner ? (
+      {/* Empty state */}
+      {favorites.length === 0 && !isOwner && (
         <p className="text-gray-500 text-sm">No favorite characters yet.</p>
-      ) : (
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+      )}
+
+      {/* Character avatars */}
+      {favorites.length > 0 && (
+        <div className="flex flex-wrap gap-4 mb-1">
           {favorites.map((char) => (
-            <div key={char.id} className="shrink-0 text-center relative group">
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700
-                            flex items-center justify-center overflow-hidden">
-                {char.imageUrl ? (
+            <div key={char.id} className="relative group">
+              <Link href={`/character/${char.id}`} className="block text-center w-16">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-gray-800 rounded-full border border-gray-700
+                                flex items-center justify-center overflow-hidden hover:border-purple-500/60 transition">
                   <Image
                     fill
                     sizes="64px"
-                    src={char.imageUrl}
+                    src={char.imageUrl || "/default-avatar.svg"}
                     alt={char.name}
                     className="object-cover"
                   />
-                ) : (
-                  <span className="text-lg font-bold text-gray-500">
-                    {char.name[0]}
-                  </span>
-                )}
-              </div>
-              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 max-w-[60px] sm:max-w-[70px] truncate">
-                {char.name}
-              </p>
-              <p className="text-[9px] text-gray-600 truncate max-w-[60px] sm:max-w-[70px]">
-                {char.novel.title}
-              </p>
+                </div>
+                <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 truncate hover:text-purple-400 transition">
+                  {char.name}
+                </p>
+                <p className="text-[9px] text-gray-600 truncate">
+                  {char.novel.title}
+                </p>
+              </Link>
 
               {isOwner && (
                 <button
                   onClick={() => removeCharacter(char.id)}
                   disabled={loading}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 hover:bg-red-700 rounded-full 
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 hover:bg-red-700 rounded-full
                              flex items-center justify-center opacity-0 group-hover:opacity-100 transition
                              disabled:opacity-50"
                 >
-                  <X className="w-2.5 h-2.5 text-white" />
+                  <X className="w-3 h-3 text-white" />
                 </button>
               )}
             </div>
           ))}
-
-          {/* Add button */}
-          {isOwner && favorites.length < 5 && (
-            <div className="relative">
-              <button
-                onClick={() => setShowPicker(!showPicker)}
-                disabled={loading || remaining.length === 0}
-                className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700 
-                           border-dashed flex items-center justify-center text-gray-500 hover:text-gray-300 
-                           hover:border-gray-600 transition disabled:opacity-30"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-
-              {showPicker && remaining.length > 0 && (
-                <div className="absolute left-0 top-full mt-2 bg-gray-800 border border-gray-700 rounded-xl 
-                                shadow-xl z-50 w-64 max-h-72 overflow-hidden">
-                  <div className="p-2 border-b border-gray-700">
-                    <input
-                      type="text"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      placeholder="Search characters or novels..."
-                      className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm 
-                                 text-gray-200 focus:outline-none focus:border-purple-500"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="overflow-y-auto max-h-56">
-                    {filtered.length === 0 ? (
-                      <p className="text-gray-500 text-sm p-3 text-center">No characters found.</p>
-                    ) : (
-                      filtered.map((char) => (
-                        <button
-                          key={char.id}
-                          onClick={() => addCharacter(char)}
-                          disabled={loading}
-                          className="w-full text-left px-3 py-2 hover:bg-gray-700 transition flex items-center gap-3"
-                        >
-                          <div className="relative w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
-                            {char.imageUrl ? (
-                              <Image
-                                fill
-                                sizes="32px"
-                                src={char.imageUrl}
-                                alt={char.name}
-                                className="rounded-full object-cover"
-                              />
-                            ) : (
-                              <span className="text-xs font-bold text-gray-500">
-                                {char.name[0]}
-                              </span>
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm text-gray-200 truncate">{char.name}</p>
-                            <p className="text-[10px] text-gray-500 truncate">{char.novel.title}</p>
-                          </div>
-                          <span className="text-[10px] text-gray-600 ml-auto shrink-0">
-                            {char.role}
-                          </span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       )}
 
-      {isOwner && remaining.length === 0 && favorites.length < 5 && (
-        <p className="text-gray-600 text-xs mt-2">
-          No more characters available. Add novels to your list to see characters.
-        </p>
+      {/* Picker */}
+      {showPicker && (
+        <div className="mt-3 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
+          <div className="flex items-center gap-2 p-2 border-b border-gray-700">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search characters or novels..."
+              className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm
+                         text-gray-200 focus:outline-none focus:border-purple-500"
+              autoFocus
+            />
+            <button
+              onClick={() => { setShowPicker(false); setSearch(""); }}
+              className="p-1.5 text-gray-500 hover:text-gray-300 transition"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="overflow-y-auto max-h-64">
+            {filtered.length === 0 ? (
+              <p className="text-gray-500 text-sm p-4 text-center">No characters found.</p>
+            ) : (
+              filtered.map((char) => (
+                <button
+                  key={char.id}
+                  onClick={() => addCharacter(char)}
+                  disabled={loading}
+                  className="w-full text-left px-3 py-2.5 hover:bg-gray-700 transition flex items-center gap-3
+                             border-b border-gray-700/50 last:border-0 disabled:opacity-50"
+                >
+                  <div className="relative w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-gray-600">
+                    <Image
+                      fill
+                      sizes="36px"
+                      src={char.imageUrl || "/default-avatar.svg"}
+                      alt={char.name}
+                      className="rounded-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-200 truncate">{char.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{char.novel.title}</p>
+                  </div>
+                  {char.role && (
+                    <span className="text-[10px] text-gray-600 shrink-0">{char.role}</span>
+                  )}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {isOwner && remaining.length === 0 && favorites.length < 5 && !showPicker && (
+        <p className="text-gray-600 text-xs mt-2">No more characters available.</p>
       )}
     </div>
   );
