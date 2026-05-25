@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/novels/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -36,10 +37,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(novels);
   } catch (error) {
     console.error("Failed to fetch novels:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch novels" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch novels", 500);
   }
 }
 
@@ -52,25 +50,22 @@ export async function POST(request: NextRequest) {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     if (!canManageNovels(user.role)) {
-      return NextResponse.json(
-        { error: "You don't have permission to add novels" },
-        { status: 403 }
-      );
+      return apiError("You don't have permission to add novels", 403);
     }
 
     const body = await request.json();
 
     // Validate required fields
     if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+      return apiError("Title is required", 400);
     }
 
     if (body.title.length > 500) {
-      return NextResponse.json({ error: "Title is too long" }, { status: 400 });
+      return apiError("Title is too long", 400);
     }
 
     // Check for suspicious content
@@ -81,16 +76,13 @@ export async function POST(request: NextRequest) {
 
     for (const field of fieldsToCheck) {
       if (containsSuspiciousContent(field)) {
-        return NextResponse.json(
-          { error: "Input contains invalid characters" },
-          { status: 400 }
-        );
+        return apiError("Input contains invalid characters", 400);
       }
     }
 
     // Validate URL if provided
     if (body.coverImageUrl && !isValidUrl(body.coverImageUrl)) {
-      return NextResponse.json({ error: "Invalid cover image URL" }, { status: 400 });
+      return apiError("Invalid cover image URL", 400);
     }
 
     // Sanitize all string inputs
@@ -113,9 +105,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(novel, { status: 201 });
   } catch (error) {
     console.error("Failed to create novel:", error);
-    return NextResponse.json(
-      { error: "Failed to create novel" },
-      { status: 500 }
-    );
+    return apiError("Failed to create novel", 500);
   }
 }

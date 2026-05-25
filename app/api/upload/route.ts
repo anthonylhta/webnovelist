@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -22,34 +23,28 @@ export async function POST(request: NextRequest) {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     if (!canManageNovels(user.role)) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return apiError("Not authorized", 403);
     }
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return apiError("No file provided", 400);
     }
 
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        { error: "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed." },
-        { status: 400 }
-      );
+      return apiError("Invalid file type. Only JPG, PNG, WebP, and GIF are allowed.", 400);
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: "File too large. Maximum size is 5MB." },
-        { status: 400 }
-      );
+      return apiError("File too large. Maximum size is 5MB.", 400);
     }
 
     // Convert file to base64
@@ -72,9 +67,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Upload failed:", error);
-    return NextResponse.json(
-      { error: "Upload failed" },
-      { status: 500 }
-    );
+    return apiError("Upload failed", 500);
   }
 }

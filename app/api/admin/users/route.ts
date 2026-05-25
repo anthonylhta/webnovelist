@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/admin/users/route.ts
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -8,12 +9,12 @@ export async function GET() {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const role = user.role;
     if (role !== "admin" && role !== "moderator") {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return apiError("Not authorized", 403);
     }
 
     const users = await prisma.user.findMany({
@@ -33,9 +34,6 @@ export async function GET() {
     return NextResponse.json(users);
   } catch (error) {
     console.error("Failed to fetch users:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch users" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch users", 500);
   }
 }

@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
@@ -28,21 +29,15 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return apiError("No file provided", 400);
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        { error: "Invalid file type. Only JPG, PNG, WebP, and GIF are allowed." },
-        { status: 400 }
-      );
+      return apiError("Invalid file type. Only JPG, PNG, WebP, and GIF are allowed.", 400);
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: "File too large. Maximum size is 5MB." },
-        { status: 400 }
-      );
+      return apiError("File too large. Maximum size is 5MB.", 400);
     }
 
     const bytes = await file.arrayBuffer();
@@ -65,6 +60,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: result.secure_url });
   } catch (error) {
     console.error("Avatar upload failed:", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return apiError("Upload failed", 500);
   }
 }

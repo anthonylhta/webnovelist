@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +8,7 @@ export async function GET() {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
@@ -25,7 +26,7 @@ export async function GET() {
     return NextResponse.json(favorites);
   } catch (error) {
     console.error("Failed to fetch favorite characters:", error);
-    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
+    return apiError("Failed to fetch", 500);
   }
 }
 
@@ -34,14 +35,14 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
     const { characterId } = await request.json();
 
     if (!characterId || typeof characterId !== "number") {
-      return NextResponse.json({ error: "Invalid character ID" }, { status: 400 });
+      return apiError("Invalid character ID", 400);
     }
 
     // Check max 5
@@ -49,10 +50,7 @@ export async function POST(request: NextRequest) {
       where: { userId },
     });
     if (count >= 5) {
-      return NextResponse.json(
-        { error: "Maximum 5 favorite characters allowed" },
-        { status: 400 }
-      );
+      return apiError("Maximum 5 favorite characters allowed", 400);
     }
 
     // Check character exists
@@ -60,7 +58,7 @@ export async function POST(request: NextRequest) {
       where: { id: characterId },
     });
     if (!character) {
-      return NextResponse.json({ error: "Character not found" }, { status: 404 });
+      return apiError("Character not found", 404);
     }
 
     // Check not already favorited
@@ -68,7 +66,7 @@ export async function POST(request: NextRequest) {
       where: { userId_characterId: { userId, characterId } },
     });
     if (existing) {
-      return NextResponse.json({ error: "Already in favorites" }, { status: 400 });
+      return apiError("Already in favorites", 400);
     }
 
     const favorite = await prisma.userFavoriteCharacter.create({
@@ -83,7 +81,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(favorite, { status: 201 });
   } catch (error) {
     console.error("Failed to add favorite character:", error);
-    return NextResponse.json({ error: "Failed to add" }, { status: 500 });
+    return apiError("Failed to add", 500);
   }
 }
 
@@ -92,7 +90,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
@@ -103,7 +101,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return apiError("Not found", 404);
     }
 
     await prisma.userFavoriteCharacter.delete({
@@ -113,6 +111,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: "Removed from favorites" });
   } catch (error) {
     console.error("Failed to remove favorite character:", error);
-    return NextResponse.json({ error: "Failed to remove" }, { status: 500 });
+    return apiError("Failed to remove", 500);
   }
 }

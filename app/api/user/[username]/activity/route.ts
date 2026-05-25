@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/user/[username]/activity/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +16,7 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return apiError("User not found", 404);
     }
 
     // Get activities from the last year
@@ -40,9 +41,6 @@ export async function GET(
     return NextResponse.json(activities);
   } catch (error) {
     console.error("Failed to fetch activities:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch activities" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch activities", 500);
   }
 }

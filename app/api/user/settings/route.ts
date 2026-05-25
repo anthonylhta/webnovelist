@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/user/settings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -12,7 +13,7 @@ export async function GET() {
     const me = await getCurrentUser();
 
     if (!me) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = me.id;
@@ -30,7 +31,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return apiError("User not found", 404);
     }
 
     // Calculate days until next change allowed
@@ -53,10 +54,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Failed to fetch settings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch settings" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch settings", 500);
   }
 }
 
@@ -68,7 +66,7 @@ export async function PUT(request: NextRequest) {
     const me = await getCurrentUser();
 
     if (!me) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = me.id;
@@ -77,34 +75,22 @@ export async function PUT(request: NextRequest) {
     const { username } = body;
 
     if (!username || typeof username !== "string") {
-      return NextResponse.json(
-        { error: "Username is required" },
-        { status: 400 }
-      );
+      return apiError("Username is required", 400);
     }
 
     const trimmed = username.trim();
 
     // Validation
     if (trimmed.length < 3 || trimmed.length > 30) {
-      return NextResponse.json(
-        { error: "Username must be 3-30 characters" },
-        { status: 400 }
-      );
+      return apiError("Username must be 3-30 characters", 400);
     }
 
     if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
-      return NextResponse.json(
-        { error: "Username can only contain letters, numbers, hyphens, and underscores" },
-        { status: 400 }
-      );
+      return apiError("Username can only contain letters, numbers, hyphens, and underscores", 400);
     }
 
     if (containsSuspiciousContent(trimmed)) {
-      return NextResponse.json(
-        { error: "Username contains invalid characters" },
-        { status: 400 }
-      );
+      return apiError("Username contains invalid characters", 400);
     }
 
     // Get current user
@@ -114,7 +100,7 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!currentUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return apiError("User not found", 404);
     }
 
     // If username hasn't changed, just return success
@@ -146,10 +132,7 @@ export async function PUT(request: NextRequest) {
     });
 
     if (existing && existing.id !== userId) {
-      return NextResponse.json(
-        { error: "Username already taken" },
-        { status: 400 }
-      );
+      return apiError("Username already taken", 400);
     }
 
     // Update username
@@ -172,9 +155,6 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to update username:", error);
-    return NextResponse.json(
-      { error: "Failed to update username" },
-      { status: 500 }
-    );
+    return apiError("Failed to update username", 500);
   }
 }
