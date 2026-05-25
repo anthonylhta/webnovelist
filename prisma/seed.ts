@@ -611,7 +611,10 @@ const novels = [
   },
 ];
 
-async function seedNovels() {
+async function main() {
+  console.log("🌱 Seeding database...\n");
+
+  // Clear existing novels to avoid duplicates
   const existingCount = await prisma.novel.count();
   if (existingCount > 0) {
     console.log(`⚠️  Found ${existingCount} existing novels.`);
@@ -622,7 +625,9 @@ async function seedNovels() {
   let skipped = 0;
 
   for (const novel of novels) {
-    const existing = await prisma.novel.findFirst({ where: { title: novel.title } });
+    const existing = await prisma.novel.findFirst({
+      where: { title: novel.title },
+    });
 
     if (existing) {
       console.log(`  ⏭️  Skipped (exists): ${novel.title}`);
@@ -640,71 +645,7 @@ async function seedNovels() {
     added++;
   }
 
-  console.log(`\nNovels — Added: ${added}, Skipped: ${skipped}`);
-}
-
-async function seedAuthors() {
-  // Collect unique author names from the novels list
-  const uniqueNames = [...new Set(novels.map((n) => n.author).filter(Boolean))] as string[];
-
-  let created = 0;
-  let skipped = 0;
-
-  for (const name of uniqueNames.sort()) {
-    const existing = await prisma.author.findUnique({ where: { name } });
-
-    if (existing) {
-      console.log(`  ⏭️  Skipped (exists): ${name}`);
-      skipped++;
-      continue;
-    }
-
-    await prisma.author.create({ data: { name } });
-    console.log(`  ✅ Created: ${name}`);
-    created++;
-  }
-
-  console.log(`\nAuthors — Created: ${created}, Skipped: ${skipped}`);
-
-  // Link each novel's authorId based on matching author string
-  const allAuthors = await prisma.author.findMany({ select: { id: true, name: true } });
-  const authorMap = new Map(allAuthors.map((a) => [a.name, a.id]));
-
-  const dbNovels = await prisma.novel.findMany({
-    where: { author: { not: null } },
-    select: { id: true, author: true, authorId: true },
-  });
-
-  let linked = 0;
-  let alreadyLinked = 0;
-
-  for (const novel of dbNovels) {
-    if (!novel.author) continue;
-    const authorId = authorMap.get(novel.author);
-    if (!authorId) continue;
-
-    if (novel.authorId === authorId) {
-      alreadyLinked++;
-      continue;
-    }
-
-    await prisma.novel.update({ where: { id: novel.id }, data: { authorId } });
-    linked++;
-  }
-
-  console.log(`Novel links — Linked: ${linked}, Already linked: ${alreadyLinked}`);
-}
-
-async function main() {
-  console.log("🌱 Seeding database...\n");
-
-  console.log("📚 Seeding novels...");
-  await seedNovels();
-
-  console.log("\n✍️  Seeding authors...");
-  await seedAuthors();
-
-  console.log("\n🎉 Seeding complete!");
+  console.log(`\n🎉 Seeding complete! Added: ${added}, Skipped: ${skipped}`);
 }
 
 main()

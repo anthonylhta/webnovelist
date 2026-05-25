@@ -106,21 +106,19 @@ export default async function PublicProfilePage({
     .map((entry) => entry.novel);
 
   // Favorite authors
-  const favoriteAuthorRows = await prisma.userFavoriteAuthor.findMany({
+  const favoriteAuthors = await prisma.userFavoriteAuthor.findMany({
     where: { userId: user.id },
-    include: { author: true },
     orderBy: { createdAt: "asc" },
   });
-  const favoriteAuthors = favoriteAuthorRows.map((r) => ({
-    id: r.author.id,
-    name: r.author.name,
-    imageUrl: r.author.imageUrl,
-  }));
+  const favoriteAuthorNames = favoriteAuthors.map((a) => a.authorName);
 
-  const allAuthors = await prisma.author.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, imageUrl: true },
-  });
+  const availableAuthors = [
+    ...new Set(
+      list
+        .map((entry) => entry.novel.author)
+        .filter((a): a is string => a !== null && a !== undefined && a.trim() !== "")
+    ),
+  ].sort();
 
   // Favorite characters
   const userFavoriteCharacters = await prisma.userFavoriteCharacter.findMany({
@@ -372,10 +370,10 @@ export default async function PublicProfilePage({
               isOwner={!!isOwner}
             />
 
-            {/* Favourite Authors */}
+            {/* Favorite Authors */}
             <FavoriteAuthorsEditor
-              initialFavorites={favoriteAuthors}
-              availableAuthors={allAuthors}
+              initialFavorites={favoriteAuthorNames}
+              availableAuthors={availableAuthors}
               isOwner={!!isOwner}
             />
           </div>
