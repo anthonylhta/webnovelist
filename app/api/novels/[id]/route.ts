@@ -53,6 +53,7 @@ export async function PUT(
         title: body.title,
         titleChinese: body.titleChinese,
         author: body.author,
+        authorId: body.authorId ?? null,
         description: body.description,
         coverImageUrl: body.coverImageUrl,
         totalChapters: body.totalChapters,

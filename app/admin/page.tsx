@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Shield, Users, BookOpen, Crown, ShieldCheck, User, Trash2,
 } from "lucide-react";
@@ -163,6 +164,17 @@ export default function AdminPage() {
         <Shield className="w-8 h-8 text-red-500" />
         Admin Panel
       </h1>
+
+      {/* Quick links */}
+      <div className="flex gap-3 mb-8">
+        <Link
+          href="/admin/authors"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-orange-500/50 rounded-xl px-4 py-3 text-sm text-gray-300 hover:text-orange-400 transition"
+        >
+          <User className="w-4 h-4 text-orange-500" />
+          Manage Authors
+        </Link>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
