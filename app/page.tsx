@@ -1,10 +1,11 @@
 // app/page.tsx
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
 import Link from "next/link";
 import {
-  BookOpen, Star, TrendingUp, CheckCircle,
-  ChevronRight, Search, Users, BookMarked,
+  BookOpen, TrendingUp,
+  ChevronRight, Search, Users,
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
 
@@ -118,14 +119,15 @@ export default async function Home() {
                   href={`/novel/${novel.id}`}
                   className="shrink-0 w-28 sm:w-36 group"
                 >
-                  <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
-                    <img
+                  <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
+                    <Image
+                      fill
                       src={
                         novel.coverImageUrl ||
                         "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
                       }
                       alt={novel.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      className="object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>
                   <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">
@@ -168,14 +170,15 @@ export default async function Home() {
                   href={`/novel/${novel.id}`}
                   className="shrink-0 w-28 sm:w-36 group"
                 >
-                  <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
-                    <img
+                  <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
+                    <Image
+                      fill
                       src={
                         novel.coverImageUrl ||
                         "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
                       }
                       alt={novel.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                      className="object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>
                   <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">

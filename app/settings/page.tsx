@@ -40,7 +40,7 @@ export default function SettingsPage() {
     if (isLoaded && isSignedIn) {
       fetchSettings();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, router]);
 
   const fetchSettings = async () => {
     try {

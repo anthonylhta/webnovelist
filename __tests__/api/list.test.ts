@@ -41,14 +41,14 @@ describe("GET /api/list", () => {
 
   it("returns 401 when not logged in", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(null);
-    const res = await GET(makeRequest("GET"));
+    const res = await GET();
     expect(res.status).toBe(401);
   });
 
   it("returns the authenticated user's list", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
     vi.mocked(prisma.userNovelList.findMany).mockResolvedValue([listEntry] as never);
-    const res = await GET(makeRequest("GET"));
+    const res = await GET();
     expect(res.status).toBe(200);
     expect(Array.isArray(await res.json())).toBe(true);
   });

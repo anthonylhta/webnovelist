@@ -51,7 +51,7 @@ export default function AdminPage() {
       }
       fetchUsers();
     }
-  }, [isLoaded, isSignedIn, currentRole]);
+  }, [isLoaded, isSignedIn, currentRole, router]);
 
   const fetchUsers = async () => {
     try {

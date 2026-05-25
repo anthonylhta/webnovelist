@@ -1,4 +1,5 @@
 // app/browse/page.tsx
+import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
@@ -161,11 +162,12 @@ export default async function BrowsePage({
               className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden 
                          hover:border-blue-500 transition group"
             >
-              <div className="aspect-[3/4] bg-gray-800 overflow-hidden">
-                <img
+              <div className="relative aspect-[3/4] bg-gray-800 overflow-hidden">
+                <Image
+                  fill
                   src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                   alt={novel.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                  className="object-cover group-hover:scale-105 transition duration-300"
                 />
               </div>
               <div className="p-4">
