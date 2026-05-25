@@ -33,12 +33,28 @@ model User {
   @@map("users")
 }
 
+// ============== AUTHORS ==============
+model Author {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  bio       String?  @db.Text
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  novels    Novel[]
+  favorites UserFavoriteAuthor[]
+
+  @@map("authors")
+}
+
 // ============== NOVELS ==============
 model Novel {
   id             Int       @id @default(autoincrement())
   title          String
   titleChinese   String?   @map("title_chinese")
   author         String?
+  authorId       Int?      @map("author_id")
   description    String?   @db.Text
   coverImageUrl  String?   @map("cover_image_url")
   totalChapters  Int?      @map("total_chapters")
@@ -50,6 +66,7 @@ model Novel {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
+  authorEntity   Author?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
   characters     Character[]
   userEntries    UserNovelList[]
 
@@ -95,14 +112,15 @@ model Activity {
 }
 
 model UserFavoriteAuthor {
-  id         Int      @id @default(autoincrement())
-  userId     String   @map("user_id")
-  authorName String   @map("author_name")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  authorId  Int      @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, authorName])
+  @@unique([userId, authorId])
   @@map("user_favorite_authors")
 }
 

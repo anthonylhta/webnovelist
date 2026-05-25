@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { User, Layers } from "lucide-react";
@@ -23,6 +24,7 @@ export default async function NovelPage({
 
   const novel = await prisma.novel.findUnique({
     where: { id: parseInt(id) },
+    include: { authorEntity: { select: { id: true, name: true } } },
   });
 
   if (!novel) notFound();
@@ -99,7 +101,16 @@ export default async function NovelPage({
                 {novel.author && (
                   <span className="flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-gray-500" />
-                    {novel.author}
+                    {novel.authorEntity ? (
+                      <Link
+                        href={`/author/${novel.authorEntity.id}`}
+                        className="hover:text-orange-400 transition"
+                      >
+                        {novel.author}
+                      </Link>
+                    ) : (
+                      novel.author
+                    )}
                   </span>
                 )}
                 {novel.totalChapters && (
