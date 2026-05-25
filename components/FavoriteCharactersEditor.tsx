@@ -96,6 +96,7 @@ export default function FavoriteCharactersEditor({
                 {char.imageUrl ? (
                   <Image
                     fill
+                    sizes="64px"
                     src={char.imageUrl}
                     alt={char.name}
                     className="object-cover"
@@ -169,6 +170,7 @@ export default function FavoriteCharactersEditor({
                             {char.imageUrl ? (
                               <Image
                                 fill
+                                sizes="32px"
                                 src={char.imageUrl}
                                 alt={char.name}
                                 className="rounded-full object-cover"

@@ -244,6 +244,7 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                 <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                   <Image
                     fill
+                    sizes="(max-width: 640px) 112px, 144px"
                     src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                     alt={novel.title}
                     className="object-cover group-hover:scale-105 transition duration-300"
