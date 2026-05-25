@@ -7,7 +7,7 @@ import AddToListButton from "@/components/AddToListButton";
 import FavoriteNovelButton from "@/components/FavoriteNovelButton";
 import NovelAdminActions from "@/components/NovelAdminActions";
 
-const PLACEHOLDER = "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover";
+const PLACEHOLDER = "/default-cover.svg";
 
 const STATUS_STYLES: Record<string, string> = {
   Ongoing: "bg-green-600/20 text-green-400 border-green-600/30",
@@ -187,19 +187,13 @@ export default async function NovelPage({
                                    hover:border-gray-700 rounded-xl px-3 py-2 transition group"
                       >
                         <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-800 border border-gray-700 shrink-0">
-                          {char.imageUrl ? (
-                            <Image
-                              fill
-                              sizes="36px"
-                              src={char.imageUrl}
-                              alt={char.name}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-500">
-                              {char.name[0]}
-                            </span>
-                          )}
+                          <Image
+                            fill
+                            sizes="36px"
+                            src={char.imageUrl || "/default-avatar.svg"}
+                            alt={char.name}
+                            className="object-cover"
+                          />
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-200 group-hover:text-white transition leading-none mb-1">

@@ -27,7 +27,7 @@ interface AuthorFormState {
 }
 
 const EMPTY_FORM: AuthorFormState = { name: "", bio: "", imageUrl: "" };
-const AVATAR_PLACEHOLDER = "https://placehold.co/200x200/1a1a2e/ffffff?text=?";
+const AVATAR_PLACEHOLDER = "/default-avatar.svg";
 
 export default function AdminAuthorsPage() {
   const { isLoaded, isSignedIn } = useAuth();

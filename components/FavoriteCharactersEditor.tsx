@@ -116,19 +116,13 @@ export default function FavoriteCharactersEditor({
               <Link href={`/character/${char.id}`} className="block text-center w-16">
                 <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-gray-800 rounded-full border border-gray-700
                                 flex items-center justify-center overflow-hidden hover:border-purple-500/60 transition">
-                  {char.imageUrl ? (
-                    <Image
-                      fill
-                      sizes="64px"
-                      src={char.imageUrl}
-                      alt={char.name}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <span className="text-lg font-bold text-gray-500">
-                      {char.name[0]}
-                    </span>
-                  )}
+                  <Image
+                    fill
+                    sizes="64px"
+                    src={char.imageUrl || "/default-avatar.svg"}
+                    alt={char.name}
+                    className="object-cover"
+                  />
                 </div>
                 <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 truncate hover:text-purple-400 transition">
                   {char.name}
@@ -188,19 +182,13 @@ export default function FavoriteCharactersEditor({
                              border-b border-gray-700/50 last:border-0 disabled:opacity-50"
                 >
                   <div className="relative w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-gray-600">
-                    {char.imageUrl ? (
-                      <Image
-                        fill
-                        sizes="36px"
-                        src={char.imageUrl}
-                        alt={char.name}
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs font-bold text-gray-500">
-                        {char.name[0]}
-                      </span>
-                    )}
+                    <Image
+                      fill
+                      sizes="36px"
+                      src={char.imageUrl || "/default-avatar.svg"}
+                      alt={char.name}
+                      className="rounded-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-200 truncate">{char.name}</p>

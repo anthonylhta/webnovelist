@@ -349,7 +349,7 @@ export default async function PublicProfilePage({
                         <Image
                           fill
                           sizes="(max-width: 640px) 80px, 96px"
-                          src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
+                          src={novel.coverImageUrl || "/default-cover.svg"}
                           alt={novel.title}
                           className="object-cover"
                         />

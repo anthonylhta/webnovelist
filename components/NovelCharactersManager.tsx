@@ -227,13 +227,7 @@ export default function NovelCharactersManager({ novelId }: NovelCharactersManag
             ) : (
               <div key={char.id} className="flex items-center gap-3 bg-gray-800/40 border border-gray-700/50 rounded-xl px-4 py-3">
                 <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-700 border border-gray-600 shrink-0">
-                  {char.imageUrl ? (
-                    <Image fill sizes="40px" src={char.imageUrl} alt={char.name} className="object-cover" />
-                  ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-400">
-                      {char.name[0]}
-                    </span>
-                  )}
+                  <Image fill sizes="40px" src={char.imageUrl || "/default-avatar.svg"} alt={char.name} className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-gray-100 truncate">{char.name}</p>
