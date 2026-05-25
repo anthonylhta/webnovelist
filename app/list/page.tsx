@@ -12,9 +12,33 @@ import {
 import AddToListModal from "@/components/AddToListModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
-import type { UserNovelList, Novel } from "@prisma/client";
-
-type ListEntry = UserNovelList & { novel: Novel };
+type ListEntry = {
+  id: number;
+  userId: string;
+  novelId: number;
+  status: string;
+  rating: number | null;
+  currentChapter: number;
+  isFavorite: boolean;
+  dateStarted: string | null;
+  dateFinished: string | null;
+  notes: string | null;
+  readingUrl: string | null;
+  rereadCount: number;
+  createdAt: string;
+  updatedAt: string;
+  novel: {
+    id: number;
+    title: string;
+    titleChinese: string | null;
+    author: string | null;
+    coverImageUrl: string | null;
+    totalChapters: number | null;
+    status: string | null;
+    genres: string[];
+    tags: string[];
+  };
+};
 
 const STATUS_TABS = [
   { key: "all", label: "All", icon: "📚" },

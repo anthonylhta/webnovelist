@@ -21,7 +21,19 @@ export default function AddToListButton({
   const currentUser = useCurrentUser();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [existingEntry, setExistingEntry] = useState<{ id: number; novelId: number; isFavorite: boolean } | null>(null);
+  const [existingEntry, setExistingEntry] = useState<{
+    id: number;
+    novelId: number;
+    isFavorite: boolean;
+    status: string;
+    rating: number | null;
+    currentChapter: number;
+    dateStarted: string | null;
+    dateFinished: string | null;
+    notes: string | null;
+    readingUrl: string | null;
+    rereadCount: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
