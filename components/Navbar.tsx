@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  BookOpen, LogOut, User, Menu, X, Plus,
+  BookOpen, LogOut, User, Menu, X,
   BarChart3, Shield, Crown, ShieldCheck, UserCircle, Settings,
 } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
@@ -19,7 +19,6 @@ export default function Navbar() {
 
   const userRole = currentUser?.role;
   const userName = currentUser?.username;
-  const canManageNovels = userRole === "admin" || userRole === "moderator";
   const isAdmin = userRole === "admin";
 
   const getRoleIcon = () => {
@@ -60,13 +59,6 @@ export default function Navbar() {
               <Link href="/stats" className="hover:text-blue-400 transition">
                 Stats
               </Link>
-
-              {canManageNovels && (
-                <Link href="/add-novel" className="hover:text-blue-400 transition">
-                  <Plus className="w-4 h-4 inline mr-1" />
-                  Add Novel
-                </Link>
-              )}
 
               {isAdmin && (
                 <Link href="/admin" className="hover:text-red-400 transition">
@@ -152,13 +144,6 @@ export default function Navbar() {
                   <Settings className="w-4 h-4 inline mr-2" />
                   Settings
                 </Link>
-
-                {canManageNovels && (
-                  <Link href="/add-novel" onClick={closeMenu} className="block py-2 hover:text-blue-400 transition">
-                    <Plus className="w-4 h-4 inline mr-2" />
-                    Add Novel
-                  </Link>
-                )}
 
                 {isAdmin && (
                   <Link href="/admin" onClick={closeMenu} className="block py-2 hover:text-red-400 transition">

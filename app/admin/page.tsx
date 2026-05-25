@@ -166,7 +166,14 @@ export default function AdminPage() {
       </h1>
 
       {/* Quick links */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex flex-wrap gap-3 mb-8">
+        <Link
+          href="/admin/novels"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-gray-300 hover:text-blue-400 transition"
+        >
+          <BookOpen className="w-4 h-4 text-blue-500" />
+          Manage Novels
+        </Link>
         <Link
           href="/admin/authors"
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-orange-500/50 rounded-xl px-4 py-3 text-sm text-gray-300 hover:text-orange-400 transition"
