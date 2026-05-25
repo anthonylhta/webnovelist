@@ -69,7 +69,7 @@ export default function FavoriteNovelButton({ novelId }: FavoriteNovelButtonProp
       <button
         onClick={toggleFavorite}
         disabled={toggling}
-        className={`w-full mt-2 font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 border
+        className={`w-full font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2 border
           ${
             isFavorite
               ? "bg-pink-600/20 hover:bg-pink-600/30 text-pink-400 border-pink-600/50"
