@@ -4,6 +4,10 @@ DROP INDEX "user_favorite_authors_user_id_author_name_key";
 -- AlterTable
 ALTER TABLE "novels" ADD COLUMN "author_id" INTEGER;
 
+-- Clear existing favourite-author rows before restructuring the table
+-- (old rows reference author names with no matching Author entity)
+TRUNCATE TABLE "user_favorite_authors";
+
 -- AlterTable
 ALTER TABLE "user_favorite_authors" DROP COLUMN "author_name",
 ADD COLUMN "author_id" INTEGER NOT NULL;
