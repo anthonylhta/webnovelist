@@ -52,7 +52,7 @@ export default function NovelAdminActions({
 
   return (
     <>
-      <div className="flex gap-2 mt-3">
+      <div className="flex gap-2">
         {/* Edit Button */}
         <Link
           href={`/novel/${novelId}/edit`}

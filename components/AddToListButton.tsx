@@ -78,7 +78,7 @@ export default function AddToListButton({
 
   if (loading) {
     return (
-      <div className="w-full mt-4 bg-gray-800 py-3 rounded-lg animate-pulse h-12" />
+      <div className="w-full bg-gray-800 py-3 rounded-lg animate-pulse h-12" />
     );
   }
 
@@ -86,7 +86,7 @@ export default function AddToListButton({
     <>
       <button
         onClick={handleClick}
-        className={`w-full mt-4 font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2
+        className={`w-full font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2
           ${
             existingEntry
               ? "bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/50"
