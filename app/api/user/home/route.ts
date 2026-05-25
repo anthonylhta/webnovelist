@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/user/home/route.ts
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -8,7 +9,7 @@ export async function GET() {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
@@ -53,9 +54,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Failed to fetch home data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch data" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch data", 500);
   }
 }

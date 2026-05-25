@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/user/[username]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -27,15 +28,12 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return apiError("User not found", 404);
     }
 
     return NextResponse.json(user);
   } catch (error) {
     console.error("Failed to fetch user profile:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch profile", 500);
   }
 }

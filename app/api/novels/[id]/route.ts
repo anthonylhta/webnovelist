@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/novels/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
@@ -17,16 +18,13 @@ export async function GET(
     });
 
     if (!novel) {
-      return NextResponse.json({ error: "Novel not found" }, { status: 404 });
+      return apiError("Novel not found", 404);
     }
 
     return NextResponse.json(novel);
   } catch (error) {
     console.error("Failed to fetch novel:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch novel" },
-      { status: 500 }
-    );
+    return apiError("Failed to fetch novel", 500);
   }
 }
 
@@ -39,14 +37,11 @@ export async function PUT(
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     if (!canManageNovels(user.role)) {
-      return NextResponse.json(
-        { error: "You don't have permission to edit novels" },
-        { status: 403 }
-      );
+      return apiError("You don't have permission to edit novels", 403);
     }
 
     const { id } = await params;
@@ -72,10 +67,7 @@ export async function PUT(
     return NextResponse.json(novel);
   } catch (error) {
     console.error("Failed to update novel:", error);
-    return NextResponse.json(
-      { error: "Failed to update novel" },
-      { status: 500 }
-    );
+    return apiError("Failed to update novel", 500);
   }
 }
 
@@ -88,14 +80,11 @@ export async function DELETE(
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     if (user.role !== "admin") {
-      return NextResponse.json(
-        { error: "Only admins can delete novels" },
-        { status: 403 }
-      );
+      return apiError("Only admins can delete novels", 403);
     }
 
     const { id } = await params;
@@ -107,9 +96,6 @@ export async function DELETE(
     return NextResponse.json({ message: "Novel deleted" });
   } catch (error) {
     console.error("Failed to delete novel:", error);
-    return NextResponse.json(
-      { error: "Failed to delete novel" },
-      { status: 500 }
-    );
+    return apiError("Failed to delete novel", 500);
   }
 }

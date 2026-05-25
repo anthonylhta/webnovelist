@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +10,7 @@ export async function PUT(
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const { id } = await params;
@@ -20,7 +21,7 @@ export async function PUT(
     });
 
     if (!entry || entry.userId !== userId) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return apiError("Not found", 404);
     }
 
     // If toggling ON, check max 5
@@ -29,10 +30,7 @@ export async function PUT(
         where: { userId, isFavorite: true },
       });
       if (favoriteCount >= 5) {
-        return NextResponse.json(
-          { error: "Maximum 5 favorite novels allowed" },
-          { status: 400 }
-        );
+        return apiError("Maximum 5 favorite novels allowed", 400);
       }
     }
 
@@ -45,9 +43,6 @@ export async function PUT(
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Failed to toggle favorite:", error);
-    return NextResponse.json(
-      { error: "Failed to toggle favorite" },
-      { status: 500 }
-    );
+    return apiError("Failed to toggle favorite", 500);
   }
 }

@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 // app/api/admin/users/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -12,11 +13,11 @@ export async function PUT(
     const me = await getCurrentUser();
 
     if (!me) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     if (me.role !== "admin") {
-      return NextResponse.json({ error: "Admin only" }, { status: 403 });
+      return apiError("Admin only", 403);
     }
 
     const { id } = await params;
@@ -24,16 +25,13 @@ export async function PUT(
 
     // Prevent admin from changing their own role
     if (id === me.id) {
-      return NextResponse.json(
-        { error: "Cannot change your own role" },
-        { status: 400 }
-      );
+      return apiError("Cannot change your own role", 400);
     }
 
     // Validate role
     const validRoles = ["user", "moderator", "admin"];
     if (!validRoles.includes(body.role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+      return apiError("Invalid role", 400);
     }
 
     const user = await prisma.user.update({
@@ -50,10 +48,7 @@ export async function PUT(
     return NextResponse.json(user);
   } catch (error) {
     console.error("Failed to update user role:", error);
-    return NextResponse.json(
-      { error: "Failed to update role" },
-      { status: 500 }
-    );
+    return apiError("Failed to update role", 500);
   }
 }
 
@@ -66,7 +61,7 @@ export async function DELETE(
     const me = await getCurrentUser();
 
     if (!me) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const currentRole = me.role;
@@ -74,20 +69,14 @@ export async function DELETE(
 
     // Only admins and moderators can delete users
     if (currentRole !== "admin" && currentRole !== "moderator") {
-      return NextResponse.json(
-        { error: "You don't have permission to delete users" },
-        { status: 403 }
-      );
+      return apiError("You don't have permission to delete users", 403);
     }
 
     const { id } = await params;
 
     // Can't delete yourself
     if (id === currentUserId) {
-      return NextResponse.json(
-        { error: "You cannot delete your own account" },
-        { status: 400 }
-      );
+      return apiError("You cannot delete your own account", 400);
     }
 
     // Fetch the target user
@@ -97,15 +86,12 @@ export async function DELETE(
     });
 
     if (!targetUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return apiError("User not found", 404);
     }
 
     // Permission checks based on role hierarchy
     if (currentRole === "moderator" && targetUser.role === "admin") {
-      return NextResponse.json(
-        { error: "Moderators cannot delete admins" },
-        { status: 403 }
-      );
+      return apiError("Moderators cannot delete admins", 403);
     }
 
     // Remove from Clerk first so they can't sign back in, then from our DB
@@ -124,9 +110,6 @@ export async function DELETE(
     });
   } catch (error) {
     console.error("Failed to delete user:", error);
-    return NextResponse.json(
-      { error: "Failed to delete user" },
-      { status: 500 }
-    );
+    return apiError("Failed to delete user", 500);
   }
 }

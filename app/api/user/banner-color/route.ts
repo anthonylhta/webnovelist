@@ -1,3 +1,4 @@
+import { apiError } from "@/lib/api-error";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
@@ -19,14 +20,14 @@ export async function PUT(request: Request) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Not logged in" }, { status: 401 });
+      return apiError("Not logged in", 401);
     }
 
     const userId = user.id;
     const { color } = await request.json();
 
     if (!ALLOWED_COLORS.includes(color)) {
-      return NextResponse.json({ error: "Invalid color" }, { status: 400 });
+      return apiError("Invalid color", 400);
     }
 
     await prisma.user.update({
@@ -37,6 +38,6 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, color });
   } catch (error) {
     console.error("Failed to update banner color:", error);
-    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
+    return apiError("Failed to update", 500);
   }
 }
