@@ -633,7 +633,7 @@ async function seedNovels() {
     await prisma.novel.create({
       data: {
         ...novel,
-        coverImageUrl: `https://placehold.co/300x400/1a1a2e/ffffff?text=${encodeURIComponent(novel.title)}`,
+        coverImageUrl: null,
       },
     });
     console.log(`  ✅ Added: ${novel.title}`);
