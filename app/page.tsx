@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
 
+
 export default async function Home() {
   const currentUser = await getCurrentUser();
 
@@ -122,6 +123,7 @@ export default async function Home() {
                   <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                     <Image
                       fill
+                      sizes="(max-width: 640px) 112px, 144px"
                       src={
                         novel.coverImageUrl ||
                         "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
@@ -173,6 +175,7 @@ export default async function Home() {
                   <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
                     <Image
                       fill
+                      sizes="(max-width: 640px) 112px, 144px"
                       src={
                         novel.coverImageUrl ||
                         "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"
@@ -203,12 +206,12 @@ export default async function Home() {
                   key={genre}
                   href={`/browse?genre=${genre}`}
                   className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4
-                             hover:border-blue-500/50 hover:bg-gray-900/80 transition group"
+                             hover:border-gray-600 hover:bg-gray-800/60 transition group"
                 >
-                  <div className="font-semibold text-sm sm:text-base group-hover:text-blue-400 transition">
+                  <div className="font-semibold text-sm sm:text-base text-gray-200 group-hover:text-white transition">
                     {genre}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-500">
+                  <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
                     {count} novel{count !== 1 ? "s" : ""}
                   </div>
                 </Link>

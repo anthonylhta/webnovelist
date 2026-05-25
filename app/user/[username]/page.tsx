@@ -214,6 +214,7 @@ export default async function PublicProfilePage({
                 {user.avatarUrl ? (
                   <Image
                     fill
+                    sizes="112px"
                     src={user.avatarUrl}
                     alt={user.username}
                     className="rounded-full object-cover"
@@ -317,6 +318,7 @@ export default async function PublicProfilePage({
                       <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-gray-700 group-hover:border-pink-500/50 transition">
                         <Image
                           fill
+                          sizes="(max-width: 640px) 80px, 96px"
                           src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                           alt={novel.title}
                           className="object-cover"

@@ -165,6 +165,7 @@ export default async function BrowsePage({
               <div className="relative aspect-[3/4] bg-gray-800 overflow-hidden">
                 <Image
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
                   src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                   alt={novel.title}
                   className="object-cover group-hover:scale-105 transition duration-300"

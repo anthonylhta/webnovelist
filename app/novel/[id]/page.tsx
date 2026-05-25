@@ -38,6 +38,8 @@ export default async function NovelPage({
           src={coverUrl}
           alt=""
           fill
+          sizes="100vw"
+          priority
           className="object-cover scale-110 blur-2xl opacity-40"
           aria-hidden="true"
         />
