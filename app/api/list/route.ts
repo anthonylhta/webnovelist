@@ -6,7 +6,7 @@ import { rateLimit, getIP } from "@/lib/rate-limit";
 import { logActivity } from "@/lib/activity";
 
 // GET current user's list
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser();
 

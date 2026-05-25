@@ -1,10 +1,11 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
-  BookOpen, Star, TrendingUp, CheckCircle,
-  Calendar, Crown, ShieldCheck, User, Heart,
-  Users, BookMarked,
+  BookOpen, Star, TrendingUp,
+  Calendar, Crown, ShieldCheck, Heart,
+  BookMarked,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
@@ -209,12 +210,13 @@ export default async function PublicProfilePage({
               isOwner={!!isOwner}
               username={user.username}
             >
-              <div className="w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0 overflow-hidden">
+              <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0 overflow-hidden">
                 {user.avatarUrl ? (
-                  <img
+                  <Image
+                    fill
                     src={user.avatarUrl}
                     alt={user.username}
-                    className="w-full h-full rounded-full object-cover"
+                    className="rounded-full object-cover"
                   />
                 ) : (
                   user.username[0].toUpperCase()
@@ -312,11 +314,12 @@ export default async function PublicProfilePage({
                       href={`/novel/${novel.id}`}
                       className="shrink-0 w-20 sm:w-24 group"
                     >
-                      <div className="aspect-[3/4] rounded-lg overflow-hidden border border-gray-700 group-hover:border-pink-500/50 transition">
-                        <img
+                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-gray-700 group-hover:border-pink-500/50 transition">
+                        <Image
+                          fill
                           src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                           alt={novel.title}
-                          className="w-full h-full object-cover"
+                          className="object-cover"
                         />
                       </div>
                       <p className="text-xs text-gray-400 mt-1 truncate group-hover:text-pink-400 transition">
@@ -401,10 +404,12 @@ export default async function PublicProfilePage({
                         <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-gray-800/50 transition">
                           <div className="mt-0.5 shrink-0">
                             {activity.novelId && novelCovers[activity.novelId] ? (
-                              <img
+                              <Image
                                 src={novelCovers[activity.novelId]!}
                                 alt=""
-                                className="w-9 h-12 rounded object-cover"
+                                width={36}
+                                height={48}
+                                className="rounded object-cover"
                               />
                             ) : (
                               <>

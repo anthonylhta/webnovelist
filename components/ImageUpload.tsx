@@ -96,6 +96,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
 
       {preview ? (
         <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Cover preview"

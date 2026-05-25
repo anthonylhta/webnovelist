@@ -73,7 +73,7 @@ export default function ListPage() {
     if (isLoaded && isSignedIn) {
       fetchList();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, router]);
 
   const fetchList = async () => {
     try {

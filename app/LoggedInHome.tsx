@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   BookOpen, ChevronRight, BookMarked, Loader2,
@@ -100,10 +101,12 @@ export default function LoggedInHome({ userName }: { userName: string }) {
               >
                 <div className="flex gap-4">
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-                    <img
+                    <Image
                       src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                       alt={entry.novel.title}
-                      className="w-16 h-22 object-cover rounded-lg"
+                      width={64}
+                      height={88}
+                      className="object-cover rounded-lg"
                     />
                   </Link>
                   <div className="flex-1 min-w-0">
@@ -152,10 +155,12 @@ export default function LoggedInHome({ userName }: { userName: string }) {
               >
                 <div className="flex gap-3 min-w-0">
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-                    <img
+                    <Image
                       src={entry.novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                       alt={entry.novel.title}
-                      className="w-12 h-16 object-cover rounded-lg"
+                      width={48}
+                      height={64}
+                      className="object-cover rounded-lg"
                     />
                   </Link>
                   <div className="flex-1 min-w-0 overflow-hidden">
@@ -236,11 +241,12 @@ export default function LoggedInHome({ userName }: { userName: string }) {
                 href={`/novel/${novel.id}`}
                 className="shrink-0 w-28 sm:w-36 group"
               >
-                <div className="aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
-                  <img
+                <div className="relative aspect-[3/4] bg-gray-800 rounded-lg overflow-hidden mb-2">
+                  <Image
+                    fill
                     src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
                     alt={novel.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    className="object-cover group-hover:scale-105 transition duration-300"
                   />
                 </div>
                 <h3 className="font-medium text-xs sm:text-sm truncate group-hover:text-blue-400 transition">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { BookOpen, User, Layers, Globe, Calendar, Clock } from "lucide-react";
@@ -25,9 +26,11 @@ export default async function NovelPage({
       <div className="flex flex-col md:flex-row gap-8">
         {/* Cover Image */}
         <div className="w-64 shrink-0 mx-auto md:mx-0">
-          <img
+          <Image
             src={novel.coverImageUrl || "https://placehold.co/300x400/1a1a2e/ffffff?text=No+Cover"}
             alt={novel.title}
+            width={256}
+            height={384}
             className="w-full rounded-xl shadow-lg"
           />
           <AddToListButton

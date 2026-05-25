@@ -53,7 +53,7 @@ export default function StatsPage() {
         })
         .catch(() => setLoading(false));
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, router]);
 
   if (!isLoaded || loading) {
     return (

@@ -12,10 +12,7 @@ interface ProfileImageUploadProps {
 }
 
 export default function ProfileImageUpload({
-  type,
-  currentUrl,
   isOwner,
-  username,
   children,
 }: ProfileImageUploadProps) {
   const [uploading, setUploading] = useState(false);

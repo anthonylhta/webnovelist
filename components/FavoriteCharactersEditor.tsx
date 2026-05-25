@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Plus, X, Users } from "lucide-react";
 
 interface Character {
@@ -90,13 +91,14 @@ export default function FavoriteCharactersEditor({
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
           {favorites.map((char) => (
             <div key={char.id} className="shrink-0 text-center relative group">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700 
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gray-800 rounded-full border border-gray-700
                             flex items-center justify-center overflow-hidden">
                 {char.imageUrl ? (
-                  <img
+                  <Image
+                    fill
                     src={char.imageUrl}
                     alt={char.name}
-                    className="w-full h-full object-cover"
+                    className="object-cover"
                   />
                 ) : (
                   <span className="text-lg font-bold text-gray-500">
@@ -163,12 +165,13 @@ export default function FavoriteCharactersEditor({
                           disabled={loading}
                           className="w-full text-left px-3 py-2 hover:bg-gray-700 transition flex items-center gap-3"
                         >
-                          <div className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center shrink-0">
+                          <div className="relative w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
                             {char.imageUrl ? (
-                              <img
+                              <Image
+                                fill
                                 src={char.imageUrl}
                                 alt={char.name}
-                                className="w-full h-full rounded-full object-cover"
+                                className="rounded-full object-cover"
                               />
                             ) : (
                               <span className="text-xs font-bold text-gray-500">
