@@ -13,7 +13,10 @@
     "prod:seed": "dotenv -e .env.prod -- npx prisma db seed",
     "prod:export": "dotenv -e .env.prod -- npx tsx scripts/export-novels.ts",
     "dev:import": "npx tsx scripts/import-novels.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "prepare": "husky",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "prisma": {
     "seed": "npx tsx --tsconfig tsconfig.json prisma/seed.ts"
@@ -34,6 +37,9 @@
     "resend": "^6.10.0",
     "zod": "^4.3.6"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -42,8 +48,11 @@
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.7"
   }
 }
