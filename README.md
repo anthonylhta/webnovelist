@@ -15,11 +15,13 @@
 
 ---
 
+<!--
 ## Screenshots
 
 | Home | Novel | Profile |
 |------|-------|---------|
 | ![Home](docs/screenshots/home.png) | ![Novel](docs/screenshots/novel.png) | ![Profile](docs/screenshots/profile.png) |
+-->
 
 ## Features
 
