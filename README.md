@@ -1,4 +1,4 @@
-# 📚 WebNovelist
+# WebNovelist
 
 > An AniList-style tracker for web novels — log what you're reading, rate and review, build a library, and share a public profile.
 
@@ -26,11 +26,13 @@
 - **Reading list** — track novels across five statuses (Reading, Completed, On Hold, Dropped, Plan to Read), with per-entry rating, current chapter, reread count, notes, and a reading link.
 - **Stats dashboard** — aggregate metrics across your library: totals by status, chapters read, average rating, and genre breakdown.
 - **Activity heatmap** — a GitHub-style contribution graph of your reading activity over the past year.
-- **Public profiles** — shareable `/user/<username>` pages featuring favorite novels, authors, and characters, with a blurred cover art banner.
+- **Public profiles** — shareable `/user/<username>` pages featuring up to 5 favourite novels, authors, and characters each, with a blurred cover art banner.
+- **Author pages** — dedicated `/author/[id]` pages with bio, linked novels grid, and a favourite button. Authors are managed by admins with Cloudinary image support; novel edit pages link novels to their author page.
+- **Character pages** — dedicated `/character/[id]` pages with role badge and linked novel. Characters are managed inline on the novel edit page; users can favourite up to 5 per profile.
 - **Browse & search** — find novels by title, author, or genre with live filtering.
-- **Admin panel** — role-based user management and full novel catalog CRUD.
+- **Admin panel** — role-based management of novels, authors, and users. `/admin/novels` lists the full catalog with search, status badges, cover thumbnails, and edit/delete actions. `/admin/authors` supports create, edit, delete, and image upload.
 - **Authentication** — email/password sign-in via Clerk with secure sessions and webhook-based user sync.
-- **Image uploads** — avatars and novel covers via Cloudinary; customizable profile banners.
+- **Image uploads** — avatars, novel covers, and author images via Cloudinary; customizable profile banners.
 
 ## Tech Stack
 
@@ -55,6 +57,7 @@
 - **Authorization enforced on the server.** A single `getCurrentUser()` helper resolves the database user per request, and every API route verifies roles server-side — the UI never gates security on its own.
 - **Edge protection & security headers.** Route protection and hardening headers (`X-Frame-Options`, `Strict-Transport-Security`, etc.) run in a single Next.js middleware (`proxy.ts`).
 - **Startup env validation.** A Zod schema in `lib/env.ts` validates all required environment variables at server startup via Next.js `instrumentation.ts`, failing fast with a clear error message if anything is missing.
+- **Performance.** The home page is fully server-rendered — no client spinner or layout shift. The browse page genre list is cached with `unstable_cache` (1h TTL) to avoid a full table scan on every request. Cloudinary images are cached 24h via `minimumCacheTTL`; above-the-fold images use the `priority` prop for faster LCP.
 
 ## Roles
 
@@ -71,61 +74,6 @@
 - **Pre-commit** — Husky + lint-staged runs ESLint on staged `.ts`/`.tsx` files before every commit.
 - **Branch protection** — PRs required on `main`; CI must pass before merge.
 - **Dependency updates** — Dependabot checks for npm updates weekly.
-
-## Running Locally
-
-**Prerequisites:** Node.js 20+, a PostgreSQL database, and free accounts on [Clerk](https://clerk.com) and [Cloudinary](https://cloudinary.com).
-
-```bash
-git clone https://github.com/anthonylhta/webnovelist.git
-cd webnovelist
-npm install        # runs `prisma generate` via postinstall
-```
-
-Copy the example env file and fill in your values:
-
-```bash
-cp .env.example .env
-```
-
-Key variables:
-
-```bash
-# Database
-DATABASE_URL=
-DIRECT_URL=
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
-CLERK_SECRET_KEY=sk_test_xxx
-CLERK_WEBHOOK_SIGNING_SECRET=whsec_xxx   # optional locally (see note below)
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/browse
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/browse
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-```
-
-Apply the schema and optionally seed sample data:
-
-```bash
-npx prisma migrate dev
-npx prisma db seed    # optional
-```
-
-Start the dev server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-> **Clerk webhooks are optional for local dev.** User rows are created via just-in-time provisioning on first sign-in, so you don't need a public webhook URL to develop locally.
 
 ---
 
