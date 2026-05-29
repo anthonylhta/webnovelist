@@ -6,6 +6,7 @@ import { User, Layers } from "lucide-react";
 import AddToListButton from "@/components/AddToListButton";
 import FavoriteNovelButton from "@/components/FavoriteNovelButton";
 import NovelAdminActions from "@/components/NovelAdminActions";
+import { safeImageSrc } from "@/lib/image-hosts";
 
 const PLACEHOLDER = "/default-cover.svg";
 
@@ -38,7 +39,7 @@ export default async function NovelPage({
 
   if (!novel) notFound();
 
-  const coverUrl = novel.coverImageUrl || PLACEHOLDER;
+  const coverUrl = safeImageSrc(novel.coverImageUrl, PLACEHOLDER);
 
   const ROLE_STYLES: Record<string, string> = {
     Protagonist: "text-purple-400 bg-purple-600/10 border-purple-600/30",

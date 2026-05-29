@@ -15,6 +15,7 @@ import ProfileImageUpload from "@/components/ProfileImageUpload";
 import BannerColorPicker from "@/components/BannerColorPicker";
 import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
 import { getBannerGradient } from "@/lib/banner-colors";
+import { safeImageSrc } from "@/lib/image-hosts";
 import FavoriteCharactersEditor from "@/components/FavoriteCharactersEditor";
 
 
@@ -365,7 +366,7 @@ export default async function PublicProfilePage({
                         <Image
                           fill
                           sizes="(max-width: 640px) 80px, 96px"
-                          src={novel.coverImageUrl || "/default-cover.svg"}
+                          src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                           alt={novel.title}
                           className="object-cover"
                         />

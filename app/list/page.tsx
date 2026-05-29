@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { safeImageSrc } from "@/lib/image-hosts";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -258,7 +259,7 @@ export default function ListPage() {
                     <div className="flex items-center gap-3">
                       <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                         <Image
-                          src={entry.novel.coverImageUrl || "/default-cover.svg"}
+                          src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
                           alt={entry.novel.title}
                           width={36}
                           height={48}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import { safeImageSrc } from "@/lib/image-hosts";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 const getAllGenres = unstable_cache(
@@ -174,7 +175,7 @@ export default async function BrowsePage({
                 <Image
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                  src={novel.coverImageUrl || "/default-cover.svg"}
+                  src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                   alt={novel.title}
                   priority={i < 4}
                   className="object-cover group-hover:scale-105 transition duration-300"
