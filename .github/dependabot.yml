@@ -8,3 +8,22 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: "development"
+      # react and react-dom share an exact peer requirement; bump them
+      # together so a lone react-dom bump can't fail install with ERESOLVE.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+    ignore:
+      # eslint v10 is unsupported by eslint-config-next@16 (its bundled
+      # eslint-plugin-import peers eslint ^9). Hold eslint on v9 until
+      # eslint-config-next adds v10 support.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      # Prisma 7 is a breaking migration (schema datasource url/directUrl move
+      # to prisma.config.ts + an adapter-based client). Deferred to a dedicated
+      # PR; stay on v6 until then. See closed PR #9.
+      - dependency-name: "prisma"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/client"
+        update-types: ["version-update:semver-major"]
