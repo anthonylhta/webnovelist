@@ -26,7 +26,7 @@
     "@prisma/client": "^6.19.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "cloudinary": "^2.9.0",
+    "cloudinary": "^2.10.0",
     "date-fns": "^4.3.0",
     "lucide-react": "^1.16.0",
     "next": "^16.2.6",
