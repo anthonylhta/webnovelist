@@ -6,6 +6,7 @@ import { BookOpen, Heart, User } from "lucide-react";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import FavoriteCharacterButton from "@/components/FavoriteCharacterButton";
+import { safeImageSrc } from "@/lib/image-hosts";
 
 const PLACEHOLDER = "/default-cover.svg";
 const AVATAR_PLACEHOLDER = "/default-avatar.svg";
@@ -69,7 +70,7 @@ export default async function CharacterPage({
     : false;
 
   const avatarUrl = character.imageUrl || AVATAR_PLACEHOLDER;
-  const coverUrl = character.novel.coverImageUrl || PLACEHOLDER;
+  const coverUrl = safeImageSrc(character.novel.coverImageUrl, PLACEHOLDER);
   const roleStyle = ROLE_STYLES[character.role ?? ""] ?? ROLE_STYLES.Supporting;
 
   return (

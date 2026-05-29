@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { safeImageSrc } from "@/lib/image-hosts";
 import Link from "next/link";
 import { BookOpen, ChevronRight, BookMarked } from "lucide-react";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
@@ -74,7 +75,7 @@ export default function LoggedInHome({
                 <div className="flex gap-4">
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                     <Image
-                      src={entry.novel.coverImageUrl || "/default-cover.svg"}
+                      src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
                       alt={entry.novel.title}
                       width={64}
                       height={88}
@@ -118,7 +119,7 @@ export default function LoggedInHome({
                 <div className="flex gap-3 min-w-0">
                   <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
                     <Image
-                      src={entry.novel.coverImageUrl || "/default-cover.svg"}
+                      src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
                       alt={entry.novel.title}
                       width={48}
                       height={64}
@@ -186,7 +187,7 @@ export default function LoggedInHome({
                   <Image
                     fill
                     sizes="(max-width: 640px) 112px, 144px"
-                    src={novel.coverImageUrl || "/default-cover.svg"}
+                    src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                     alt={novel.title}
                     className="object-cover group-hover:scale-105 transition duration-300"
                   />

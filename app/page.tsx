@@ -8,6 +8,7 @@ import {
   ChevronRight, Search, Users,
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
+import { safeImageSrc } from "@/lib/image-hosts";
 
 
 export default async function Home() {
@@ -158,7 +159,7 @@ export default async function Home() {
                     <Image
                       fill
                       sizes="(max-width: 640px) 112px, 144px"
-                      src={novel.coverImageUrl || "/default-cover.svg"}
+                      src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                       alt={novel.title}
                       priority={i === 0}
                       className="object-cover group-hover:scale-105 transition duration-300"
@@ -208,10 +209,7 @@ export default async function Home() {
                     <Image
                       fill
                       sizes="(max-width: 640px) 112px, 144px"
-                      src={
-                        novel.coverImageUrl ||
-                        "/default-cover.svg"
-                      }
+                      src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                       alt={novel.title}
                       className="object-cover group-hover:scale-105 transition duration-300"
                     />

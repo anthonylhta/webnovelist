@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
+import { safeImageSrc } from "@/lib/image-hosts";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -171,7 +172,7 @@ export default function AdminNovelsPage() {
                   <Image
                     fill
                     sizes="36px"
-                    src={novel.coverImageUrl || "/default-cover.svg"}
+                    src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
                     alt={novel.title}
                     className="object-cover"
                   />

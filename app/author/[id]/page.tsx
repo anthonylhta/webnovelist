@@ -6,6 +6,7 @@ import { User, BookOpen, Heart, Layers } from "lucide-react";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import FavoriteAuthorButton from "@/components/FavoriteAuthorButton";
+import { safeImageSrc } from "@/lib/image-hosts";
 
 const PLACEHOLDER = "/default-cover.svg";
 const AVATAR_PLACEHOLDER = "/default-avatar.svg";
@@ -166,7 +167,7 @@ export default async function AuthorPage({
                         <Image
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
-                          src={novel.coverImageUrl || PLACEHOLDER}
+                          src={safeImageSrc(novel.coverImageUrl, PLACEHOLDER)}
                           alt={novel.title}
                           className="object-cover"
                         />
