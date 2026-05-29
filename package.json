@@ -34,7 +34,7 @@
     "rate-limiter-flexible": "^11.1.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "resend": "^6.10.0",
+    "resend": "^6.12.4",
     "zod": "^4.3.6"
   },
   "lint-staged": {
