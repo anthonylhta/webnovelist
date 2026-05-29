@@ -56,6 +56,42 @@ describe("PUT /api/novels/[id]", () => {
     const res = await PUT(makeRequest("PUT", { title: "Updated" }), { params });
     expect(res.status).toBe(200);
   });
+
+  it("returns 400 when title is empty", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    const res = await PUT(makeRequest("PUT", { title: "   " }), { params });
+    expect(res.status).toBe(400);
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when a field contains suspicious content", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    const res = await PUT(
+      makeRequest("PUT", { title: "Ok", description: "<script>alert(1)</script>" }),
+      { params }
+    );
+    expect(res.status).toBe(400);
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when coverImageUrl is not a valid URL", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    const res = await PUT(
+      makeRequest("PUT", { title: "Ok", coverImageUrl: "javascript:alert(1)" }),
+      { params }
+    );
+    expect(res.status).toBe(400);
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
+  it("sanitizes string fields before saving", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    vi.mocked(prisma.novel.update).mockResolvedValue(novelFixture as never);
+    await PUT(makeRequest("PUT", { title: 'A "quote" & <tag>' }), { params });
+    const data = vi.mocked(prisma.novel.update).mock.calls[0][0].data as { title: string };
+    expect(data.title).not.toContain("<");
+    expect(data.title).not.toContain('"');
+  });
 });
 
 describe("DELETE /api/novels/[id]", () => {

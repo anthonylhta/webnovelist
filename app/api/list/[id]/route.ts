@@ -20,6 +20,37 @@ export async function PUT(
     const userId = user.id;
     const body = await request.json();
 
+    // Validate inputs (same rules as POST /api/list)
+    const validStatuses = ["reading", "completed", "on_hold", "dropped", "plan_to_read"];
+    if (body.status !== undefined && !validStatuses.includes(body.status)) {
+      return apiError("Invalid status", 400);
+    }
+
+    if (body.rating !== undefined && body.rating !== null) {
+      const rating = parseFloat(body.rating);
+      if (isNaN(rating) || rating < 0 || rating > 10) {
+        return apiError("Rating must be between 0 and 10", 400);
+      }
+    }
+
+    if (
+      body.currentChapter !== undefined &&
+      (typeof body.currentChapter !== "number" ||
+        !Number.isInteger(body.currentChapter) ||
+        body.currentChapter < 0)
+    ) {
+      return apiError("Invalid chapter number", 400);
+    }
+
+    if (
+      body.rereadCount !== undefined &&
+      (typeof body.rereadCount !== "number" ||
+        !Number.isInteger(body.rereadCount) ||
+        body.rereadCount < 0)
+    ) {
+      return apiError("Invalid reread count", 400);
+    }
+
     const existing = await prisma.userNovelList.findUnique({
       where: { id: parseInt(id) },
       include: { novel: true },

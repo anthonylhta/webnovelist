@@ -65,6 +65,27 @@ describe("PUT /api/list/[id]", () => {
     const res = await PUT(makeRequest("PUT", { status: "completed" }), { params });
     expect(res.status).toBe(200);
   });
+
+  it("returns 400 for an invalid status", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
+    const res = await PUT(makeRequest("PUT", { status: "bogus" }), { params });
+    expect(res.status).toBe(400);
+    expect(prisma.userNovelList.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 for an out-of-range rating", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
+    const res = await PUT(makeRequest("PUT", { rating: 9999 }), { params });
+    expect(res.status).toBe(400);
+    expect(prisma.userNovelList.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 for a negative chapter number", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
+    const res = await PUT(makeRequest("PUT", { currentChapter: -3 }), { params });
+    expect(res.status).toBe(400);
+    expect(prisma.userNovelList.findUnique).not.toHaveBeenCalled();
+  });
 });
 
 describe("DELETE /api/list/[id]", () => {
