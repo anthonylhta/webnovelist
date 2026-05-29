@@ -16,7 +16,7 @@ export default async function Home() {
   if (currentUser) {
     const [readingEntries, recentNovels] = await Promise.all([
       prisma.userNovelList.findMany({
-        where: { userId: currentUser.id, status: "Reading" },
+        where: { userId: currentUser.id, status: "reading" },
         include: {
           novel: {
             select: {
