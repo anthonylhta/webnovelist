@@ -47,7 +47,6 @@
 | Styling | Tailwind CSS v4 |
 | Validation | Zod |
 | Media | Cloudinary |
-| Email | Resend |
 | Rate limiting | rate-limiter-flexible |
 | Testing | Vitest |
 | CI | GitHub Actions |
