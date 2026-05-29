@@ -6,8 +6,14 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     groups:
+      # Group only minor/patch dev-dep bumps. Majors (e.g. a future eslint 10,
+      # typescript 7, lint-staged 18) come as individual PRs so each gets its
+      # own review + CI instead of riding inside — or silently blocking — the group.
       dev-dependencies:
         dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
       # react and react-dom share an exact peer requirement; bump them
       # together so a lone react-dom bump can't fail install with ERESOLVE.
       react:
