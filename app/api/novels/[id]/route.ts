@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
+import { sanitizeString, isValidUrl, containsSuspiciousContent } from "@/lib/sanitize";
 
 // GET — anyone can view a novel
 export async function GET(
@@ -47,21 +48,48 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    // Validate required fields (same rules as POST /api/novels)
+    if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {
+      return apiError("Title is required", 400);
+    }
+
+    if (body.title.length > 500) {
+      return apiError("Title is too long", 400);
+    }
+
+    // Check for suspicious content
+    const fieldsToCheck = [
+      body.title, body.titleChinese, body.author,
+      body.description, body.originalSource
+    ].filter(Boolean);
+
+    for (const field of fieldsToCheck) {
+      if (containsSuspiciousContent(field)) {
+        return apiError("Input contains invalid characters", 400);
+      }
+    }
+
+    // Validate URL if provided
+    if (body.coverImageUrl && !isValidUrl(body.coverImageUrl)) {
+      return apiError("Invalid cover image URL", 400);
+    }
+
+    // Sanitize all string inputs
     const novel = await prisma.novel.update({
       where: { id: parseInt(id) },
       data: {
-        title: body.title,
-        titleChinese: body.titleChinese,
-        author: body.author,
+        title: sanitizeString(body.title),
+        titleChinese: body.titleChinese ? sanitizeString(body.titleChinese) : null,
+        author: body.author ? sanitizeString(body.author) : null,
         authorId: body.authorId ?? null,
-        description: body.description,
-        coverImageUrl: body.coverImageUrl,
-        totalChapters: body.totalChapters,
-        status: body.status,
-        genres: body.genres,
-        tags: body.tags,
-        originalSource: body.originalSource,
-        yearPublished: body.yearPublished,
+        description: body.description ? sanitizeString(body.description) : null,
+        coverImageUrl: body.coverImageUrl || null,
+        totalChapters: body.totalChapters ? parseInt(body.totalChapters) : null,
+        status: body.status ? sanitizeString(body.status) : null,
+        genres: Array.isArray(body.genres) ? body.genres.map(sanitizeString) : [],
+        tags: Array.isArray(body.tags) ? body.tags.map(sanitizeString) : [],
+        originalSource: body.originalSource ? sanitizeString(body.originalSource) : null,
+        yearPublished: body.yearPublished ? parseInt(body.yearPublished) : null,
       },
     });
 
