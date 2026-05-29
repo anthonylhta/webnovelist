@@ -1,7 +1,7 @@
 // components/ActivityHeatmap.tsx
 "use client";
 
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo } from "react";
 
 interface Activity {
   createdAt: string | Date;
@@ -12,9 +12,6 @@ interface ActivityHeatmapProps {
 }
 
 export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [visibleWeeks, setVisibleWeeks] = useState(52);
-
   const { weeks, totalActivities, maxCount } = useMemo(() => {
     const counts: Record<string, number> = {};
     let total = 0;
@@ -53,23 +50,6 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
     return { weeks: weekGroups, totalActivities: total, maxCount: max };
   }, [activities]);
 
-  useEffect(() => {
-    const calculate = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.offsetWidth;
-        const colWidth = 13; // 11px box + 2px gap
-        const maxCols = Math.floor(width / colWidth);
-        setVisibleWeeks(Math.min(maxCols, weeks.length));
-      }
-    };
-
-    calculate();
-    window.addEventListener("resize", calculate);
-    return () => window.removeEventListener("resize", calculate);
-  }, [weeks.length]);
-
-  const displayWeeks = weeks.slice(-visibleWeeks);
-
   const getColor = (count: number) => {
     if (count === 0) return "bg-gray-800/50";
     const intensity = count / maxCount;
@@ -81,8 +61,8 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
 
   return (
     <div>
-      <div ref={containerRef} className="flex gap-0.5 justify-end">
-        {displayWeeks.map((week, weekIndex) => (
+      <div className="flex gap-0.5 justify-end">
+        {weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="flex flex-col gap-0.5">
             {week.map((day) => (
               <div

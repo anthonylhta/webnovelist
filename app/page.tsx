@@ -1,5 +1,6 @@
 // app/page.tsx
 import Image from "next/image";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
 import Link from "next/link";
@@ -9,6 +10,25 @@ import {
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
 
+// Genre breakdown + novel count is a full-table scan; it changes rarely, so cache
+// it for an hour rather than re-scanning on every home-page request.
+const getGenreStats = unstable_cache(
+  async () => {
+    const allNovels = await prisma.novel.findMany({ select: { genres: true } });
+    const genreCounts: Record<string, number> = {};
+    allNovels.forEach((novel) => {
+      novel.genres.forEach((genre) => {
+        genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+      });
+    });
+    const topGenres = Object.entries(genreCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 9);
+    return { topGenres, totalNovels: allNovels.length };
+  },
+  ["home-genre-stats"],
+  { revalidate: 3600 }
+);
 
 export default async function Home() {
   const currentUser = await getCurrentUser();
@@ -51,7 +71,7 @@ export default async function Home() {
     );
   }
 
-  const [trendingNovels, recentNovels, allNovels, userCount, entryCount] =
+  const [trendingNovels, recentNovels, genreStats, userCount, entryCount] =
     await Promise.all([
       prisma.novel.findMany({
         include: {
@@ -64,24 +84,12 @@ export default async function Home() {
         orderBy: { createdAt: "desc" },
         take: 10,
       }),
-      prisma.novel.findMany({
-        select: { genres: true },
-      }),
+      getGenreStats(),
       prisma.user.count(),
       prisma.userNovelList.count(),
     ]);
 
-  const genreCounts: Record<string, number> = {};
-  allNovels.forEach((novel) => {
-    novel.genres.forEach((genre) => {
-      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-    });
-  });
-  const topGenres = Object.entries(genreCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 9);
-
-  const totalNovels = allNovels.length;
+  const { topGenres, totalNovels } = genreStats;
 
   return (
     <div className="-mt-8 -mx-4">

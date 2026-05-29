@@ -60,29 +60,44 @@ export default async function PublicProfilePage({
 
   if (!user) notFound();
 
-  const me = await getCurrentUser();
-  const isOwner = me?.id === user.id;
-
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  const [list, activities] = await Promise.all([
-    prisma.userNovelList.findMany({
-      where: { userId: user.id },
-      include: { novel: true },
-      orderBy: { updatedAt: "desc" },
-    }),
-    prisma.activity.findMany({
-      where: {
-        userId: user.id,
-        createdAt: { gte: oneYearAgo },
-      },
-      select: { createdAt: true, type: true, detail: true, novelId: true },
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+  // Batch 1 — everything that depends only on user.id (or nothing). One round trip.
+  const [me, list, activities, favoriteAuthorRows, userFavoriteCharacters] =
+    await Promise.all([
+      getCurrentUser(),
+      prisma.userNovelList.findMany({
+        where: { userId: user.id },
+        include: { novel: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+      prisma.activity.findMany({
+        where: {
+          userId: user.id,
+          createdAt: { gte: oneYearAgo },
+        },
+        select: { createdAt: true, type: true, detail: true, novelId: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.userFavoriteAuthor.findMany({
+        where: { userId: user.id },
+        include: { author: true },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.userFavoriteCharacter.findMany({
+        where: { userId: user.id },
+        include: {
+          character: {
+            include: { novel: { select: { id: true, title: true } } },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
 
-  // Fetch novel covers for activity feed
+  const isOwner = me?.id === user.id;
+
   const activityNovelIds = [
     ...new Set(
       activities
@@ -90,10 +105,36 @@ export default async function PublicProfilePage({
         .filter((id): id is number => id !== null)
     ),
   ];
-  const activityNovels = await prisma.novel.findMany({
-    where: { id: { in: activityNovelIds } },
-    select: { id: true, coverImageUrl: true },
-  });
+
+  // Batch 2 — depends on batch-1 results. The full-table author/character lists
+  // only feed the owner's editor dropdowns, so visitors skip those scans entirely.
+  const [activityNovels, allAuthors, availableCharactersRaw] = await Promise.all([
+    prisma.novel.findMany({
+      where: { id: { in: activityNovelIds } },
+      select: { id: true, coverImageUrl: true },
+    }),
+    isOwner
+      ? prisma.author.findMany({
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, imageUrl: true },
+        })
+      : Promise.resolve([] as { id: number; name: string; imageUrl: string | null }[]),
+    isOwner
+      ? prisma.character.findMany({
+          include: { novel: { select: { id: true, title: true } } },
+          orderBy: [{ novel: { title: "asc" } }, { name: "asc" }],
+        })
+      : Promise.resolve(
+          [] as Awaited<
+            ReturnType<
+              typeof prisma.character.findMany<{
+                include: { novel: { select: { id: true; title: true } } };
+              }>
+            >
+          >
+        ),
+  ]);
+
   const novelCovers: Record<number, string | null> = {};
   activityNovels.forEach((n) => {
     novelCovers[n.id] = n.coverImageUrl;
@@ -105,33 +146,12 @@ export default async function PublicProfilePage({
     .slice(0, 5)
     .map((entry) => entry.novel);
 
-  // Favorite authors
-  const favoriteAuthorRows = await prisma.userFavoriteAuthor.findMany({
-    where: { userId: user.id },
-    include: { author: true },
-    orderBy: { createdAt: "asc" },
-  });
   const favoriteAuthors = favoriteAuthorRows.map((r) => ({
     id: r.author.id,
     name: r.author.name,
     imageUrl: r.author.imageUrl,
   }));
 
-  const allAuthors = await prisma.author.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, imageUrl: true },
-  });
-
-  // Favorite characters
-  const userFavoriteCharacters = await prisma.userFavoriteCharacter.findMany({
-    where: { userId: user.id },
-    include: {
-      character: {
-        include: { novel: { select: { id: true, title: true } } },
-      },
-    },
-    orderBy: { createdAt: "asc" },
-  });
   const favoriteChars = userFavoriteCharacters.map((f) => ({
     id: f.character.id,
     name: f.character.name,
@@ -140,11 +160,6 @@ export default async function PublicProfilePage({
     novel: f.character.novel,
   }));
 
-  // Available characters (all characters system-wide)
-  const availableCharactersRaw = await prisma.character.findMany({
-    include: { novel: { select: { id: true, title: true } } },
-    orderBy: [{ novel: { title: "asc" } }, { name: "asc" }],
-  });
   const availableCharacters = availableCharactersRaw.map((c) => ({
     id: c.id,
     name: c.name,
@@ -209,10 +224,11 @@ export default async function PublicProfilePage({
                 <div key={i} className="relative flex-1">
                   <Image
                     fill
-                    sizes="25vw"
+                    sizes="200px"
                     src={url}
                     alt=""
                     aria-hidden="true"
+                    priority={i === 0}
                     className="object-cover blur-2xl scale-125 opacity-70"
                   />
                 </div>
