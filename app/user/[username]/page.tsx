@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import {
   BookOpen, Star, TrendingUp,
   Calendar, Crown, ShieldCheck, Heart,
@@ -15,8 +14,8 @@ import ProfileImageUpload from "@/components/ProfileImageUpload";
 import BannerColorPicker from "@/components/BannerColorPicker";
 import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
 import { getBannerGradient } from "@/lib/banner-colors";
-import { safeImageSrc } from "@/lib/image-hosts";
 import FavoriteCharactersEditor from "@/components/FavoriteCharactersEditor";
+import NovelCard from "@/components/NovelCard";
 
 
 export const dynamic = "force-dynamic";
@@ -357,24 +356,13 @@ export default async function PublicProfilePage({
               ) : (
                 <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
                   {favoriteNovels.map((novel) => (
-                    <Link
+                    <NovelCard
                       key={novel.id}
-                      href={`/novel/${novel.id}`}
-                      className="shrink-0 w-20 sm:w-24 group"
-                    >
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-hairline group-hover:border-gold/50 transition">
-                        <Image
-                          fill
-                          sizes="(max-width: 640px) 80px, 96px"
-                          src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                          alt={novel.title}
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="text-xs text-muted mt-1 truncate group-hover:text-gold transition">
-                        {novel.title}
-                      </p>
-                    </Link>
+                      id={novel.id}
+                      title={novel.title}
+                      coverImageUrl={novel.coverImageUrl}
+                      size="sm"
+                    />
                   ))}
                 </div>
               )}

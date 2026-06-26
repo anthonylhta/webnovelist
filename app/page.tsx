@@ -1,5 +1,4 @@
 // app/page.tsx
-import Image from "next/image";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
@@ -9,7 +8,7 @@ import {
   ChevronRight, Search, Users,
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
-import { safeImageSrc } from "@/lib/image-hosts";
+import NovelCard from "@/components/NovelCard";
 
 // Genre breakdown + novel count is a full-table scan; it changes rarely, so cache
 // it for an hour rather than re-scanning on every home-page request.
@@ -161,34 +160,22 @@ export default async function Home() {
 
             <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
               {trendingNovels.map((novel, i) => (
-                <Link
+                <NovelCard
                   key={novel.id}
-                  href={`/novel/${novel.id}`}
-                  className="shrink-0 w-28 sm:w-36 group"
-                >
-                  <div className="relative aspect-[3/4] bg-surface rounded-md overflow-hidden mb-2 ring-1 ring-hairline group-hover:ring-gold/50 transition">
-                    <Image
-                      fill
-                      sizes="(max-width: 640px) 112px, 144px"
-                      src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                      alt={novel.title}
-                      priority={i === 0}
-                      className="object-cover group-hover:scale-105 transition duration-300"
-                    />
-                  </div>
-                  <h3 className="font-serif text-sm truncate text-paper group-hover:text-gold transition">
-                    {novel.title}
-                  </h3>
-                  {novel.titleChinese && (
-                    <p className="font-cjk text-xs text-muted truncate">{novel.titleChinese}</p>
-                  )}
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <Users className="w-3 h-3 text-faint" />
-                    <span className="text-xs text-faint">
-                      {novel._count.userEntries} tracking
-                    </span>
-                  </div>
-                </Link>
+                  id={novel.id}
+                  title={novel.title}
+                  titleChinese={novel.titleChinese}
+                  coverImageUrl={novel.coverImageUrl}
+                  priority={i === 0}
+                  footer={
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Users className="w-3 h-3 text-faint" />
+                      <span className="text-xs text-faint">
+                        {novel._count.userEntries} tracking
+                      </span>
+                    </div>
+                  }
+                />
               ))}
             </div>
           </div>
@@ -214,28 +201,14 @@ export default async function Home() {
 
             <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
               {recentNovels.map((novel) => (
-                <Link
+                <NovelCard
                   key={novel.id}
-                  href={`/novel/${novel.id}`}
-                  className="shrink-0 w-28 sm:w-36 group"
-                >
-                  <div className="relative aspect-[3/4] bg-surface rounded-md overflow-hidden mb-2 ring-1 ring-hairline group-hover:ring-gold/50 transition">
-                    <Image
-                      fill
-                      sizes="(max-width: 640px) 112px, 144px"
-                      src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                      alt={novel.title}
-                      className="object-cover group-hover:scale-105 transition duration-300"
-                    />
-                  </div>
-                  <h3 className="font-serif text-sm truncate text-paper group-hover:text-gold transition">
-                    {novel.title}
-                  </h3>
-                  {novel.titleChinese && (
-                    <p className="font-cjk text-xs text-muted truncate">{novel.titleChinese}</p>
-                  )}
-                  <p className="text-xs text-faint truncate">{novel.author}</p>
-                </Link>
+                  id={novel.id}
+                  title={novel.title}
+                  titleChinese={novel.titleChinese}
+                  coverImageUrl={novel.coverImageUrl}
+                  footer={<p className="text-xs text-faint truncate">{novel.author}</p>}
+                />
               ))}
             </div>
           </div>

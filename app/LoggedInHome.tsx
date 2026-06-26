@@ -6,6 +6,7 @@ import { safeImageSrc } from "@/lib/image-hosts";
 import Link from "next/link";
 import { BookOpen, ChevronRight, BookMarked } from "lucide-react";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
+import NovelCard from "@/components/NovelCard";
 
 interface ReadingEntry {
   id: number;
@@ -187,23 +188,14 @@ export default function LoggedInHome({
 
           <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
             {recentNovels.map((novel) => (
-              <Link key={novel.id} href={`/novel/${novel.id}`} className="shrink-0 w-28 sm:w-36 group">
-                <div className="relative aspect-[3/4] bg-surface rounded-md overflow-hidden mb-2 ring-1 ring-hairline group-hover:ring-gold/50 transition">
-                  <Image
-                    fill
-                    sizes="(max-width: 640px) 112px, 144px"
-                    src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                    alt={novel.title}
-                    className="object-cover group-hover:scale-105 transition duration-300"
-                  />
-                </div>
-                <h3 className="font-serif text-sm truncate text-paper group-hover:text-gold transition">{novel.title}</h3>
-                {novel.titleChinese ? (
-                  <p className="font-cjk text-xs text-muted truncate">{novel.titleChinese}</p>
-                ) : (
-                  <p className="text-xs text-faint truncate">{novel.author}</p>
-                )}
-              </Link>
+              <NovelCard
+                key={novel.id}
+                id={novel.id}
+                title={novel.title}
+                titleChinese={novel.titleChinese}
+                coverImageUrl={novel.coverImageUrl}
+                footer={novel.titleChinese ? null : <p className="text-xs text-faint truncate">{novel.author}</p>}
+              />
             ))}
           </div>
         </section>

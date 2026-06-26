@@ -1,10 +1,9 @@
 // app/browse/page.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
-import { safeImageSrc } from "@/lib/image-hosts";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import NovelCard from "@/components/NovelCard";
 
 const getAllGenres = unstable_cache(
   async () => {
@@ -166,41 +165,31 @@ export default async function BrowsePage({
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {novels.map((novel, i) => (
-            <Link
+            <NovelCard
               key={novel.id}
-              href={`/novel/${novel.id}`}
-              className="bg-surface rounded-lg border border-hairline overflow-hidden
-                         hover:border-gold-dim transition group"
-            >
-              <div className="relative aspect-[3/4] bg-elevated overflow-hidden">
-                <Image
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px"
-                  src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                  alt={novel.title}
-                  priority={i < 4}
-                  className="object-cover group-hover:scale-105 transition duration-300"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="font-serif text-paper truncate group-hover:text-gold transition">{novel.title}</h3>
-                {novel.titleChinese && (
-                  <p className="font-cjk text-muted text-sm truncate">{novel.titleChinese}</p>
-                )}
-                <p className="text-faint text-sm mt-1 truncate">{novel.author}</p>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {novel.genres.slice(0, 2).map((g) => (
-                    <span key={g} className="px-2 py-0.5 bg-elevated border border-hairline rounded text-xs text-muted">
-                      {g}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between mt-3 text-xs text-faint">
-                  <span className="capitalize">{novel.status}</span>
-                  <span>{novel.totalChapters} ch.</span>
-                </div>
-              </div>
-            </Link>
+              id={novel.id}
+              title={novel.title}
+              titleChinese={novel.titleChinese}
+              coverImageUrl={novel.coverImageUrl}
+              bordered
+              priority={i < 4}
+              footer={
+                <>
+                  <p className="text-faint text-sm mt-1 truncate">{novel.author}</p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {novel.genres.slice(0, 2).map((g) => (
+                      <span key={g} className="px-2 py-0.5 bg-elevated border border-hairline rounded text-xs text-muted">
+                        {g}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between mt-3 text-xs text-faint">
+                    <span className="capitalize">{novel.status}</span>
+                    <span>{novel.totalChapters} ch.</span>
+                  </div>
+                </>
+              }
+            />
           ))}
         </div>
       )}
