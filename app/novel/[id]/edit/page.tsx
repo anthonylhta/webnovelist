@@ -79,7 +79,7 @@ export default function EditNovelPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
@@ -93,14 +93,14 @@ export default function EditNovelPage() {
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <ShieldX className="w-16 h-16 text-red-500 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-        <p className="text-gray-400 mb-6">
+        <ShieldX className="w-16 h-16 text-seal-bright mb-4" />
+        <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
+        <p className="text-muted mb-6">
           Only admins and moderators can edit novels.
         </p>
         <Link
           href={`/novel/${novelId}`}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition"
+          className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition"
         >
           Back to Novel
         </Link>
@@ -168,14 +168,14 @@ export default function EditNovelPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
-        <Pencil className="w-8 h-8 text-blue-500" />
+      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 font-serif text-paper">
+        <Pencil className="w-8 h-8 text-gold" />
         Edit Novel
       </h1>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <div className="bg-surface border border-hairline rounded-xl p-6">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg p-3 mb-6 text-sm">
+          <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-6 text-sm">
             {error}
           </div>
         )}
@@ -183,57 +183,57 @@ export default function EditNovelPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
-              Title (English) <span className="text-red-500">*</span>
+            <label className="block text-sm text-muted mb-1">
+              Title (English) <span className="text-seal-bright">*</span>
             </label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-paper focus:outline-none focus:border-gold-dim"
               required
             />
           </div>
 
           {/* Chinese Title */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Title (Chinese)</label>
+            <label className="block text-sm text-muted mb-1">Title (Chinese)</label>
             <input
               type="text"
               value={form.titleChinese}
               onChange={(e) => setForm({ ...form, titleChinese: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-muted font-cjk focus:outline-none focus:border-gold-dim"
             />
           </div>
 
           {/* Author */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Author (display name)</label>
+            <label className="block text-sm text-muted mb-1">Author (display name)</label>
             <input
               type="text"
               value={form.author}
               onChange={(e) => setForm({ ...form, author: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
 
           {/* Link to Author entity */}
           {allAuthors.length > 0 && (
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
+              <label className="block text-sm text-muted mb-1">
                 Link to Author page
-                <span className="text-gray-600 ml-1">(optional)</span>
+                <span className="text-faint ml-1">(optional)</span>
               </label>
               <select
                 value={form.authorId ?? ""}
                 onChange={(e) =>
                   setForm({ ...form, authorId: e.target.value ? parseInt(e.target.value) : null })
                 }
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               >
                 <option value="">— None —</option>
                 {allAuthors.map((a) => (
@@ -247,13 +247,13 @@ export default function EditNovelPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Description</label>
+            <label className="block text-sm text-muted mb-1">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-paper focus:outline-none focus:border-gold-dim resize-none"
             />
           </div>
 
@@ -267,26 +267,26 @@ export default function EditNovelPage() {
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Total Chapters</label>
+              <label className="block text-sm text-muted mb-1">Total Chapters</label>
               <input
                 type="number"
                 min="0"
                 value={form.totalChapters}
                 onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Year Published</label>
+              <label className="block text-sm text-muted mb-1">Year Published</label>
               <input
                 type="number"
                 min="1990"
                 max="2030"
                 value={form.yearPublished}
                 onChange={(e) => setForm({ ...form, yearPublished: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
           </div>
@@ -294,12 +294,12 @@ export default function EditNovelPage() {
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Novel Status</label>
+              <label className="block text-sm text-muted mb-1">Novel Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               >
                 <option value="Ongoing">Ongoing</option>
                 <option value="Completed">Completed</option>
@@ -307,20 +307,20 @@ export default function EditNovelPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Original Source</label>
+              <label className="block text-sm text-muted mb-1">Original Source</label>
               <input
                 type="text"
                 value={form.originalSource}
                 onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
           </div>
 
           {/* Genres */}
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Genres</label>
+            <label className="block text-sm text-muted mb-2">Genres</label>
             <div className="flex flex-wrap gap-2">
               {GENRE_OPTIONS.map((genre) => (
                 <button
@@ -329,8 +329,8 @@ export default function EditNovelPage() {
                   onClick={() => toggleGenre(genre)}
                   className={`px-3 py-1.5 rounded-lg text-sm transition ${
                     form.genres.includes(genre)
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      ? "bg-gold text-ink"
+                      : "bg-elevated text-muted hover:bg-hairline"
                   }`}
                 >
                   {form.genres.includes(genre) && "✓ "}
@@ -342,15 +342,15 @@ export default function EditNovelPage() {
 
           {/* Tags */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm text-muted mb-1">
               Tags (comma separated)
             </label>
             <input
               type="text"
               value={form.tags}
               onChange={(e) => setForm({ ...form, tags: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                         text-gray-100 focus:outline-none focus:border-blue-500"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
 
@@ -359,14 +359,14 @@ export default function EditNovelPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50
-                         text-white font-semibold py-3 rounded-lg transition"
+              className="flex-1 bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50
+                         font-semibold py-3 rounded-lg transition"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
             <Link
               href={`/novel/${novelId}`}
-              className="px-6 bg-gray-800 hover:bg-gray-700 text-gray-300
+              className="px-6 bg-elevated hover:bg-hairline text-body
                          font-semibold py-3 rounded-lg transition text-center"
             >
               Cancel

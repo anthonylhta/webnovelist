@@ -50,7 +50,7 @@ export default function QuickChapterUpdate({
       <button
         onClick={() => updateChapter(chapter - 1)}
         disabled={saving || chapter <= 0}
-        className="p-1 text-gray-500 hover:text-white disabled:opacity-30 transition"
+        className="p-1 text-faint hover:text-paper disabled:opacity-30 transition"
       >
         <Minus className="w-3 h-3" />
       </button>
@@ -78,18 +78,18 @@ export default function QuickChapterUpdate({
             (e.target as HTMLInputElement).blur();
           }
         }}
-        className="w-14 bg-transparent border border-gray-700 rounded px-1 py-0.5 
-                   text-center text-sm focus:outline-none focus:border-blue-500"
+        className="w-14 bg-transparent border border-hairline rounded px-1 py-0.5
+                   text-center text-sm focus:outline-none focus:border-gold-dim"
       />
 
-      <span className="text-gray-500 text-sm">
+      <span className="text-faint text-sm">
         {totalChapters ? `/ ${totalChapters}` : ""}
       </span>
 
       <button
         onClick={() => updateChapter(chapter + 1)}
         disabled={saving || (totalChapters !== null && chapter >= totalChapters)}
-        className="p-1 text-gray-500 hover:text-white disabled:opacity-30 transition"
+        className="p-1 text-faint hover:text-paper disabled:opacity-30 transition"
       >
         <Plus className="w-3 h-3" />
       </button>

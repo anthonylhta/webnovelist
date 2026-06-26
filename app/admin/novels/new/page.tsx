@@ -41,7 +41,7 @@ export default function AddNovelPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
@@ -55,10 +55,10 @@ export default function AddNovelPage() {
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <ShieldX className="w-16 h-16 text-red-500 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-        <p className="text-gray-400 mb-6">Only admins and moderators can add novels.</p>
-        <Link href="/browse" className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition">
+        <ShieldX className="w-16 h-16 text-seal-bright mb-4" />
+        <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
+        <p className="text-muted mb-6">Only admins and moderators can add novels.</p>
+        <Link href="/browse" className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition">
           Browse Novels
         </Link>
       </div>
@@ -110,51 +110,51 @@ export default function AddNovelPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/novels" className="flex items-center gap-1.5 text-gray-400 hover:text-white transition text-sm">
+        <Link href="/admin/novels" className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm">
           <ChevronLeft className="w-4 h-4" />
           Manage Novels
         </Link>
-        <span className="text-gray-700">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Plus className="w-6 h-6 text-blue-500" />
+        <span className="text-faint">/</span>
+        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
+          <Plus className="w-6 h-6 text-gold" />
           Add Novel
         </h1>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <div className="bg-surface border border-hairline rounded-xl p-6">
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg p-3 mb-6 text-sm">
+          <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-6 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Title (English) <span className="text-red-500">*</span></label>
+            <label className="block text-sm text-muted mb-1">Title (English) <span className="text-seal-bright">*</span></label>
             <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g., Reverend Insanity"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" required />
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" required />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Title (Chinese)</label>
+            <label className="block text-sm text-muted mb-1">Title (Chinese)</label>
             <input type="text" value={form.titleChinese} onChange={(e) => setForm({ ...form, titleChinese: e.target.value })}
               placeholder="e.g., 蛊真人"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-muted font-cjk focus:outline-none focus:border-gold-dim" />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Author</label>
+            <label className="block text-sm text-muted mb-1">Author</label>
             <input type="text" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })}
               placeholder="e.g., Er Gen"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Description</label>
+            <label className="block text-sm text-muted mb-1">Description</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4} placeholder="Brief synopsis..."
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500 resize-none" />
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim resize-none" />
           </div>
 
           <ImageUpload
@@ -164,44 +164,44 @@ export default function AddNovelPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Total Chapters</label>
+              <label className="block text-sm text-muted mb-1">Total Chapters</label>
               <input type="number" min="0" value={form.totalChapters} onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
                 placeholder="e.g., 1394"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Year Published</label>
+              <label className="block text-sm text-muted mb-1">Year Published</label>
               <input type="number" min="1990" max="2030" value={form.yearPublished} onChange={(e) => setForm({ ...form, yearPublished: e.target.value })}
                 placeholder="e.g., 2018"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Status</label>
+              <label className="block text-sm text-muted mb-1">Status</label>
               <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500">
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim">
                 <option value="Ongoing">Ongoing</option>
                 <option value="Completed">Completed</option>
                 <option value="Hiatus">Hiatus</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Original Source</label>
+              <label className="block text-sm text-muted mb-1">Original Source</label>
               <input type="text" value={form.originalSource} onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
                 placeholder="e.g., Qidian"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-2">Genres</label>
+            <label className="block text-sm text-muted mb-2">Genres</label>
             <div className="flex flex-wrap gap-2">
               {GENRE_OPTIONS.map((genre) => (
                 <button key={genre} type="button" onClick={() => toggleGenre(genre)}
                   className={`px-3 py-1.5 rounded-lg text-sm transition ${
-                    form.genres.includes(genre) ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    form.genres.includes(genre) ? "bg-gold text-ink" : "bg-elevated text-muted hover:bg-hairline"
                   }`}>
                   {form.genres.includes(genre) && "✓ "}{genre}
                 </button>
@@ -210,14 +210,14 @@ export default function AddNovelPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Tags (comma separated)</label>
+            <label className="block text-sm text-muted mb-1">Tags (comma separated)</label>
             <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })}
               placeholder="e.g., Smart MC, Rebirth, Cultivation"
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-blue-500" />
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
           </div>
 
           <button type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white font-semibold py-3 rounded-lg transition mt-2">
+            className="w-full bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50 font-semibold py-3 rounded-lg transition mt-2">
             {loading ? "Adding..." : "Add Novel"}
           </button>
         </form>

@@ -1,26 +1,155 @@
-/* src/app/globals.css */
+/* app/globals.css */
 @import "tailwindcss";
 
-/* Custom scrollbar */
+/*
+  "Ink & Gold" — WebNovelist design system.
+  Warm charcoal base (never pure black), a single gold accent, a literary serif
+  for titles, and a faint ink-wash texture. Extends the Tone-Translator palette.
+  Tokens here generate Tailwind utilities (bg-ink, text-gold, border-hairline…).
+*/
+@theme {
+  /* Warm charcoal base — the whole trick is it's never #000 */
+  --color-ink: #0d0d0b; /* page background */
+  --color-surface: #16140f; /* cards lift slightly off the page */
+  --color-elevated: #211e17; /* hover / raised surfaces */
+  --color-hairline: #2a2519; /* borders, dividers, grid lines */
+
+  /* Gold — the single warm accent. Used sparingly. */
+  --color-gold: #c9a84c;
+  --color-gold-bright: #e2c86e; /* hover / active */
+  --color-gold-dim: #8a7635; /* subdued gold, quiet states */
+
+  /* Seal red — favourites + destructive (borrowed from the Jade & Seal idea) */
+  --color-seal: #c0392b;
+  --color-seal-bright: #d9543f;
+
+  /* Jade — "completed / positive" reading status only. Used sparingly. */
+  --color-jade: #6f9e7e;
+
+  /* Text — warm off-white down to faint */
+  --color-paper: #f0ede8; /* primary headings */
+  --color-body: #c7c1b8; /* body copy */
+  --color-muted: #8a8580; /* secondary / labels */
+  --color-faint: #5a5652; /* tertiary / captions */
+}
+
+@theme inline {
+  --font-sans: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  /* Literary display serif for titles + section headings */
+  --font-serif: var(--font-shippori), Georgia, "Times New Roman", serif;
+  /* Original-language (Chinese/Japanese) titles — system CJK serif stack,
+     no heavy webfont download. Shippori covers JP; ZH serifs lead for hanzi. */
+  --font-cjk:
+    "Noto Serif SC", "Source Han Serif SC", "Songti SC", var(--font-shippori),
+    "SimSun", serif;
+}
+
+/* The ink canvas lives on <html> so the fixed texture layers below (z -1) can
+   sit behind page content without an opaque body background covering them. */
+html {
+  background: var(--color-ink);
+}
+
+body {
+  color: var(--color-body);
+  font-family: var(--font-sans);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Ink-wash: a fine noise grain over the whole page. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Slow-drifting gold glow — the warmth that says "lamp-lit reading room". */
+@keyframes inkDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(1.5%, 1%) scale(1.03);
+  }
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      circle at 25% 18%,
+      rgba(201, 168, 76, 0.05) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 82% 70%,
+      rgba(192, 57, 43, 0.025) 0%,
+      transparent 55%
+    );
+  pointer-events: none;
+  animation: inkDrift 26s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+/* Warm scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--color-ink);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
+  background: #312b1d;
+  border: 2px solid var(--color-ink);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-dim);
 }
 
-/* Hide scrollbar on horizontal scroll sections */
+/* Hide scrollbar on horizontal cover strips */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* A hairline rule with a gold fade in the middle — used under section headings
+   and the navbar. Apply as a className on a full-width element. */
+.rule-gold {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-hairline) 12%,
+    var(--color-gold-dim) 50%,
+    var(--color-hairline) 88%,
+    transparent
+  );
 }

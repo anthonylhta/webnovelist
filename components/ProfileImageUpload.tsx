@@ -91,7 +91,7 @@ export default function ProfileImageUpload({
       </div>
 
       {error && (
-        <div className="mt-2 text-center text-red-400 text-xs bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-1.5">
+        <div className="mt-2 text-center text-seal-bright text-xs bg-seal/10 border border-seal/30 rounded-lg px-3 py-1.5">
           {error}
         </div>
       )}

@@ -111,13 +111,13 @@ export default function AddToListModal({
   return (
     <>
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="bg-surface border border-hairline rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-800">
-            <h2 className="text-xl font-bold truncate pr-4">
+          <div className="flex items-center justify-between p-6 border-b border-hairline">
+            <h2 className="text-xl font-bold font-serif truncate pr-4">
               {isEditing ? "Edit" : "Add"}: {novelTitle}
             </h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <button onClick={onClose} className="text-muted hover:text-paper">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -125,19 +125,19 @@ export default function AddToListModal({
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg p-3 text-sm">
+              <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 text-sm">
                 {error}
               </div>
             )}
 
             {/* Status */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Status</label>
+              <label className="block text-sm text-muted mb-1">Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               >
                 <option value="reading">📖 Reading</option>
                 <option value="completed">✅ Completed</option>
@@ -150,7 +150,7 @@ export default function AddToListModal({
             {/* Rating and Chapter on same row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-muted mb-1">
                   Rating (0-10)
                 </label>
                 <input
@@ -161,12 +161,12 @@ export default function AddToListModal({
                   value={form.rating}
                   onChange={(e) => setForm({ ...form, rating: e.target.value })}
                   placeholder="—"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                             text-gray-100 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                             text-paper focus:outline-none focus:border-gold-dim"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-muted mb-1">
                   Chapter{totalChapters ? ` (of ${totalChapters})` : ""}
                 </label>
                 <input
@@ -177,15 +177,15 @@ export default function AddToListModal({
                   onChange={(e) =>
                     setForm({ ...form, currentChapter: parseInt(e.target.value) || 0 })
                   }
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                             text-gray-100 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                             text-paper focus:outline-none focus:border-gold-dim"
                 />
               </div>
             </div>
 
             {/* Reading URL */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
+              <label className="block text-sm text-muted mb-1">
                 Reading Link
               </label>
               <input
@@ -193,42 +193,42 @@ export default function AddToListModal({
                 value={form.readingUrl}
                 onChange={(e) => setForm({ ...form, readingUrl: e.target.value })}
                 placeholder="https://www.novelupdates.com/..."
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
 
             {/* Dates on same row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-muted mb-1">
                   Date Started
                 </label>
                 <input
                   type="date"
                   value={form.dateStarted}
                   onChange={(e) => setForm({ ...form, dateStarted: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                             text-gray-100 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                             text-paper focus:outline-none focus:border-gold-dim"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="block text-sm text-muted mb-1">
                   Date Finished
                 </label>
                 <input
                   type="date"
                   value={form.dateFinished}
                   onChange={(e) => setForm({ ...form, dateFinished: e.target.value })}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                             text-gray-100 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                             text-paper focus:outline-none focus:border-gold-dim"
                 />
               </div>
             </div>
 
             {/* Reread Count */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">
+              <label className="block text-sm text-muted mb-1">
                 Times Re-read
               </label>
               <input
@@ -238,21 +238,21 @@ export default function AddToListModal({
                 onChange={(e) =>
                   setForm({ ...form, rereadCount: parseInt(e.target.value) || 0 })
                 }
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Notes</label>
+              <label className="block text-sm text-muted mb-1">Notes</label>
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={3}
                 placeholder="Personal notes..."
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3
-                           text-gray-100 focus:outline-none focus:border-blue-500 resize-none"
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim resize-none"
               />
             </div>
 
@@ -261,8 +261,8 @@ export default function AddToListModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50
-                           text-white font-semibold py-3 rounded-lg transition"
+                className="flex-1 bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50
+                           font-semibold py-3 rounded-lg transition"
               >
                 {loading ? "Saving..." : isEditing ? "Update" : "Add to List"}
               </button>
@@ -272,7 +272,7 @@ export default function AddToListModal({
                   type="button"
                   onClick={() => setShowConfirmDelete(true)}
                   disabled={loading}
-                  className="px-4 bg-red-600/20 hover:bg-red-600/40 text-red-400
+                  className="px-4 bg-seal/20 hover:bg-seal/40 text-seal-bright
                              font-semibold py-3 rounded-lg transition"
                 >
                   Remove

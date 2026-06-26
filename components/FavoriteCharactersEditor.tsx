@@ -83,18 +83,18 @@ export default function FavoriteCharactersEditor({
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
+    <div className="bg-surface border border-hairline rounded-xl p-4 sm:p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
-          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+        <h2 className="text-base sm:text-lg font-semibold font-serif flex items-center gap-2">
+          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
           Favorite Characters
         </h2>
         {isOwner && favorites.length < 5 && !showPicker && (
           <button
             onClick={openPicker}
             disabled={loading || remaining.length === 0}
-            className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300
+            className="flex items-center gap-1 text-sm text-gold hover:text-gold-bright
                        disabled:opacity-40 transition"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export default function FavoriteCharactersEditor({
 
       {/* Empty state */}
       {favorites.length === 0 && !isOwner && (
-        <p className="text-gray-500 text-sm">No favorite characters yet.</p>
+        <p className="text-faint text-sm">No favorite characters yet.</p>
       )}
 
       {/* Character avatars */}
@@ -114,8 +114,8 @@ export default function FavoriteCharactersEditor({
           {favorites.map((char) => (
             <div key={char.id} className="relative group">
               <Link href={`/character/${char.id}`} className="block text-center w-16">
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-gray-800 rounded-full border border-gray-700
-                                flex items-center justify-center overflow-hidden hover:border-purple-500/60 transition">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-elevated rounded-full border border-hairline
+                                flex items-center justify-center overflow-hidden hover:border-gold/60 transition">
                   <Image
                     fill
                     sizes="64px"
@@ -124,10 +124,10 @@ export default function FavoriteCharactersEditor({
                     className="object-cover"
                   />
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-400 mt-1.5 truncate hover:text-purple-400 transition">
+                <p className="text-[10px] sm:text-xs text-muted mt-1.5 truncate hover:text-gold transition">
                   {char.name}
                 </p>
-                <p className="text-[9px] text-gray-600 truncate">
+                <p className="text-[9px] text-faint truncate">
                   {char.novel.title}
                 </p>
               </Link>
@@ -136,11 +136,11 @@ export default function FavoriteCharactersEditor({
                 <button
                   onClick={() => removeCharacter(char.id)}
                   disabled={loading}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 hover:bg-red-700 rounded-full
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-seal hover:bg-seal-bright rounded-full
                              flex items-center justify-center opacity-0 group-hover:opacity-100 transition
                              disabled:opacity-50"
                 >
-                  <X className="w-3 h-3 text-white" />
+                  <X className="w-3 h-3 text-paper" />
                 </button>
               )}
             </div>
@@ -150,20 +150,20 @@ export default function FavoriteCharactersEditor({
 
       {/* Picker */}
       {showPicker && (
-        <div className="mt-3 bg-gray-800 border border-gray-700 rounded-xl overflow-hidden">
-          <div className="flex items-center gap-2 p-2 border-b border-gray-700">
+        <div className="mt-3 bg-elevated border border-hairline rounded-xl overflow-hidden">
+          <div className="flex items-center gap-2 p-2 border-b border-hairline">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search characters or novels..."
-              className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-1.5 text-sm
-                         text-gray-200 focus:outline-none focus:border-purple-500"
+              className="flex-1 bg-surface border border-hairline rounded-lg px-3 py-1.5 text-sm
+                         text-body focus:outline-none focus:border-gold-dim"
               autoFocus
             />
             <button
               onClick={() => { setShowPicker(false); setSearch(""); }}
-              className="p-1.5 text-gray-500 hover:text-gray-300 transition"
+              className="p-1.5 text-faint hover:text-body transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -171,17 +171,17 @@ export default function FavoriteCharactersEditor({
 
           <div className="overflow-y-auto max-h-64">
             {filtered.length === 0 ? (
-              <p className="text-gray-500 text-sm p-4 text-center">No characters found.</p>
+              <p className="text-faint text-sm p-4 text-center">No characters found.</p>
             ) : (
               filtered.map((char) => (
                 <button
                   key={char.id}
                   onClick={() => addCharacter(char)}
                   disabled={loading}
-                  className="w-full text-left px-3 py-2.5 hover:bg-gray-700 transition flex items-center gap-3
-                             border-b border-gray-700/50 last:border-0 disabled:opacity-50"
+                  className="w-full text-left px-3 py-2.5 hover:bg-hairline transition flex items-center gap-3
+                             border-b border-hairline/50 last:border-0 disabled:opacity-50"
                 >
-                  <div className="relative w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-gray-600">
+                  <div className="relative w-9 h-9 bg-surface rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-hairline">
                     <Image
                       fill
                       sizes="36px"
@@ -191,11 +191,11 @@ export default function FavoriteCharactersEditor({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-200 truncate">{char.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{char.novel.title}</p>
+                    <p className="text-sm text-body truncate">{char.name}</p>
+                    <p className="text-xs text-faint truncate">{char.novel.title}</p>
                   </div>
                   {char.role && (
-                    <span className="text-[10px] text-gray-600 shrink-0">{char.role}</span>
+                    <span className="text-[10px] text-faint shrink-0">{char.role}</span>
                   )}
                 </button>
               ))
@@ -205,7 +205,7 @@ export default function FavoriteCharactersEditor({
       )}
 
       {isOwner && remaining.length === 0 && favorites.length < 5 && !showPicker && (
-        <p className="text-gray-600 text-xs mt-2">No more characters available.</p>
+        <p className="text-faint text-xs mt-2">No more characters available.</p>
       )}
     </div>
   );

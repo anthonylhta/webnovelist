@@ -51,12 +51,12 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
   }, [activities]);
 
   const getColor = (count: number) => {
-    if (count === 0) return "bg-gray-800/50";
+    if (count === 0) return "bg-elevated";
     const intensity = count / maxCount;
-    if (intensity <= 0.25) return "bg-green-900/60";
-    if (intensity <= 0.5) return "bg-green-700/70";
-    if (intensity <= 0.75) return "bg-green-500/80";
-    return "bg-green-400";
+    if (intensity <= 0.25) return "bg-gold/20";
+    if (intensity <= 0.5) return "bg-gold/40";
+    if (intensity <= 0.75) return "bg-gold/70";
+    return "bg-gold";
   };
 
   return (
@@ -81,17 +81,17 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
 
       {/* Legend */}
       <div className="flex items-center justify-between mt-3">
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted">
           {totalActivities} update{totalActivities !== 1 ? "s" : ""} in the last year
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500 mr-1">Less</span>
-          <div className="w-[11px] h-[11px] rounded-sm bg-gray-800/50" />
-          <div className="w-[11px] h-[11px] rounded-sm bg-green-900/60" />
-          <div className="w-[11px] h-[11px] rounded-sm bg-green-700/70" />
-          <div className="w-[11px] h-[11px] rounded-sm bg-green-500/80" />
-          <div className="w-[11px] h-[11px] rounded-sm bg-green-400" />
-          <span className="text-xs text-gray-500 ml-1">More</span>
+          <span className="text-xs text-faint mr-1">Less</span>
+          <div className="w-[11px] h-[11px] rounded-sm bg-elevated" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-gold/20" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-gold/40" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-gold/70" />
+          <div className="w-[11px] h-[11px] rounded-sm bg-gold" />
+          <span className="text-xs text-faint ml-1">More</span>
         </div>
       </div>
     </div>

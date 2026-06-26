@@ -26,23 +26,23 @@ export default function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl w-full max-w-md">
+      <div className="bg-surface border border-hairline rounded-xl w-full max-w-md">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-800">
+        <div className="flex items-center justify-between p-6 border-b border-hairline">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${danger ? "bg-red-500/10" : "bg-blue-500/10"}`}>
-              <AlertTriangle className={`w-5 h-5 ${danger ? "text-red-500" : "text-blue-500"}`} />
+            <div className={`p-2 rounded-lg ${danger ? "bg-seal/10" : "bg-gold/10"}`}>
+              <AlertTriangle className={`w-5 h-5 ${danger ? "text-seal-bright" : "text-gold"}`} />
             </div>
-            <h2 className="text-lg font-bold">{title}</h2>
+            <h2 className="text-lg font-bold font-serif">{title}</h2>
           </div>
-          <button onClick={onCancel} className="text-gray-400 hover:text-white transition">
+          <button onClick={onCancel} className="text-muted hover:text-paper transition">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
         <div className="p-6">
-          <p className="text-gray-300">{message}</p>
+          <p className="text-body">{message}</p>
         </div>
 
         {/* Buttons */}
@@ -50,7 +50,7 @@ export default function ConfirmModal({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 
+            className="flex-1 bg-elevated hover:bg-hairline text-body
                        font-semibold py-3 rounded-lg transition"
           >
             {cancelText}
@@ -61,8 +61,8 @@ export default function ConfirmModal({
             className={`flex-1 font-semibold py-3 rounded-lg transition
               ${
                 danger
-                  ? "bg-red-600 hover:bg-red-700 disabled:bg-red-600/50 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white"
+                  ? "bg-seal text-paper hover:bg-seal-bright disabled:bg-seal/50"
+                  : "bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50"
               }`}
           >
             {loading ? "Removing..." : confirmText}

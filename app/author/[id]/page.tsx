@@ -68,9 +68,9 @@ export default async function AuthorPage({
   const avatarUrl = author.imageUrl || AVATAR_PLACEHOLDER;
 
   const STATUS_STYLES: Record<string, string> = {
-    Ongoing: "bg-green-600/20 text-green-400 border-green-600/30",
-    Completed: "bg-blue-600/20 text-blue-400 border-blue-600/30",
-    Hiatus: "bg-yellow-600/20 text-yellow-400 border-yellow-600/30",
+    Ongoing: "bg-gold/10 text-gold border-gold/30",
+    Completed: "bg-jade/10 text-jade border-jade/30",
+    Hiatus: "bg-elevated text-muted border-hairline",
   };
 
   return (
@@ -86,7 +86,7 @@ export default async function AuthorPage({
           className="object-cover scale-110 blur-2xl opacity-30"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent" />
       </div>
 
       {/* Content — pulled up to overlap hero */}
@@ -96,7 +96,7 @@ export default async function AuthorPage({
 
             {/* Avatar */}
             <div className="shrink-0">
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-gray-900 shadow-2xl ring-1 ring-white/10 bg-gray-800">
+              <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-ink shadow-2xl ring-1 ring-white/10 bg-elevated">
                 <Image
                   src={avatarUrl}
                   alt={author.name}
@@ -110,11 +110,11 @@ export default async function AuthorPage({
             {/* Name + meta */}
             <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
               <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                <User className="w-4 h-4 text-gray-500" />
-                <span className="text-xs text-gray-500 uppercase tracking-widest">Author</span>
+                <User className="w-4 h-4 text-faint" />
+                <span className="text-xs text-faint uppercase tracking-widest">Author</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold">{author.name}</h1>
-              <div className="flex items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-gray-500">
+              <h1 className="text-3xl sm:text-4xl font-bold font-serif text-paper">{author.name}</h1>
+              <div className="flex items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-faint">
                 <span className="flex items-center gap-1.5">
                   <BookOpen className="w-3.5 h-3.5" />
                   {author.novels.length} novel{author.novels.length !== 1 ? "s" : ""}
@@ -137,10 +137,10 @@ export default async function AuthorPage({
           {/* Bio */}
           {author.bio && (
             <div className="mt-8 max-w-3xl">
-              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+              <h2 className="text-xs font-semibold text-faint uppercase tracking-widest mb-3">
                 About
               </h2>
-              <p className="text-gray-300 leading-relaxed whitespace-pre-line text-[15px]">
+              <p className="text-body leading-relaxed whitespace-pre-line text-[15px]">
                 {author.bio}
               </p>
             </div>
@@ -148,22 +148,22 @@ export default async function AuthorPage({
 
           {/* Novels */}
           <div className="mt-10">
-            <h2 className="text-xl font-bold mb-5">Novels</h2>
+            <h2 className="text-xl font-bold mb-5 font-serif text-paper">Novels</h2>
             {author.novels.length === 0 ? (
-              <p className="text-gray-500 text-sm">No novels linked to this author yet.</p>
+              <p className="text-faint text-sm">No novels linked to this author yet.</p>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {author.novels.map((novel) => {
                   const statusStyle =
                     STATUS_STYLES[novel.status ?? ""] ??
-                    "bg-gray-600/20 text-gray-400 border-gray-600/30";
+                    "bg-elevated text-muted border-hairline";
                   return (
                     <Link
                       key={novel.id}
                       href={`/novel/${novel.id}`}
                       className="group flex flex-col"
                     >
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-gray-800 group-hover:border-blue-500/50 transition">
+                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-hairline group-hover:border-gold/50 transition">
                         <Image
                           fill
                           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
@@ -179,11 +179,11 @@ export default async function AuthorPage({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-2 line-clamp-2 group-hover:text-white transition leading-snug">
+                      <p className="text-xs text-muted mt-2 line-clamp-2 group-hover:text-paper transition leading-snug">
                         {novel.title}
                       </p>
                       {novel.totalChapters && (
-                        <p className="text-[10px] text-gray-600 mt-0.5 flex items-center gap-1">
+                        <p className="text-[10px] text-faint mt-0.5 flex items-center gap-1">
                           <Layers className="w-2.5 h-2.5" />
                           {novel.totalChapters.toLocaleString()} ch
                         </p>

@@ -48,16 +48,16 @@ export default function FavoriteAuthorButton({
         className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition border
           ${
             favorited
-              ? "bg-pink-600/20 hover:bg-pink-600/30 text-pink-400 border-pink-600/50"
-              : "bg-gray-800 hover:bg-gray-700 text-gray-400 border-gray-700"
+              ? "bg-seal/20 hover:bg-seal/30 text-seal border-seal/40"
+              : "bg-elevated hover:bg-hairline text-muted hover:text-gold border-hairline"
           }
           ${loading ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
-        <Heart className={`w-4 h-4 ${favorited ? "fill-pink-400" : ""}`} />
+        <Heart className={`w-4 h-4 ${favorited ? "fill-seal" : ""}`} />
         {favorited ? "Favourited" : "Add to Favourites"}
       </button>
-      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+      {error && <p className="text-seal-bright text-xs mt-1">{error}</p>}
     </div>
   );
 }
