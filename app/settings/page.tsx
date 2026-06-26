@@ -207,7 +207,7 @@ export default function SettingsPage() {
 
         {/* Cooldown Notice */}
         {!isAdmin && settings.daysUntilChange > 0 && (
-          <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-lg p-3 mb-4 text-sm">
+          <div className="flex items-center gap-2 bg-warn/10 border border-warn/30 text-warn rounded-lg p-3 mb-4 text-sm">
             <Clock className="w-4 h-4 shrink-0" />
             You can change your username again in {settings.daysUntilChange} day
             {settings.daysUntilChange !== 1 ? "s" : ""}.
