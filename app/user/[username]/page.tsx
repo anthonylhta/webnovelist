@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import {
   BookOpen, Star, TrendingUp,
   Calendar, Crown, ShieldCheck, Heart,
@@ -15,8 +14,8 @@ import ProfileImageUpload from "@/components/ProfileImageUpload";
 import BannerColorPicker from "@/components/BannerColorPicker";
 import FavoriteAuthorsEditor from "@/components/FavoriteAuthorsEditor";
 import { getBannerGradient } from "@/lib/banner-colors";
-import { safeImageSrc } from "@/lib/image-hosts";
 import FavoriteCharactersEditor from "@/components/FavoriteCharactersEditor";
+import NovelCard from "@/components/NovelCard";
 
 
 export const dynamic = "force-dynamic";
@@ -198,16 +197,16 @@ export default async function PublicProfilePage({
 
   const getRoleIcon = () => {
     switch (user.role) {
-      case "admin": return <Crown className="w-4 h-4 text-red-400" />;
-      case "moderator": return <ShieldCheck className="w-4 h-4 text-blue-400" />;
+      case "admin": return <Crown className="w-4 h-4 text-seal-bright" />;
+      case "moderator": return <ShieldCheck className="w-4 h-4 text-gold" />;
       default: return null;
     }
   };
 
   const getRoleBadge = () => {
     switch (user.role) {
-      case "admin": return "bg-red-500/20 text-red-400 border border-red-500/50";
-      case "moderator": return "bg-blue-500/20 text-blue-400 border border-blue-500/50";
+      case "admin": return "bg-seal/20 text-seal-bright border border-seal/50";
+      case "moderator": return "bg-gold/20 text-gold border border-gold/50";
       default: return "";
     }
   };
@@ -243,7 +242,7 @@ export default async function PublicProfilePage({
             <div className={`absolute inset-0 bg-gradient-to-r ${getBannerGradient(user.bannerColor)} mix-blend-color`} />
           )}
           {/* Bottom fade into page background */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
           <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
         </div>
 
@@ -257,7 +256,7 @@ export default async function PublicProfilePage({
               isOwner={!!isOwner}
               username={user.username}
             >
-              <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-gray-800 border-4 border-gray-950 rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0 overflow-hidden">
+              <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-elevated border-4 border-ink rounded-full flex items-center justify-center text-2xl sm:text-4xl font-bold shrink-0 overflow-hidden">
                 {user.avatarUrl ? (
                   <Image
                     fill
@@ -275,7 +274,7 @@ export default async function PublicProfilePage({
             {/* Name + Meta */}
             <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-2xl sm:text-3xl font-bold">{user.username}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold font-serif text-paper">{user.username}</h1>
                 {user.role !== "user" && (
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${getRoleBadge()}`}>
                     {getRoleIcon()}
@@ -283,7 +282,7 @@ export default async function PublicProfilePage({
                   </span>
                 )}
               </div>
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-500 text-xs sm:text-sm mt-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-faint text-xs sm:text-sm mt-1">
                 <Calendar className="w-3 h-3" />
                 Joined {new Date(user.createdAt).toLocaleDateString("en-US", {
                   month: "long",
@@ -313,29 +312,29 @@ export default async function PublicProfilePage({
           <div className="lg:w-[55%] space-y-6">
 
             {/* Heatmap */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 overflow-x-auto scrollbar-hide">
+            <div className="bg-surface border border-hairline rounded-xl p-3 sm:p-4 overflow-x-auto scrollbar-hide">
               <ActivityHeatmap activities={activities} />
             </div>
 
             {/* Genre Overview */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-              <h2 className="text-base sm:text-lg font-semibold mb-4">Genre Overview</h2>
+            <div className="bg-surface border border-hairline rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-4 font-serif text-paper">Genre Overview</h2>
               {sortedGenres.length === 0 ? (
-                <p className="text-gray-500 text-sm">No genre data yet.</p>
+                <p className="text-faint text-sm">No genre data yet.</p>
               ) : (
                 <div className="space-y-2.5">
                   {sortedGenres.slice(0, 10).map(([genre, count]) => (
                     <div key={genre} className="flex items-center gap-3">
-                      <span className="w-20 sm:w-24 text-xs sm:text-sm text-gray-400 truncate shrink-0">
+                      <span className="w-20 sm:w-24 text-xs sm:text-sm text-muted truncate shrink-0">
                         {genre}
                       </span>
-                      <div className="flex-1 bg-gray-800 rounded-full h-3 overflow-hidden">
+                      <div className="flex-1 bg-elevated rounded-full h-3 overflow-hidden">
                         <div
-                          className="bg-blue-500/70 h-full rounded-full transition-all duration-500"
+                          className="bg-gold/70 h-full rounded-full transition-all duration-500"
                           style={{ width: `${(count / maxGenreCount) * 100}%` }}
                         />
                       </div>
-                      <span className="w-6 text-xs sm:text-sm text-gray-500 text-right shrink-0">
+                      <span className="w-6 text-xs sm:text-sm text-faint text-right shrink-0">
                         {count}
                       </span>
                     </div>
@@ -345,36 +344,25 @@ export default async function PublicProfilePage({
             </div>
 
             {/* Favorite Novels */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5">
-              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
+            <div className="bg-surface border border-hairline rounded-xl p-4 sm:p-5">
+              <h2 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2 font-serif text-paper">
+                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
                 Favorite Novels
               </h2>
               {favoriteNovels.length === 0 ? (
-                <p className="text-gray-500 text-sm">
+                <p className="text-faint text-sm">
                   {isOwner ? "Add favorites from any novel page." : "No favorite novels yet."}
                 </p>
               ) : (
                 <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
                   {favoriteNovels.map((novel) => (
-                    <Link
+                    <NovelCard
                       key={novel.id}
-                      href={`/novel/${novel.id}`}
-                      className="shrink-0 w-20 sm:w-24 group"
-                    >
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-gray-700 group-hover:border-pink-500/50 transition">
-                        <Image
-                          fill
-                          sizes="(max-width: 640px) 80px, 96px"
-                          src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
-                          alt={novel.title}
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-400 mt-1 truncate group-hover:text-pink-400 transition">
-                        {novel.title}
-                      </p>
-                    </Link>
+                      id={novel.id}
+                      title={novel.title}
+                      coverImageUrl={novel.coverImageUrl}
+                      size="sm"
+                    />
                   ))}
                 </div>
               )}
@@ -401,30 +389,30 @@ export default async function PublicProfilePage({
             {/* Mini Stats */}
             <div className="grid grid-cols-3 gap-3">
               <MiniStat
-                icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />}
+                icon={<BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />}
                 label="Total Novels"
                 value={totalNovels.toString()}
               />
               <MiniStat
-                icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />}
+                icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-jade" />}
                 label="Chapters Read"
                 value={totalChaptersRead.toLocaleString()}
               />
               <MiniStat
-                icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500" />}
+                icon={<Star className="w-4 h-4 sm:w-5 sm:h-5 text-gold fill-gold" />}
                 label="Mean Score"
                 value={meanScore}
               />
             </div>
 
             {/* Activity Feed */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-5 lg:sticky lg:top-24">
-              <h2 className="text-base sm:text-lg font-semibold mb-4">Activity</h2>
+            <div className="bg-surface border border-hairline rounded-xl p-4 sm:p-5 lg:sticky lg:top-24">
+              <h2 className="text-base sm:text-lg font-semibold mb-4 font-serif text-paper">Activity</h2>
 
               {recentActivities.length === 0 ? (
                 <div className="text-center py-8">
-                  <BookOpen className="w-8 h-8 text-gray-700 mx-auto mb-2" />
-                  <p className="text-gray-500 text-sm">No activity yet.</p>
+                  <BookOpen className="w-8 h-8 text-faint mx-auto mb-2" />
+                  <p className="text-faint text-sm">No activity yet.</p>
                 </div>
               ) : (
                 <div className="space-y-1 max-h-[600px] overflow-y-auto scrollbar-hide">
@@ -445,12 +433,12 @@ export default async function PublicProfilePage({
                     return (
                       <div key={i}>
                         {showDateHeader && (
-                          <div className="text-xs text-gray-500 font-medium pt-3 pb-1 first:pt-0">
+                          <div className="text-xs text-faint font-medium pt-3 pb-1 first:pt-0">
                             {currentDate}
                           </div>
                         )}
 
-                        <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-gray-800/50 transition">
+                        <div className="flex items-start gap-3 py-2 px-2 rounded-lg hover:bg-elevated/50 transition">
                           <div className="mt-0.5 shrink-0">
                             {activity.novelId && novelCovers[activity.novelId] ? (
                               <Image
@@ -463,28 +451,28 @@ export default async function PublicProfilePage({
                             ) : (
                               <>
                                 {activity.type === "chapter_update" && (
-                                  <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
-                                    <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                                  <div className="w-7 h-7 rounded-full bg-gold/10 flex items-center justify-center">
+                                    <TrendingUp className="w-3.5 h-3.5 text-gold" />
                                   </div>
                                 )}
                                 {activity.type === "status_change" && (
-                                  <div className="w-7 h-7 rounded-full bg-green-500/10 flex items-center justify-center">
-                                    <BookMarked className="w-3.5 h-3.5 text-green-400" />
+                                  <div className="w-7 h-7 rounded-full bg-jade/10 flex items-center justify-center">
+                                    <BookMarked className="w-3.5 h-3.5 text-jade" />
                                   </div>
                                 )}
                                 {activity.type === "rating" && (
-                                  <div className="w-7 h-7 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                                    <Star className="w-3.5 h-3.5 text-yellow-400" />
+                                  <div className="w-7 h-7 rounded-full bg-gold/10 flex items-center justify-center">
+                                    <Star className="w-3.5 h-3.5 text-gold" />
                                   </div>
                                 )}
                                 {activity.type === "add" && (
-                                  <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                                  <div className="w-7 h-7 rounded-full bg-jade/10 flex items-center justify-center">
+                                    <BookOpen className="w-3.5 h-3.5 text-jade" />
                                   </div>
                                 )}
                                 {activity.type === "remove" && (
-                                  <div className="w-7 h-7 rounded-full bg-red-500/10 flex items-center justify-center">
-                                    <span className="text-red-400 text-xs">✕</span>
+                                  <div className="w-7 h-7 rounded-full bg-seal/10 flex items-center justify-center">
+                                    <span className="text-seal-bright text-xs">✕</span>
                                   </div>
                                 )}
                               </>
@@ -492,10 +480,10 @@ export default async function PublicProfilePage({
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-300 leading-snug">
+                            <p className="text-sm text-body leading-snug">
                               {activity.detail}
                             </p>
-                            <p className="text-xs text-gray-600 mt-0.5">
+                            <p className="text-xs text-faint mt-0.5">
                               {new Date(activity.createdAt).toLocaleTimeString("en-US", {
                                 hour: "numeric",
                                 minute: "2-digit",
@@ -526,10 +514,10 @@ function MiniStat({
   value: string;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3 sm:p-4 text-center">
+    <div className="bg-surface border border-hairline rounded-xl p-3 sm:p-4 text-center">
       <div className="flex justify-center mb-1">{icon}</div>
       <div className="text-lg sm:text-xl font-bold">{value}</div>
-      <div className="text-[10px] sm:text-xs text-gray-500">{label}</div>
+      <div className="text-[10px] sm:text-xs text-faint">{label}</div>
     </div>
   );
 }

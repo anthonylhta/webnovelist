@@ -131,37 +131,37 @@ export default function AdminPage() {
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "admin":
-        return <Crown className="w-4 h-4 text-red-400" />;
+        return <Crown className="w-4 h-4 text-gold" />;
       case "moderator":
-        return <ShieldCheck className="w-4 h-4 text-blue-400" />;
+        return <ShieldCheck className="w-4 h-4 text-gold-dim" />;
       default:
-        return <User className="w-4 h-4 text-gray-400" />;
+        return <User className="w-4 h-4 text-muted" />;
     }
   };
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case "admin":
-        return "bg-red-500/20 text-red-400 border border-red-500/50";
+        return "bg-gold/10 text-gold border border-gold/30";
       case "moderator":
-        return "bg-blue-500/20 text-blue-400 border border-blue-500/50";
+        return "bg-gold/10 text-gold-dim border border-gold/30";
       default:
-        return "bg-gray-500/20 text-gray-400 border border-gray-500/50";
+        return "bg-elevated text-muted border border-hairline";
     }
   };
 
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
-        <Shield className="w-8 h-8 text-red-500" />
+      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 font-serif text-paper">
+        <Shield className="w-8 h-8 text-gold" />
         Admin Panel
       </h1>
 
@@ -169,55 +169,55 @@ export default function AdminPage() {
       <div className="flex flex-wrap gap-3 mb-8">
         <Link
           href="/admin/novels"
-          className="flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-blue-500/50 rounded-xl px-4 py-3 text-sm text-gray-300 hover:text-blue-400 transition"
+          className="flex items-center gap-2 bg-surface border border-hairline hover:border-gold-dim rounded-xl px-4 py-3 text-sm text-body hover:text-gold-bright transition"
         >
-          <BookOpen className="w-4 h-4 text-blue-500" />
+          <BookOpen className="w-4 h-4 text-gold" />
           Manage Novels
         </Link>
         <Link
           href="/admin/authors"
-          className="flex items-center gap-2 bg-gray-900 border border-gray-800 hover:border-orange-500/50 rounded-xl px-4 py-3 text-sm text-gray-300 hover:text-orange-400 transition"
+          className="flex items-center gap-2 bg-surface border border-hairline hover:border-gold-dim rounded-xl px-4 py-3 text-sm text-body hover:text-gold-bright transition"
         >
-          <User className="w-4 h-4 text-orange-500" />
+          <User className="w-4 h-4 text-gold" />
           Manage Authors
         </Link>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <Users className="w-5 h-5 text-blue-500 mx-auto mb-2" />
+        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
+          <Users className="w-5 h-5 text-gold mx-auto mb-2" />
           <div className="text-2xl font-bold">{users.length}</div>
-          <div className="text-xs text-gray-500">Total Users</div>
+          <div className="text-xs text-faint">Total Users</div>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <Crown className="w-5 h-5 text-red-400 mx-auto mb-2" />
+        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
+          <Crown className="w-5 h-5 text-gold mx-auto mb-2" />
           <div className="text-2xl font-bold">
             {users.filter((u) => u.role === "admin").length}
           </div>
-          <div className="text-xs text-gray-500">Admins</div>
+          <div className="text-xs text-faint">Admins</div>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <ShieldCheck className="w-5 h-5 text-blue-400 mx-auto mb-2" />
+        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
+          <ShieldCheck className="w-5 h-5 text-gold-dim mx-auto mb-2" />
           <div className="text-2xl font-bold">
             {users.filter((u) => u.role === "moderator").length}
           </div>
-          <div className="text-xs text-gray-500">Moderators</div>
+          <div className="text-xs text-faint">Moderators</div>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-          <BookOpen className="w-5 h-5 text-green-500 mx-auto mb-2" />
+        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
+          <BookOpen className="w-5 h-5 text-jade mx-auto mb-2" />
           <div className="text-2xl font-bold">
             {users.reduce((sum, u) => sum + u._count.novelList, 0)}
           </div>
-          <div className="text-xs text-gray-500">Total List Entries</div>
+          <div className="text-xs text-faint">Total List Entries</div>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-gray-400 text-sm">
+            <tr className="border-b border-hairline text-muted text-sm">
               <th className="text-left p-4">User</th>
               <th className="text-left p-4">Role</th>
               <th className="text-left p-4 hidden md:table-cell">Novels</th>
@@ -229,11 +229,11 @@ export default function AdminPage() {
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-gray-800/50 hover:bg-gray-800/30 transition"
+                className="border-b border-hairline hover:bg-elevated/30 transition"
               >
                 <td className="p-4">
                   <div className="font-medium">{user.username}</div>
-                  <div className="text-gray-500 text-sm">{user.email}</div>
+                  <div className="text-faint text-sm">{user.email}</div>
                 </td>
                 <td className="p-4">
                   <span
@@ -245,15 +245,15 @@ export default function AdminPage() {
                     {user.role}
                   </span>
                 </td>
-                <td className="p-4 hidden md:table-cell text-gray-400">
+                <td className="p-4 hidden md:table-cell text-muted">
                   {user._count.novelList}
                 </td>
-                <td className="p-4 hidden lg:table-cell text-gray-400 text-sm">
+                <td className="p-4 hidden lg:table-cell text-muted text-sm">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="p-4 text-right">
                   {user.id === currentUserId ? (
-                    <span className="text-gray-600 text-sm">You</span>
+                    <span className="text-faint text-sm">You</span>
                   ) : (
                     <div className="flex items-center justify-end gap-2">
                       {/* Role Change — Admin Only */}
@@ -263,8 +263,8 @@ export default function AdminPage() {
                           onChange={(e) =>
                             setChangingRole({ user, newRole: e.target.value })
                           }
-                          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 
-                                     text-sm text-gray-100 focus:outline-none focus:border-blue-500"
+                          className="bg-surface border border-hairline rounded-lg px-3 py-1.5
+                                     text-sm text-paper focus:outline-none focus:border-gold-dim"
                         >
                           <option value="user">User</option>
                           <option value="moderator">Moderator</option>
@@ -276,7 +276,7 @@ export default function AdminPage() {
                       {canDelete(user) && (
                         <button
                           onClick={() => setDeletingUser(user)}
-                          className="p-2 text-gray-400 hover:text-red-400 transition"
+                          className="p-2 text-muted hover:text-seal-bright transition"
                           title={`Delete ${user.username}`}
                         >
                           <Trash2 className="w-4 h-4" />

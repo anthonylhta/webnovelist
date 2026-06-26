@@ -78,7 +78,7 @@ export default function AddToListButton({
 
   if (loading) {
     return (
-      <div className="w-full bg-gray-800 py-3 rounded-lg animate-pulse h-12" />
+      <div className="w-full bg-elevated py-3 rounded-lg animate-pulse h-12" />
     );
   }
 
@@ -89,8 +89,8 @@ export default function AddToListButton({
         className={`w-full font-semibold py-3 rounded-lg transition flex items-center justify-center gap-2
           ${
             existingEntry
-              ? "bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-600/50"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              ? "bg-jade/20 hover:bg-jade/30 text-jade border border-jade/40"
+              : "bg-gold text-ink hover:bg-gold-bright"
           }`}
       >
         {existingEntry ? (

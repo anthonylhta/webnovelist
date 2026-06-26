@@ -23,14 +23,14 @@ export default function CopyLinkButton({ username }: { username: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 
-                 rounded-lg transition text-sm text-gray-400 hover:text-white shrink-0"
+      className="flex items-center gap-2 bg-elevated hover:bg-hairline px-4 py-2
+                 rounded-lg transition text-sm text-muted hover:text-paper shrink-0"
       title="Copy profile link"
     >
       {copied ? (
         <>
-          <Check className="w-4 h-4 text-green-400" />
-          <span className="text-green-400">Copied!</span>
+          <Check className="w-4 h-4 text-jade" />
+          <span className="text-jade">Copied!</span>
         </>
       ) : (
         <>

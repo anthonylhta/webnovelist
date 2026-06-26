@@ -172,7 +172,7 @@ export default function AdminAuthorsPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
@@ -183,14 +183,14 @@ export default function AdminAuthorsPage() {
       <div className="flex items-center gap-4 mb-6">
         <Link
           href="/admin"
-          className="flex items-center gap-1.5 text-gray-400 hover:text-white transition text-sm"
+          className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm"
         >
           <ChevronLeft className="w-4 h-4" />
           Admin Panel
         </Link>
-        <span className="text-gray-700">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <User className="w-6 h-6 text-orange-500" />
+        <span className="text-faint">/</span>
+        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
+          <User className="w-6 h-6 text-gold" />
           Authors
         </h1>
       </div>
@@ -198,9 +198,9 @@ export default function AdminAuthorsPage() {
       {/* Stats + action bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-2 text-center">
+          <div className="bg-surface border border-hairline rounded-xl px-4 py-2 text-center">
             <div className="text-lg font-bold">{authors.length}</div>
-            <div className="text-xs text-gray-500">Total Authors</div>
+            <div className="text-xs text-faint">Total Authors</div>
           </div>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -209,11 +209,11 @@ export default function AdminAuthorsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search authors…"
-            className="flex-1 sm:w-64 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 sm:w-64 bg-surface border border-hairline rounded-lg px-3 py-2 text-sm text-paper placeholder-faint focus:outline-none focus:border-gold-dim"
           />
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shrink-0"
+            className="flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-4 py-2 rounded-lg text-sm font-medium transition shrink-0"
           >
             <Plus className="w-4 h-4" />
             New Author
@@ -223,7 +223,7 @@ export default function AdminAuthorsPage() {
 
       {/* Author grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-faint">
           {authors.length === 0 ? "No authors yet. Create one to get started." : "No authors match your search."}
         </div>
       ) : (
@@ -231,10 +231,10 @@ export default function AdminAuthorsPage() {
           {filtered.map((author) => (
             <div
               key={author.id}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-start gap-4"
+              className="bg-surface border border-hairline rounded-xl p-4 flex items-start gap-4"
             >
               {/* Avatar */}
-              <div className="relative w-14 h-14 rounded-full overflow-hidden border border-gray-700 shrink-0 bg-gray-800">
+              <div className="relative w-14 h-14 rounded-full overflow-hidden border border-hairline shrink-0 bg-elevated">
                 <Image
                   fill
                   sizes="56px"
@@ -248,18 +248,18 @@ export default function AdminAuthorsPage() {
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/author/${author.id}`}
-                  className="font-semibold text-white hover:text-orange-400 transition truncate block"
+                  className="font-semibold text-paper hover:text-gold-bright transition truncate block"
                 >
                   {author.name}
                 </Link>
-                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-faint">
                   <span className="flex items-center gap-1">
                     <BookOpen className="w-3 h-3" />
                     {author._count.novels} novel{author._count.novels !== 1 ? "s" : ""}
                   </span>
                 </div>
                 {author.bio && (
-                  <p className="text-xs text-gray-400 mt-1.5 line-clamp-2 leading-snug">
+                  <p className="text-xs text-muted mt-1.5 line-clamp-2 leading-snug">
                     {author.bio}
                   </p>
                 )}
@@ -269,14 +269,14 @@ export default function AdminAuthorsPage() {
               <div className="flex flex-col gap-1 shrink-0">
                 <button
                   onClick={() => openEdit(author)}
-                  className="p-1.5 text-gray-500 hover:text-blue-400 transition"
+                  className="p-1.5 text-faint hover:text-gold-bright transition"
                   title="Edit"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setDeletingAuthor(author)}
-                  className="p-1.5 text-gray-500 hover:text-red-400 transition"
+                  className="p-1.5 text-faint hover:text-seal-bright transition"
                   title="Delete"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -290,19 +290,19 @@ export default function AdminAuthorsPage() {
       {/* Create / Edit form modal */}
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="flex items-center justify-between p-5 border-b border-gray-800">
-              <h2 className="text-lg font-semibold">
+          <div className="bg-surface border border-hairline rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-hairline">
+              <h2 className="text-lg font-semibold font-serif text-paper">
                 {editingId ? "Edit Author" : "New Author"}
               </h2>
-              <button onClick={closeForm} className="text-gray-500 hover:text-white transition">
+              <button onClick={closeForm} className="text-faint hover:text-paper transition">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
               {formError && (
-                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-3 text-sm">
+                <div className="flex items-center gap-2 bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 text-sm">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   {formError}
                 </div>
@@ -310,9 +310,9 @@ export default function AdminAuthorsPage() {
 
               {/* Image */}
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Photo</label>
+                <label className="block text-sm text-muted mb-2">Photo</label>
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gray-700 bg-gray-800 shrink-0">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-hairline bg-elevated shrink-0">
                     <Image
                       fill
                       sizes="64px"
@@ -322,7 +322,7 @@ export default function AdminAuthorsPage() {
                     />
                     {uploading && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <div className="text-xs text-white">...</div>
+                        <div className="text-xs text-paper">...</div>
                       </div>
                     )}
                   </div>
@@ -331,7 +331,7 @@ export default function AdminAuthorsPage() {
                       type="button"
                       onClick={() => fileRef.current?.click()}
                       disabled={uploading}
-                      className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 transition disabled:opacity-50"
+                      className="flex items-center gap-2 bg-elevated hover:bg-hairline border border-hairline rounded-lg px-3 py-1.5 text-sm text-body transition disabled:opacity-50"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       Upload image
@@ -341,7 +341,7 @@ export default function AdminAuthorsPage() {
                       value={form.imageUrl}
                       onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
                       placeholder="Or paste image URL"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                      className="w-full bg-surface border border-hairline rounded-lg px-3 py-1.5 text-sm text-paper placeholder-faint focus:outline-none focus:border-gold-dim"
                     />
                   </div>
                 </div>
@@ -359,40 +359,40 @@ export default function AdminAuthorsPage() {
 
               {/* Name */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Name *</label>
+                <label className="block text-sm text-muted mb-1.5">Name *</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Er Gen"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500"
+                  className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-paper text-sm focus:outline-none focus:border-gold-dim"
                 />
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1.5">Bio</label>
+                <label className="block text-sm text-muted mb-1.5">Bio</label>
                 <textarea
                   value={form.bio}
                   onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
                   placeholder="A short biography…"
                   rows={3}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                  className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-paper text-sm focus:outline-none focus:border-gold-dim resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 p-5 border-t border-gray-800">
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-hairline">
               <button
                 onClick={closeForm}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition"
+                className="px-4 py-2 text-sm text-muted hover:text-paper transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || uploading}
-                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
+                className="flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50"
               >
                 <Check className="w-4 h-4" />
                 {saving ? "Saving…" : editingId ? "Save Changes" : "Create Author"}

@@ -166,7 +166,7 @@ export default function ListPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-gray-400">Loading your list...</div>
+        <div className="text-muted">Loading your list...</div>
       </div>
     );
   }
@@ -174,11 +174,11 @@ export default function ListPage() {
   const SortButton = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (
     <button
       onClick={() => toggleSort(sortKeyName)}
-      className="flex items-center gap-1 hover:text-blue-400 transition"
+      className="flex items-center gap-1 hover:text-gold-bright transition"
     >
       {label}
       {sortKey === sortKeyName && (
-        <ArrowUpDown className="w-3 h-3 text-blue-400" />
+        <ArrowUpDown className="w-3 h-3 text-gold" />
       )}
     </button>
   );
@@ -186,8 +186,8 @@ export default function ListPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">My List</h1>
-        <div className="text-gray-400">
+        <h1 className="text-3xl font-bold font-serif text-paper">My List</h1>
+        <div className="text-muted">
           {list.length} novel{list.length !== 1 ? "s" : ""} total
         </div>
       </div>
@@ -201,14 +201,14 @@ export default function ListPage() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
               ${
                 activeTab === tab.key
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  ? "bg-gold text-ink"
+                  : "bg-elevated text-muted hover:bg-hairline"
               }`}
           >
             <span>{tab.icon}</span>
             <span>{tab.label}</span>
             {counts[tab.key] ? (
-              <span className="bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full text-xs">
+              <span className="bg-hairline text-body px-2 py-0.5 rounded-full text-xs">
                 {counts[tab.key]}
               </span>
             ) : null}
@@ -219,20 +219,20 @@ export default function ListPage() {
       {/* List */}
       {sortedList.length === 0 ? (
         <div className="text-center py-16">
-          <BookOpen className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">No novels in this category</p>
+          <BookOpen className="w-12 h-12 text-faint mx-auto mb-4" />
+          <p className="text-faint text-lg">No novels in this category</p>
           <Link
             href="/browse"
-            className="inline-block mt-4 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition"
+            className="inline-block mt-4 bg-gold text-ink hover:bg-gold-bright px-6 py-2 rounded-lg transition"
           >
             Browse Novels
           </Link>
         </div>
       ) : (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-800 text-gray-400 text-sm">
+              <tr className="border-b border-hairline text-muted text-sm">
                 <th className="text-left p-4">
                   <SortButton label="Novel" sortKeyName="title" />
                 </th>
@@ -252,7 +252,7 @@ export default function ListPage() {
               {sortedList.map((entry) => (
                 <tr
                   key={entry.id}
-                  className="border-b border-gray-800/50 hover:bg-gray-800/30 transition"
+                  className="border-b border-hairline/50 hover:bg-elevated/30 transition"
                 >
                   {/* Novel Title */}
                   <td className="p-4">
@@ -269,11 +269,11 @@ export default function ListPage() {
                       <div className="flex items-center gap-2 min-w-0">
                       <Link
                         href={`/novel/${entry.novel.id}`}
-                        className="hover:text-blue-400 transition min-w-0"
+                        className="hover:text-gold-bright transition min-w-0"
                       >
                         <div className="font-medium truncate">{entry.novel.title}</div>
                         {entry.novel.titleChinese && (
-                          <div className="text-gray-500 text-sm truncate">
+                          <div className="font-cjk text-muted text-sm truncate">
                             {entry.novel.titleChinese}
                           </div>
                         )}
@@ -283,7 +283,7 @@ export default function ListPage() {
                           href={entry.readingUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-gray-500 hover:text-blue-400 transition shrink-0"
+                          className="text-faint hover:text-gold transition shrink-0"
                           title="Open reading link"
                         >
                           <ExternalLink className="w-3 h-3" />
@@ -302,9 +302,9 @@ export default function ListPage() {
                       onUpdate={(newCh) => handleChapterUpdate(entry.id, newCh)}
                     />
                     {entry.novel.totalChapters && (
-                      <div className="w-24 bg-gray-700 rounded-full h-1.5 mt-1">
+                      <div className="w-24 bg-hairline rounded-full h-1.5 mt-1">
                         <div
-                          className="bg-blue-500 rounded-full h-1.5"
+                          className="bg-gold rounded-full h-1.5"
                           style={{
                             width: `${Math.min(
                               (entry.currentChapter / entry.novel.totalChapters) * 100,
@@ -320,16 +320,16 @@ export default function ListPage() {
                   <td className="p-4">
                     {entry.rating ? (
                       <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="w-4 h-4 text-gold fill-gold" />
                         <span>{entry.rating}</span>
                       </div>
                     ) : (
-                      <span className="text-gray-600">—</span>
+                      <span className="text-faint">—</span>
                     )}
                   </td>
 
                   {/* Last Updated */}
-                  <td className="p-4 text-sm text-gray-400 hidden lg:table-cell">
+                  <td className="p-4 text-sm text-muted hidden lg:table-cell">
                     {new Date(entry.updatedAt).toLocaleDateString()}
                   </td>
 
@@ -338,14 +338,14 @@ export default function ListPage() {
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setEditingEntry(entry)}
-                        className="p-2 text-gray-400 hover:text-blue-400 transition"
+                        className="p-2 text-muted hover:text-gold transition"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDeletingEntry(entry)}
-                        className="p-2 text-gray-400 hover:text-red-400 transition"
+                        className="p-2 text-muted hover:text-seal-bright transition"
                         title="Remove"
                       >
                         <Trash2 className="w-4 h-4" />

@@ -49,7 +49,7 @@ export default function BannerColorPicker({
           e.stopPropagation();
           setOpen(!open);
         }}
-        className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg transition text-white/70 hover:text-white"
+        className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-sm rounded-lg transition text-paper/70 hover:text-paper"
       >
         <Palette className="w-4 h-4" />
       </button>
@@ -61,8 +61,8 @@ export default function BannerColorPicker({
             onClick={() => setOpen(false)}
           />
 
-          <div className="absolute right-0 top-full mt-2 bg-gray-900 border border-gray-700 rounded-xl p-3 shadow-xl z-50 w-56">
-            <p className="text-xs text-gray-400 mb-2 font-medium">Banner Color</p>
+          <div className="absolute right-0 top-full mt-2 bg-surface border border-hairline rounded-xl p-3 shadow-xl z-50 w-56">
+            <p className="text-xs text-muted mb-2 font-medium">Banner Color</p>
             <div className="grid grid-cols-5 gap-2">
               {BANNER_OPTIONS.map((option) => (
                 <button
@@ -77,14 +77,14 @@ export default function BannerColorPicker({
                     border-2 transition hover:scale-110
                     ${
                       selected === option.name
-                        ? "border-white"
-                        : "border-transparent hover:border-gray-500"
+                        ? "border-gold"
+                        : "border-transparent hover:border-hairline"
                     }
                     ${saving ? "opacity-50 cursor-not-allowed" : ""}
                   `}
                 >
                   {selected === option.name && (
-                    <Check className="w-3.5 h-3.5 text-white absolute inset-0 m-auto" />
+                    <Check className="w-3.5 h-3.5 text-paper absolute inset-0 m-auto" />
                   )}
                 </button>
               ))}

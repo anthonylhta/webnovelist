@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { DM_Sans, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
@@ -8,6 +9,22 @@ import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { getCurrentUser } from "@/lib/current-user";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+
+// UI sans — quiet, modern; carries body copy + chrome.
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+// Literary display serif — novel titles + section headings.
+const shippori = Shippori_Mincho({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-shippori",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "WebNovelist",
@@ -33,16 +50,16 @@ export default async function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorBackground: "#111827",
-          colorInputBackground: "#1f2937",
-          colorText: "#f3f4f6",
-          colorInputText: "#f3f4f6",
-          colorPrimary: "#2563eb",
+          colorBackground: "#16140f",
+          colorInputBackground: "#211e17",
+          colorText: "#f0ede8",
+          colorInputText: "#f0ede8",
+          colorPrimary: "#c9a84c",
         },
       }}
     >
-      <html lang="en">
-        <body className="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+      <html lang="en" className={`${dmSans.variable} ${shippori.variable}`}>
+        <body className="text-body min-h-screen flex flex-col font-sans antialiased">
           <CurrentUserProvider value={currentUser}>
             <Navbar />
             <main className="max-w-7xl mx-auto px-4 py-8 flex-1">

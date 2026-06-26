@@ -56,8 +56,8 @@ export default function NovelAdminActions({
         {/* Edit Button */}
         <Link
           href={`/novel/${novelId}/edit`}
-          className="flex-1 flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 
-                     text-gray-300 font-semibold py-2.5 rounded-lg transition text-sm"
+          className="flex-1 flex items-center justify-center gap-2 bg-elevated hover:bg-hairline
+                     text-body font-semibold py-2.5 rounded-lg transition text-sm"
         >
           <Pencil className="w-4 h-4" />
           Edit
@@ -67,9 +67,9 @@ export default function NovelAdminActions({
         {canDelete && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center justify-center gap-2 bg-red-600/20 hover:bg-red-600/30
-                       text-red-400 font-semibold py-2.5 px-4 rounded-lg transition text-sm
-                       border border-red-600/30"
+            className="flex items-center justify-center gap-2 bg-seal/20 hover:bg-seal/30
+                       text-seal-bright font-semibold py-2.5 px-4 rounded-lg transition text-sm
+                       border border-seal/40"
           >
             <Trash2 className="w-4 h-4" />
           </button>
