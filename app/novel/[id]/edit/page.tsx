@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter, useParams } from "next/navigation";
 import { Pencil, ShieldX } from "lucide-react";
+import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/media-types";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
 import NovelCharactersManager from "@/components/NovelCharactersManager";
@@ -29,6 +30,7 @@ export default function EditNovelPage() {
   const [form, setForm] = useState({
     title: "",
     nativeTitle: "",
+    mediaType: "webnovel",
     author: "",
     authorId: null as number | null,
     description: "",
@@ -56,6 +58,7 @@ export default function EditNovelPage() {
         setForm({
           title: novel.title || "",
           nativeTitle: novel.nativeTitle || "",
+          mediaType: novel.mediaType || "webnovel",
           author: novel.author || "",
           authorId: novel.authorId ?? null,
           description: novel.description || "",
@@ -135,6 +138,7 @@ export default function EditNovelPage() {
         body: JSON.stringify({
           title: form.title.trim(),
           nativeTitle: form.nativeTitle.trim() || null,
+          mediaType: form.mediaType,
           author: form.author.trim() || null,
           authorId: form.authorId,
           description: form.description.trim() || null,
@@ -294,6 +298,19 @@ export default function EditNovelPage() {
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
             <div>
+              <label className="block text-sm text-muted mb-1">Media Type</label>
+              <select
+                value={form.mediaType}
+                onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                           text-paper focus:outline-none focus:border-gold-dim"
+              >
+                {MEDIA_TYPES.map((t) => (
+                  <option key={t} value={t}>{MEDIA_TYPE_LABELS[t]}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="block text-sm text-muted mb-1">Novel Status</label>
               <select
                 value={form.status}
@@ -306,16 +323,17 @@ export default function EditNovelPage() {
                 <option value="Hiatus">Hiatus</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm text-muted mb-1">Original Source</label>
-              <input
-                type="text"
-                value={form.originalSource}
-                onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                           text-paper focus:outline-none focus:border-gold-dim"
-              />
-            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm text-muted mb-1">Original Source</label>
+            <input
+              type="text"
+              value={form.originalSource}
+              onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                         text-paper focus:outline-none focus:border-gold-dim"
+            />
           </div>
 
           {/* Genres */}

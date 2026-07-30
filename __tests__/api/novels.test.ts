@@ -65,6 +65,21 @@ describe("POST /api/novels", () => {
     expect(res.status).toBe(400);
   });
 
+  it("returns 400 when media type is not in the allowed list", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    const res = await POST(makeRequest("POST", { title: "Valid", mediaType: "comic" }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/media type/i);
+  });
+
+  it("passes a valid media type through to the create", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    vi.mocked(prisma.novel.create).mockResolvedValue(novelFixture as never);
+    const res = await POST(makeRequest("POST", { title: "Valid Novel", mediaType: "manhwa", genres: [], tags: [] }));
+    expect(res.status).toBe(201);
+    expect(vi.mocked(prisma.novel.create).mock.calls[0][0].data.mediaType).toBe("manhwa");
+  });
+
   it("allows admin to create a novel", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
     vi.mocked(prisma.novel.create).mockResolvedValue(novelFixture as never);

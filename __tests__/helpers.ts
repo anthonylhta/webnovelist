@@ -50,6 +50,7 @@ export const novelFixture = {
   id: 1,
   title: "Test Novel",
   nativeTitle: null,
+  mediaType: "webnovel",
   author: "Test Author",
   description: "A great story",
   coverImageUrl: null,

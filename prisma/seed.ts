@@ -760,6 +760,7 @@ const novels = [
   {
     title: "Mushoku Tensei: Jobless Reincarnation",
     nativeTitle: "無職転生",
+    mediaType: "light_novel",
     author: "Rifujin na Magonote",
     description: "A 34-year-old shut-in dies and is reborn as Rudeus Greyrat in a world of magic and swords. Determined not to waste his second life, he masters magic from infancy and grows into a powerful mage.",
     totalChapters: 286,
@@ -772,6 +773,7 @@ const novels = [
   {
     title: "That Time I Got Reincarnated as a Slime",
     nativeTitle: "転生したらスライムだった件",
+    mediaType: "light_novel",
     author: "Fuse",
     description: "Satoru Mikami is stabbed to death and reincarnates in a fantasy world as a slime monster. Naming himself Rimuru Tempest, he builds a nation of monsters and befriends powerful beings along the way.",
     totalChapters: 247,
@@ -784,6 +786,7 @@ const novels = [
   {
     title: "Re:Zero − Starting Life in Another World",
     nativeTitle: "Re:ゼロから始める異世界生活",
+    mediaType: "light_novel",
     author: "Tappei Nagatsuki",
     description: "Subaru Natsuki is suddenly transported to a fantasy world, where he discovers his only power: 'Return by Death,' which rewinds time to a save point whenever he dies. He must endure death again and again to protect those he loves.",
     totalChapters: 700,
@@ -796,6 +799,7 @@ const novels = [
   {
     title: "Overlord",
     nativeTitle: "オーバーロード",
+    mediaType: "light_novel",
     author: "Kugane Maruyama",
     description: "When the popular VR game Yggdrasil shuts down, the player Momonga remains trapped in the game as his skeletal overlord avatar, his NPC servants now sentient. He sets out to dominate the new world he finds himself in.",
     totalChapters: 105,
@@ -808,6 +812,7 @@ const novels = [
   {
     title: "The Rising of the Shield Hero",
     nativeTitle: "盾の勇者の成り上がり",
+    mediaType: "light_novel",
     author: "Aneko Yusagi",
     description: "Naofumi Iwatani is summoned to another world as the Shield Hero, the weakest of four legendary heroes. Betrayed and branded a criminal on his first day, he grows cynical and strong as he fights to clear his name and protect the world.",
     totalChapters: 379,
@@ -820,6 +825,7 @@ const novels = [
   {
     title: "KonoSuba: God's Blessing on This Wonderful World!",
     nativeTitle: "この素晴らしい世界に祝福を!",
+    mediaType: "light_novel",
     author: "Natsume Akatsuki",
     description: "After a pathetic death, hikikomori Kazuma Satou is reincarnated in a fantasy world with the useless goddess Aqua. Together with an explosion-obsessed mage and a masochistic crusader, he stumbles through misadventures and debt.",
     totalChapters: 100,
@@ -832,6 +838,7 @@ const novels = [
   {
     title: "Arifureta: From Commonplace to World's Strongest",
     nativeTitle: "ありふれた職業で世界最強",
+    mediaType: "light_novel",
     author: "Ryo Shirakome",
     description: "Hajime Nagumo, a bullied classmate summoned to another world as a lowly transmutation user, is betrayed and cast into an abyss. He claws his way back from the depths, transformed into a ruthless monster-slaying powerhouse.",
     totalChapters: 523,
@@ -844,6 +851,7 @@ const novels = [
   {
     title: "So I'm a Spider, So What?",
     nativeTitle: "蜘蛛ですが、なにか?",
+    mediaType: "light_novel",
     author: "Okina Baba",
     description: "A high school girl is reincarnated as a lowly spider monster in a deadly dungeon. With sharp wit and sheer determination, she fights to survive, level up, and evolve in a world that wants her dead.",
     totalChapters: 681,
@@ -856,6 +864,7 @@ const novels = [
   {
     title: "Ascendance of a Bookworm",
     nativeTitle: "本好きの下剋上",
+    mediaType: "light_novel",
     author: "Miya Kazuki",
     description: "Urano, a book-loving woman, dies and is reborn as Myne, a sickly child in a medieval world where books are scarce and literacy is rare. Unable to live without books, she resolves to make her own — no matter what it takes.",
     totalChapters: 677,
@@ -868,6 +877,7 @@ const novels = [
   {
     title: "The Saga of Tanya the Evil",
     nativeTitle: "幼女戦記",
+    mediaType: "light_novel",
     author: "Carlo Zen",
     description: "A coldly rational salaryman is reincarnated as Tanya Degurechaff, a young girl in a war-torn world resembling WWI Europe. As a ruthless mage-soldier, she fights to climb the ranks and secure a safe life, defying the god who cursed her.",
     totalChapters: 100,
@@ -966,6 +976,7 @@ const novels = [
   {
     title: "Cradle",
     nativeTitle: null,
+    mediaType: "novel",
     author: "Will Wight",
     description: "Lindon is born 'Unsouled,' powerless in a world where everyone wields sacred arts. After learning his homeland is doomed, he sets out to grow strong enough to defy fate itself, climbing the ranks of cultivation one realm at a time.",
     totalChapters: null,

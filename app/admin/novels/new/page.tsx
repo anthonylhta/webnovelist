@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Plus, ShieldX, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
+import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/media-types";
 
 const GENRE_OPTIONS = [
   "Xianxia", "Xuanhuan", "Wuxia", "Fantasy", "Sci-Fi", "Romance",
@@ -24,6 +25,7 @@ export default function AddNovelPage() {
   const [form, setForm] = useState({
     title: "",
     nativeTitle: "",
+    mediaType: "webnovel",
     author: "",
     description: "",
     coverImageUrl: "",
@@ -86,6 +88,7 @@ export default function AddNovelPage() {
         body: JSON.stringify({
           title: form.title.trim(),
           nativeTitle: form.nativeTitle.trim() || null,
+          mediaType: form.mediaType,
           author: form.author.trim() || null,
           description: form.description.trim() || null,
           coverImageUrl: form.coverImageUrl.trim() || null,
@@ -179,6 +182,15 @@ export default function AddNovelPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
+              <label className="block text-sm text-muted mb-1">Media Type</label>
+              <select value={form.mediaType} onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
+                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim">
+                {MEDIA_TYPES.map((t) => (
+                  <option key={t} value={t}>{MEDIA_TYPE_LABELS[t]}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="block text-sm text-muted mb-1">Status</label>
               <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
                 className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim">
@@ -187,12 +199,13 @@ export default function AddNovelPage() {
                 <option value="Hiatus">Hiatus</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm text-muted mb-1">Original Source</label>
-              <input type="text" value={form.originalSource} onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
-                placeholder="e.g., Qidian"
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
-            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm text-muted mb-1">Original Source</label>
+            <input type="text" value={form.originalSource} onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
+              placeholder="e.g., Qidian"
+              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
           </div>
 
           <div>

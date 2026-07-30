@@ -84,6 +84,13 @@ describe("PUT /api/novels/[id]", () => {
     expect(prisma.novel.update).not.toHaveBeenCalled();
   });
 
+  it("returns 400 when media type is not in the allowed list", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    const res = await PUT(makeRequest("PUT", { title: "Ok", mediaType: "comic" }), { params });
+    expect(res.status).toBe(400);
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
   it("sanitizes string fields before saving", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
     vi.mocked(prisma.novel.update).mockResolvedValue(novelFixture as never);

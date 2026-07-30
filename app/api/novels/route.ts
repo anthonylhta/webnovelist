@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { sanitizeString, isValidUrl, containsSuspiciousContent } from "@/lib/sanitize";
+import { isMediaType } from "@/lib/media-types";
 
 // GET all novels — anyone can browse
 export async function GET(request: NextRequest) {
@@ -85,11 +86,16 @@ export async function POST(request: NextRequest) {
       return apiError("Invalid cover image URL", 400);
     }
 
+    if (body.mediaType !== undefined && !isMediaType(body.mediaType)) {
+      return apiError("Invalid media type", 400);
+    }
+
     // Sanitize all string inputs
     const novel = await prisma.novel.create({
       data: {
         title: sanitizeString(body.title),
         nativeTitle: body.nativeTitle ? sanitizeString(body.nativeTitle) : null,
+        mediaType: body.mediaType,
         author: body.author ? sanitizeString(body.author) : null,
         description: body.description ? sanitizeString(body.description) : null,
         coverImageUrl: body.coverImageUrl || null,

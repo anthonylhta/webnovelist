@@ -3,11 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { safeImageSrc } from "@/lib/image-hosts";
+import { mediaTypeLabel } from "@/lib/media-types";
 
 interface NovelCardProps {
   id: number;
   title: string;
   nativeTitle?: string | null;
+  /** When set, a small type chip is overlaid on the cover. */
+  mediaType?: string | null;
   coverImageUrl?: string | null;
   /** Poster width. "md" = home strips (w-28 sm:w-36), "sm" = compact (w-20 sm:w-24). Ignored when `bordered`. */
   size?: "sm" | "md";
@@ -38,6 +41,7 @@ export default function NovelCard({
   id,
   title,
   nativeTitle,
+  mediaType,
   coverImageUrl,
   size = "md",
   bordered = false,
@@ -46,6 +50,12 @@ export default function NovelCard({
   className,
 }: NovelCardProps) {
   const src = safeImageSrc(coverImageUrl, "/default-cover.svg");
+
+  const typeChip = mediaType ? (
+    <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-ink/80 text-paper text-[10px] font-medium tracking-wide">
+      {mediaTypeLabel(mediaType)}
+    </span>
+  ) : null;
 
   if (bordered) {
     return (
@@ -62,6 +72,7 @@ export default function NovelCard({
             priority={priority}
             className="object-cover group-hover:scale-105 transition duration-300"
           />
+          {typeChip}
         </div>
         <div className="p-4">
           <h3 className="font-serif text-paper truncate group-hover:text-gold transition">{title}</h3>
@@ -86,6 +97,7 @@ export default function NovelCard({
           priority={priority}
           className="object-cover group-hover:scale-105 transition duration-300"
         />
+        {typeChip}
       </div>
       <h3 className={`font-serif ${poster.title} truncate text-paper group-hover:text-gold transition`}>
         {title}
