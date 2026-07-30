@@ -225,7 +225,7 @@ export default function ListPage() {
             href="/browse"
             className="inline-block mt-4 bg-gold text-ink hover:bg-gold-bright px-6 py-2 rounded-lg transition"
           >
-            Browse Novels
+            Browse Library
           </Link>
         </div>
       ) : (

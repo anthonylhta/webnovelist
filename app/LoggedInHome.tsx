@@ -168,7 +168,7 @@ export default function LoggedInHome({
             <h3 className="font-serif text-lg text-paper mb-1">Nothing in progress</h3>
             <p className="text-muted text-xs sm:text-sm mb-5">Start reading a novel and it&apos;ll show up here.</p>
             <Link href="/browse" className="inline-block bg-gold text-ink hover:bg-gold-bright px-5 py-2 rounded-md text-sm font-medium transition">
-              Browse Novels
+              Browse Library
             </Link>
           </div>
         </section>

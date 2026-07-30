@@ -61,7 +61,7 @@ export default function AddNovelPage() {
         <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
         <p className="text-muted mb-6">Only admins and moderators can add novels.</p>
         <Link href="/browse" className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition">
-          Browse Novels
+          Browse Library
         </Link>
       </div>
     );
