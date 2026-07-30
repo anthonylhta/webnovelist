@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import NovelCard from "@/components/NovelCard";
+import { MEDIA_TYPES, MEDIA_TYPE_LABELS, isMediaType } from "@/lib/media-types";
 
 const getAllGenres = unstable_cache(
   async () => {
@@ -14,15 +15,30 @@ const getAllGenres = unstable_cache(
   { revalidate: 3600 }
 );
 
+// Types actually present in the catalog, in canonical order
+const getAllMediaTypes = unstable_cache(
+  async () => {
+    const rows = await prisma.novel.findMany({
+      select: { mediaType: true },
+      distinct: ["mediaType"],
+    });
+    const present = new Set(rows.map((r) => r.mediaType));
+    return MEDIA_TYPES.filter((t) => present.has(t));
+  },
+  ["all-media-types"],
+  { revalidate: 3600 }
+);
+
 const NOVELS_PER_PAGE = 20;
 
 export default async function BrowsePage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; genre?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; genre?: string; type?: string; page?: string }>;
 }) {
-  const { search, genre, page } = await searchParams;
+  const { search, genre, type, page } = await searchParams;
 
+  const mediaType = isMediaType(type) ? type : undefined;
   const currentPage = Math.max(1, parseInt(page || "1") || 1);
 
   // Build the where clause once so we reuse it for both queries
@@ -38,6 +54,7 @@ export default async function BrowsePage({
           }
         : {},
       genre ? { genres: { has: genre } } : {},
+      mediaType ? { mediaType } : {},
     ],
   };
 
@@ -54,15 +71,25 @@ export default async function BrowsePage({
 
   const totalPages = Math.max(1, Math.ceil(totalCount / NOVELS_PER_PAGE));
 
-  const allGenres = await getAllGenres();
+  const [allGenres, allMediaTypes] = await Promise.all([getAllGenres(), getAllMediaTypes()]);
 
-  // Helper to build pagination URLs preserving search & genre
+  // Helper to build pagination URLs preserving search, genre & type
   const buildPageUrl = (pageNum: number) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (genre) params.set("genre", genre);
+    if (mediaType) params.set("type", mediaType);
     params.set("page", pageNum.toString());
     return `/browse?${params.toString()}`;
+  };
+
+  // Helper for the filter pills — genre and type compose with each other
+  const filterUrl = (nextGenre?: string, nextType?: string) => {
+    const params = new URLSearchParams();
+    if (nextGenre) params.set("genre", nextGenre);
+    if (nextType) params.set("type", nextType);
+    const qs = params.toString();
+    return qs ? `/browse?${qs}` : "/browse";
   };
 
   // Generate page numbers to show
@@ -99,8 +126,9 @@ export default async function BrowsePage({
 
       {/* Search Bar */}
       <form className="mb-6">
-        {/* Preserve genre filter when searching */}
+        {/* Preserve genre + type filters when searching */}
         {genre && <input type="hidden" name="genre" value={genre} />}
+        {mediaType && <input type="hidden" name="type" value={mediaType} />}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-faint" />
           <input
@@ -114,10 +142,39 @@ export default async function BrowsePage({
         </div>
       </form>
 
+      {/* Media Type Filters — only once the catalog has more than one type */}
+      {allMediaTypes.length > 1 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          <Link
+            href={filterUrl(genre, undefined)}
+            className={`px-3 py-1 rounded-full text-sm border transition ${
+              !mediaType
+                ? "bg-gold text-ink border-gold font-medium"
+                : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
+            }`}
+          >
+            All Types
+          </Link>
+          {allMediaTypes.map((t) => (
+            <Link
+              key={t}
+              href={filterUrl(genre, t)}
+              className={`px-3 py-1 rounded-full text-sm border transition ${
+                mediaType === t
+                  ? "bg-gold text-ink border-gold font-medium"
+                  : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
+              }`}
+            >
+              {MEDIA_TYPE_LABELS[t]}
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Genre Filters */}
       <div className="flex flex-wrap gap-2 mb-8">
         <Link
-          href="/browse"
+          href={filterUrl(undefined, mediaType)}
           className={`px-3 py-1 rounded-full text-sm border transition ${
             !genre
               ? "bg-gold text-ink border-gold font-medium"
@@ -129,7 +186,7 @@ export default async function BrowsePage({
         {allGenres.map((g) => (
           <Link
             key={g}
-            href={`/browse?genre=${g}`}
+            href={filterUrl(g, mediaType)}
             className={`px-3 py-1 rounded-full text-sm border transition ${
               genre === g
                 ? "bg-gold text-ink border-gold font-medium"
@@ -170,6 +227,7 @@ export default async function BrowsePage({
               id={novel.id}
               title={novel.title}
               nativeTitle={novel.nativeTitle}
+              mediaType={novel.mediaType}
               coverImageUrl={novel.coverImageUrl}
               bordered
               priority={i < 4}

@@ -7,6 +7,7 @@ import AddToListButton from "@/components/AddToListButton";
 import FavoriteNovelButton from "@/components/FavoriteNovelButton";
 import NovelAdminActions from "@/components/NovelAdminActions";
 import { safeImageSrc } from "@/lib/image-hosts";
+import { mediaTypeLabel } from "@/lib/media-types";
 
 const PLACEHOLDER = "/default-cover.svg";
 
@@ -95,6 +96,9 @@ export default async function NovelPage({
             <div className="flex-1 md:pt-8">
               {/* Status / source / year inline */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="px-2.5 py-0.5 text-xs font-medium rounded-full border bg-elevated/80 text-muted border-hairline">
+                  {mediaTypeLabel(novel.mediaType)}
+                </span>
                 {novel.status && (
                   <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full border ${statusStyle}`}>
                     {novel.status}
