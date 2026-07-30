@@ -25,7 +25,7 @@ async function main() {
       await prisma.novel.update({
         where: { id: existing.id },
         data: {
-          titleChinese: novel.titleChinese,
+          nativeTitle: novel.nativeTitle,
           author: novel.author,
           description: novel.description,
           coverImageUrl: novel.coverImageUrl,
@@ -43,7 +43,7 @@ async function main() {
       await prisma.novel.create({
         data: {
           title: novel.title,
-          titleChinese: novel.titleChinese,
+          nativeTitle: novel.nativeTitle,
           author: novel.author,
           description: novel.description,
           coverImageUrl: novel.coverImageUrl,

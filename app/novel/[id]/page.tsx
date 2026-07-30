@@ -109,8 +109,8 @@ export default async function NovelPage({
               </div>
 
               <h1 className="text-3xl sm:text-4xl font-bold leading-tight font-serif text-paper">{novel.title}</h1>
-              {novel.titleChinese && (
-                <p className="font-cjk text-muted mt-1.5 text-lg">{novel.titleChinese}</p>
+              {novel.nativeTitle && (
+                <p className="font-cjk text-muted mt-1.5 text-lg">{novel.nativeTitle}</p>
               )}
 
               {/* Author + chapter count */}

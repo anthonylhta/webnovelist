@@ -42,7 +42,7 @@ export default async function Home() {
             select: {
               id: true,
               title: true,
-              titleChinese: true,
+              nativeTitle: true,
               coverImageUrl: true,
               totalChapters: true,
               author: true,
@@ -55,7 +55,7 @@ export default async function Home() {
       prisma.novel.findMany({
         orderBy: { createdAt: "desc" },
         take: 10,
-        select: { id: true, title: true, titleChinese: true, author: true, coverImageUrl: true },
+        select: { id: true, title: true, nativeTitle: true, author: true, coverImageUrl: true },
       }),
     ]);
 
@@ -164,7 +164,7 @@ export default async function Home() {
                   key={novel.id}
                   id={novel.id}
                   title={novel.title}
-                  titleChinese={novel.titleChinese}
+                  nativeTitle={novel.nativeTitle}
                   coverImageUrl={novel.coverImageUrl}
                   priority={i === 0}
                   footer={
@@ -205,7 +205,7 @@ export default async function Home() {
                   key={novel.id}
                   id={novel.id}
                   title={novel.title}
-                  titleChinese={novel.titleChinese}
+                  nativeTitle={novel.nativeTitle}
                   coverImageUrl={novel.coverImageUrl}
                   footer={<p className="text-xs text-faint truncate">{novel.author}</p>}
                 />

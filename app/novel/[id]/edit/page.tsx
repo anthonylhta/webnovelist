@@ -28,7 +28,7 @@ export default function EditNovelPage() {
 
   const [form, setForm] = useState({
     title: "",
-    titleChinese: "",
+    nativeTitle: "",
     author: "",
     authorId: null as number | null,
     description: "",
@@ -55,7 +55,7 @@ export default function EditNovelPage() {
       .then(([novel, authors]) => {
         setForm({
           title: novel.title || "",
-          titleChinese: novel.titleChinese || "",
+          nativeTitle: novel.nativeTitle || "",
           author: novel.author || "",
           authorId: novel.authorId ?? null,
           description: novel.description || "",
@@ -134,7 +134,7 @@ export default function EditNovelPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: form.title.trim(),
-          titleChinese: form.titleChinese.trim() || null,
+          nativeTitle: form.nativeTitle.trim() || null,
           author: form.author.trim() || null,
           authorId: form.authorId,
           description: form.description.trim() || null,
@@ -196,13 +196,13 @@ export default function EditNovelPage() {
             />
           </div>
 
-          {/* Chinese Title */}
+          {/* Native Title */}
           <div>
-            <label className="block text-sm text-muted mb-1">Title (Chinese)</label>
+            <label className="block text-sm text-muted mb-1">Title (Native)</label>
             <input
               type="text"
-              value={form.titleChinese}
-              onChange={(e) => setForm({ ...form, titleChinese: e.target.value })}
+              value={form.nativeTitle}
+              onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
               className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
                          text-muted font-cjk focus:outline-none focus:border-gold-dim"
             />

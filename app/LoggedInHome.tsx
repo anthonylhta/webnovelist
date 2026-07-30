@@ -14,7 +14,7 @@ interface ReadingEntry {
   novel: {
     id: number;
     title: string;
-    titleChinese: string | null;
+    nativeTitle: string | null;
     coverImageUrl: string | null;
     totalChapters: number | null;
     author: string | null;
@@ -24,7 +24,7 @@ interface ReadingEntry {
 interface RecentNovel {
   id: number;
   title: string;
-  titleChinese: string | null;
+  nativeTitle: string | null;
   author: string | null;
   coverImageUrl: string | null;
 }
@@ -91,8 +91,8 @@ export default function LoggedInHome({
                     <Link href={`/novel/${entry.novel.id}`} className="font-serif text-paper truncate block hover:text-gold transition">
                       {entry.novel.title}
                     </Link>
-                    {entry.novel.titleChinese ? (
-                      <p className="font-cjk text-xs text-muted truncate">{entry.novel.titleChinese}</p>
+                    {entry.novel.nativeTitle ? (
+                      <p className="font-cjk text-xs text-muted truncate">{entry.novel.nativeTitle}</p>
                     ) : entry.novel.author && (
                       <p className="text-sm text-faint truncate">{entry.novel.author}</p>
                     )}
@@ -192,9 +192,9 @@ export default function LoggedInHome({
                 key={novel.id}
                 id={novel.id}
                 title={novel.title}
-                titleChinese={novel.titleChinese}
+                nativeTitle={novel.nativeTitle}
                 coverImageUrl={novel.coverImageUrl}
-                footer={novel.titleChinese ? null : <p className="text-xs text-faint truncate">{novel.author}</p>}
+                footer={novel.nativeTitle ? null : <p className="text-xs text-faint truncate">{novel.author}</p>}
               />
             ))}
           </div>

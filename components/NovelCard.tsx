@@ -7,7 +7,7 @@ import { safeImageSrc } from "@/lib/image-hosts";
 interface NovelCardProps {
   id: number;
   title: string;
-  titleChinese?: string | null;
+  nativeTitle?: string | null;
   coverImageUrl?: string | null;
   /** Poster width. "md" = home strips (w-28 sm:w-36), "sm" = compact (w-20 sm:w-24). Ignored when `bordered`. */
   size?: "sm" | "md";
@@ -37,7 +37,7 @@ const BORDERED_SIZES = "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 200px
 export default function NovelCard({
   id,
   title,
-  titleChinese,
+  nativeTitle,
   coverImageUrl,
   size = "md",
   bordered = false,
@@ -65,8 +65,8 @@ export default function NovelCard({
         </div>
         <div className="p-4">
           <h3 className="font-serif text-paper truncate group-hover:text-gold transition">{title}</h3>
-          {titleChinese && (
-            <p className="font-cjk text-muted text-sm truncate">{titleChinese}</p>
+          {nativeTitle && (
+            <p className="font-cjk text-muted text-sm truncate">{nativeTitle}</p>
           )}
           {footer}
         </div>
@@ -90,8 +90,8 @@ export default function NovelCard({
       <h3 className={`font-serif ${poster.title} truncate text-paper group-hover:text-gold transition`}>
         {title}
       </h3>
-      {titleChinese && (
-        <p className="font-cjk text-xs text-muted truncate">{titleChinese}</p>
+      {nativeTitle && (
+        <p className="font-cjk text-xs text-muted truncate">{nativeTitle}</p>
       )}
       {footer}
     </Link>

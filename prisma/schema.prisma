@@ -52,7 +52,7 @@ model Author {
 model Novel {
   id             Int       @id @default(autoincrement())
   title          String
-  titleChinese   String?   @map("title_chinese")
+  nativeTitle    String?   @map("native_title")
   author         String?
   authorId       Int?      @map("author_id")
   description    String?   @db.Text

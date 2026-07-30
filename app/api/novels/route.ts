@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
             ? {
                 OR: [
                   { title: { contains: search, mode: "insensitive" } },
-                  { titleChinese: { contains: search, mode: "insensitive" } },
+                  { nativeTitle: { contains: search, mode: "insensitive" } },
                   { author: { contains: search, mode: "insensitive" } },
                 ],
               }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Check for suspicious content
     const fieldsToCheck = [
-      body.title, body.titleChinese, body.author,
+      body.title, body.nativeTitle, body.author,
       body.description, body.originalSource
     ].filter(Boolean);
 
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     const novel = await prisma.novel.create({
       data: {
         title: sanitizeString(body.title),
-        titleChinese: body.titleChinese ? sanitizeString(body.titleChinese) : null,
+        nativeTitle: body.nativeTitle ? sanitizeString(body.nativeTitle) : null,
         author: body.author ? sanitizeString(body.author) : null,
         description: body.description ? sanitizeString(body.description) : null,
         coverImageUrl: body.coverImageUrl || null,

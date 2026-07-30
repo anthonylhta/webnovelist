@@ -23,7 +23,7 @@ export default function AddNovelPage() {
 
   const [form, setForm] = useState({
     title: "",
-    titleChinese: "",
+    nativeTitle: "",
     author: "",
     description: "",
     coverImageUrl: "",
@@ -85,7 +85,7 @@ export default function AddNovelPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: form.title.trim(),
-          titleChinese: form.titleChinese.trim() || null,
+          nativeTitle: form.nativeTitle.trim() || null,
           author: form.author.trim() || null,
           description: form.description.trim() || null,
           coverImageUrl: form.coverImageUrl.trim() || null,
@@ -137,8 +137,8 @@ export default function AddNovelPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Title (Chinese)</label>
-            <input type="text" value={form.titleChinese} onChange={(e) => setForm({ ...form, titleChinese: e.target.value })}
+            <label className="block text-sm text-muted mb-1">Title (Native)</label>
+            <input type="text" value={form.nativeTitle} onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
               placeholder="e.g., 蛊真人"
               className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-muted font-cjk focus:outline-none focus:border-gold-dim" />
           </div>

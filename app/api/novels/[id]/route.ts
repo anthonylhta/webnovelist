@@ -59,7 +59,7 @@ export async function PUT(
 
     // Check for suspicious content
     const fieldsToCheck = [
-      body.title, body.titleChinese, body.author,
+      body.title, body.nativeTitle, body.author,
       body.description, body.originalSource
     ].filter(Boolean);
 
@@ -79,7 +79,7 @@ export async function PUT(
       where: { id: parseInt(id) },
       data: {
         title: sanitizeString(body.title),
-        titleChinese: body.titleChinese ? sanitizeString(body.titleChinese) : null,
+        nativeTitle: body.nativeTitle ? sanitizeString(body.nativeTitle) : null,
         author: body.author ? sanitizeString(body.author) : null,
         authorId: body.authorId ?? null,
         description: body.description ? sanitizeString(body.description) : null,
