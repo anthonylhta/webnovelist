@@ -53,6 +53,7 @@ model Novel {
   id             Int       @id @default(autoincrement())
   title          String
   nativeTitle    String?   @map("native_title")
+  mediaType      String    @default("webnovel") @map("media_type")
   author         String?
   authorId       Int?      @map("author_id")
   description    String?   @db.Text
@@ -63,6 +64,7 @@ model Novel {
   tags           String[]
   originalSource String?   @map("original_source")
   yearPublished  Int?      @map("year_published")
+  anilistId      Int?      @unique @map("anilist_id")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
