@@ -8,6 +8,7 @@
 export const ALLOWED_IMAGE_HOSTS = [
   "res.cloudinary.com",
   "img.clerk.com",
+  "s4.anilist.co",
 ] as const;
 
 /**
