@@ -26,6 +26,7 @@ async function main() {
         where: { id: existing.id },
         data: {
           nativeTitle: novel.nativeTitle,
+          mediaType: novel.mediaType,
           author: novel.author,
           description: novel.description,
           coverImageUrl: novel.coverImageUrl,
@@ -44,6 +45,7 @@ async function main() {
         data: {
           title: novel.title,
           nativeTitle: novel.nativeTitle,
+          mediaType: novel.mediaType,
           author: novel.author,
           description: novel.description,
           coverImageUrl: novel.coverImageUrl,
