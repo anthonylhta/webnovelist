@@ -98,7 +98,7 @@ export default async function Home() {
       <section className="relative px-4 pt-16 sm:pt-24 pb-16 sm:pb-20 flex flex-col items-center text-center">
         <div className="relative z-10 w-full max-w-2xl mx-auto">
           <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-gold-dim mb-5">
-            A reading tracker for web novels
+            Webnovels · Manga · Manhwa · Light Novels
           </p>
           <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-semibold text-paper mb-4">
             WebNovelist
@@ -116,7 +116,7 @@ export default async function Home() {
               <input
                 type="text"
                 name="search"
-                placeholder="Search for a novel…"
+                placeholder="Search for a title…"
                 className="w-full bg-surface/80 border border-hairline rounded-lg pl-12 pr-4 py-3 sm:py-4
                            text-paper placeholder-faint focus:outline-none focus:border-gold-dim
                            backdrop-blur-sm text-base"
@@ -135,7 +135,7 @@ export default async function Home() {
               href="/browse"
               className="border border-hairline text-body hover:border-gold-dim hover:text-gold px-6 py-3 rounded-md font-medium transition text-center"
             >
-              Browse Novels
+              Browse Library
             </Link>
           </div>
         </div>

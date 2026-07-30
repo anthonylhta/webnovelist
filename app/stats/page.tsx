@@ -132,7 +132,7 @@ export default function StatsPage() {
           href="/browse"
           className="inline-block bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg transition"
         >
-          Browse Novels
+          Browse Library
         </a>
       </div>
     );

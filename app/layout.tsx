@@ -28,7 +28,7 @@ const shippori = Shippori_Mincho({
 
 export const metadata: Metadata = {
   title: "WebNovelist",
-  description: "Track your Chinese webnovel reading",
+  description: "Track your reading — webnovels, manga, manhwa, and light novels",
 };
 
 export default async function RootLayout({

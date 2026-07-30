@@ -22,7 +22,7 @@ export default function NotFound() {
           href="/browse"
           className="bg-elevated hover:bg-hairline px-6 py-3 rounded-lg font-semibold transition"
         >
-          Browse Novels
+          Browse Library
         </Link>
       </div>
     </div>

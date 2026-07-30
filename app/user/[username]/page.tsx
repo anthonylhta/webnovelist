@@ -35,7 +35,7 @@ export async function generateMetadata({
 
   return {
     title: `${user.username}'s Profile — WebNovelist`,
-    description: `Check out ${user.username}'s webnovel reading list on WebNovelist.`,
+    description: `Check out ${user.username}'s reading list on WebNovelist.`,
   };
 }
 

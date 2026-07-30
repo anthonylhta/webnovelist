@@ -1,6 +1,6 @@
 # WebNovelist
 
-> An AniList-style tracker for web novels. Log what you're reading, rate and review, build a library, and share a public profile.
+> An AniList-style tracker for everything chapter-shaped — webnovels, manga, manhwa, manhua, and light novels. Log what you're reading, rate and review, build a library, and share a public profile.
 
 **Live:** [novel.anthonyta.dev](https://novel.anthonyta.dev)
 
@@ -25,13 +25,15 @@
 
 ## Features
 
-- **Reading list** - track novels across five statuses (Reading, Completed, On Hold, Dropped, Plan to Read), with per-entry rating, current chapter, reread count, notes, and a reading link.
+- **Reading list** - track titles across five statuses (Reading, Completed, On Hold, Dropped, Plan to Read), with per-entry rating, current chapter, reread count, notes, and a reading link.
+- **Media types** - every title is typed (webnovel, light novel, novel, manga, manhwa, manhua), with cover badges and a browse filter that composes with genre filtering.
+- **AniList import** - pulls a full AniList manga list — statuses, chapter progress, scores, and dates — in one request, matching existing catalog entries by AniList id so re-imports never duplicate or overwrite.
 - **Stats dashboard** - aggregate metrics across your library: totals by status, chapters read, average rating, and genre breakdown.
 - **Activity heatmap** - a GitHub-style contribution graph of your reading activity over the past year.
 - **Public profiles** - shareable `/user/<username>` pages featuring up to 5 favourite novels, authors, and characters each, with a blurred cover art banner.
 - **Author pages** - dedicated `/author/[id]` pages with bio, linked novels grid, and a favourite button. Authors are managed by admins with Cloudinary image support; novel edit pages link novels to their author page.
 - **Character pages** - dedicated `/character/[id]` pages with role badge and linked novel. Characters are managed inline on the novel edit page; users can favourite up to 5 per profile.
-- **Browse & search** - find novels by title, author, or genre with live filtering.
+- **Browse & search** - search the catalog by title, author, or genre, with media-type and genre filters that combine.
 - **Admin panel** - role-based management of novels, authors, and users. `/admin/novels` lists the full catalog with search, status badges, cover thumbnails, and edit/delete actions. `/admin/authors` supports create, edit, delete, and image upload.
 - **Authentication** - email/password sign-in via Clerk with secure sessions and webhook-based user sync.
 - **Image uploads** - avatars, novel covers, and author images via Cloudinary; customizable profile banners.

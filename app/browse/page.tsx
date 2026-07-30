@@ -121,7 +121,7 @@ export default async function BrowsePage({
 
   return (
     <div>
-      <h1 className="font-serif text-4xl font-semibold text-paper mb-2">Browse Novels</h1>
+      <h1 className="font-serif text-4xl font-semibold text-paper mb-2">Browse Library</h1>
       <div className="rule-gold w-20 mb-8" />
 
       {/* Search Bar */}
@@ -201,7 +201,7 @@ export default async function BrowsePage({
       {/* Results Count */}
       <div className="flex items-center justify-between mb-4">
         <p className="text-muted text-sm">
-          {totalCount} novel{totalCount !== 1 ? "s" : ""} found
+          {totalCount} title{totalCount !== 1 ? "s" : ""} found
           {totalCount > NOVELS_PER_PAGE && (
             <span className="text-faint">
               {" "}· showing {(currentPage - 1) * NOVELS_PER_PAGE + 1}–
@@ -218,7 +218,7 @@ export default async function BrowsePage({
 
       {/* Novel Grid */}
       {novels.length === 0 ? (
-        <p className="text-muted text-center py-12">No novels found.</p>
+        <p className="text-muted text-center py-12">No titles found.</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {novels.map((novel, i) => (
