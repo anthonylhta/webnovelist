@@ -7,7 +7,7 @@ const novels = [
   // ============ XIANXIA / XUANHUAN ============
   {
     title: "Reverend Insanity",
-    titleChinese: "蛊真人",
+    nativeTitle: "蛊真人",
     author: "Gu Zhen Ren",
     description: "A story about Fang Yuan, a demonic cultivator who is reborn 500 years into the past with all his memories. Ruthless, cunning, and willing to do anything to achieve immortality. Widely regarded as one of the greatest Chinese webnovels ever written.",
     totalChapters: 2334,
@@ -19,7 +19,7 @@ const novels = [
   },
   {
     title: "Lord of the Mysteries",
-    titleChinese: "诡秘之主",
+    nativeTitle: "诡秘之主",
     author: "Cuttlefish That Loves Diving",
     description: "Zhou Mingrui wakes up in an alternate Victorian era world as Klein Moretti. He finds a mysterious notebook that leads him into a world of mysticism, Beyonder powers, and ancient secrets. A masterpiece of world-building and mystery.",
     totalChapters: 1394,
@@ -31,7 +31,7 @@ const novels = [
   },
   {
     title: "I Shall Seal the Heavens",
-    titleChinese: "我欲封天",
+    nativeTitle: "我欲封天",
     author: "Er Gen",
     description: "Meng Hao is a failed scholar who gets kidnapped into a sect of immortal cultivators. With his wits and determination, he rises through the cultivation world. Known for its humor, emotional depth, and unforgettable characters.",
     totalChapters: 1614,
@@ -43,7 +43,7 @@ const novels = [
   },
   {
     title: "A Will Eternal",
-    titleChinese: "一念永恒",
+    nativeTitle: "一念永恒",
     author: "Er Gen",
     description: "Bai Xiaochun is afraid of dying. In a world of cultivation where death is commonplace, he seeks eternal life while accidentally causing chaos everywhere he goes. A comedic masterpiece by Er Gen.",
     totalChapters: 1314,
@@ -55,7 +55,7 @@ const novels = [
   },
   {
     title: "Renegade Immortal",
-    titleChinese: "仙逆",
+    nativeTitle: "仙逆",
     author: "Er Gen",
     description: "Wang Lin is a smart boy born in a poor village. After failing to find spiritual roots, he stumbles upon a mysterious bead that changes his destiny. Er Gen's first and darkest novel.",
     totalChapters: 2088,
@@ -67,7 +67,7 @@ const novels = [
   },
   {
     title: "Pursuit of the Truth",
-    titleChinese: "求魔",
+    nativeTitle: "求魔",
     author: "Er Gen",
     description: "Su Ming grows up in a remote village, unaware of the vast cultivation world. After a series of tragic events, he embarks on a journey of cultivation and self-discovery.",
     totalChapters: 1468,
@@ -79,7 +79,7 @@ const novels = [
   },
   {
     title: "Coiling Dragon",
-    titleChinese: "盘龙",
+    nativeTitle: "盘龙",
     author: "I Eat Tomatoes",
     description: "Linley is the heir of a once-noble clan that has fallen into decline. Armed with a mysterious ring and the bloodline of the Dragonblood Warriors, he sets out to restore his clan's honor. One of the gateway novels to Chinese web fiction.",
     totalChapters: 806,
@@ -91,7 +91,7 @@ const novels = [
   },
   {
     title: "Desolate Era",
-    titleChinese: "莽荒纪",
+    nativeTitle: "莽荒纪",
     author: "I Eat Tomatoes",
     description: "Ji Ning, having died young due to illness, is reincarnated into a world of immortals and monsters. With memories of his past life and a strong will, he embarks on his path to become the strongest.",
     totalChapters: 1451,
@@ -103,7 +103,7 @@ const novels = [
   },
   {
     title: "Stellar Transformations",
-    titleChinese: "星辰变",
+    nativeTitle: "星辰变",
     author: "I Eat Tomatoes",
     description: "Qin Yu, the third son of a powerful emperor, is unable to practice internal techniques. He instead trains his body to extraordinary limits before discovering a mysterious meteor that changes everything.",
     totalChapters: 653,
@@ -115,7 +115,7 @@ const novels = [
   },
   {
     title: "Swallowed Star",
-    titleChinese: "吞噬星空",
+    nativeTitle: "吞噬星空",
     author: "I Eat Tomatoes",
     description: "In a future Earth devastated by a catastrophe called the Grand Nirvana, monsters roam the land. Luo Feng, a young martial artist, discovers that the universe is far vaster and more dangerous than anyone imagined.",
     totalChapters: 1484,
@@ -127,7 +127,7 @@ const novels = [
   },
   {
     title: "Battle Through the Heavens",
-    titleChinese: "斗破苍穹",
+    nativeTitle: "斗破苍穹",
     author: "Heavenly Silkworm Potato",
     description: "Xiao Yan was once a genius with immense talent, but mysteriously lost all his powers at age 11. After three years of mockery, he discovers a mysterious soul living in his mother's ring who helps him reclaim his power.",
     totalChapters: 1648,
@@ -139,7 +139,7 @@ const novels = [
   },
   {
     title: "The Great Ruler",
-    titleChinese: "大主宰",
+    nativeTitle: "大主宰",
     author: "Heavenly Silkworm Potato",
     description: "Mu Chen, a boy from the Northern Spiritual Realm, enters the Northern Heavens Spiritual Academy to become a powerful spiritual cultivator and eventually become the Great Ruler of the Great Thousand World.",
     totalChapters: 1565,
@@ -151,7 +151,7 @@ const novels = [
   },
   {
     title: "Wu Dong Qian Kun",
-    titleChinese: "武动乾坤",
+    nativeTitle: "武动乾坤",
     author: "Heavenly Silkworm Potato",
     description: "Lin Dong, a child of an offshoot branch of the Lin Clan, obtains a mysterious stone talisman that gives him extraordinary abilities. He sets out to restore his family's honor in a world of martial arts.",
     totalChapters: 1314,
@@ -163,7 +163,7 @@ const novels = [
   },
   {
     title: "Against the Gods",
-    titleChinese: "逆天邪神",
+    nativeTitle: "逆天邪神",
     author: "Mars Gravity",
     description: "Yun Che, possessing the Sky Poison Pearl, is reborn after being chased off a cliff. With knowledge of his past life and a powerful artifact, he seeks revenge and rises to power in a world where strength is everything.",
     totalChapters: 1900,
@@ -175,7 +175,7 @@ const novels = [
   },
   {
     title: "Martial World",
-    titleChinese: "武极天下",
+    nativeTitle: "武极天下",
     author: "Cocooned Cow",
     description: "Lin Ming discovers a mysterious cube containing the memories of a supreme martial artist. He uses this knowledge to rise through the martial world, uncover ancient secrets, and reach heights no one thought possible.",
     totalChapters: 2246,
@@ -187,7 +187,7 @@ const novels = [
   },
   {
     title: "True Martial World",
-    titleChinese: "真武世界",
+    nativeTitle: "真武世界",
     author: "Cocooned Cow",
     description: "Yi Yun travels to a mystical world and obtains the Purple Crystal Origins, which gives him the ability to see the essence of martial arts. A spiritual sequel to Martial World.",
     totalChapters: 1774,
@@ -199,7 +199,7 @@ const novels = [
   },
   {
     title: "Soul Land",
-    titleChinese: "斗罗大陆",
+    nativeTitle: "斗罗大陆",
     author: "Tang Jia San Shao",
     description: "Tang San, a master of hidden weapons, is reborn into a world of martial souls. With his hidden weapon skills and a powerful Blue Silver Grass martial soul, he enrolls in Shrek Academy.",
     totalChapters: 336,
@@ -211,7 +211,7 @@ const novels = [
   },
   {
     title: "Tales of Demons and Gods",
-    titleChinese: "妖神记",
+    nativeTitle: "妖神记",
     author: "Mad Snail",
     description: "Nie Li, the strongest Demon Spiritist, is killed in battle and wakes up as his 13-year-old self. With knowledge of the future, he sets out to save his city, protect his loved ones, and change fate.",
     totalChapters: 550,
@@ -223,7 +223,7 @@ const novels = [
   },
   {
     title: "The Charm of Soul Pets",
-    titleChinese: "宠魅",
+    nativeTitle: "宠魅",
     author: "Fish's Sky",
     description: "In a world where humans bond with soul pets to fight, Chu Mu is thrown into a deadly island to survive with only a small Ice Fox. He must grow stronger to escape and seek revenge.",
     totalChapters: 1648,
@@ -237,7 +237,7 @@ const novels = [
   // ============ WUXIA ============
   {
     title: "A Record of a Mortal's Journey to Immortality",
-    titleChinese: "凡人修仙传",
+    nativeTitle: "凡人修仙传",
     author: "Wang Yu",
     description: "Han Li, a poor village boy, enters a local sect and begins his long, arduous journey of cultivation. Unlike typical protagonists, Han Li is cautious, pragmatic, and values his life above all else.",
     totalChapters: 2446,
@@ -251,7 +251,7 @@ const novels = [
   // ============ KINGDOM BUILDING / STRATEGY ============
   {
     title: "Release That Witch",
-    titleChinese: "放开那个女巫",
+    nativeTitle: "放开那个女巫",
     author: "Er Mu",
     description: "A modern engineer is transported into a medieval fantasy world as a prince. Using his scientific knowledge, he works with witches to build a technological civilization while defending against demonic threats.",
     totalChapters: 1498,
@@ -263,7 +263,7 @@ const novels = [
   },
   {
     title: "Throne of Magical Arcana",
-    titleChinese: "奥术神座",
+    nativeTitle: "奥术神座",
     author: "Cuttlefish That Loves Diving",
     description: "Lucien Evans transmigrates to a world where the Church of the God of Truth rules supreme and magic is heresy. Using his knowledge of science from Earth, he revolutionizes the magical world.",
     totalChapters: 910,
@@ -277,7 +277,7 @@ const novels = [
   // ============ MYSTERY / HORROR ============
   {
     title: "My House of Horrors",
-    titleChinese: "我有一座恐怖屋",
+    nativeTitle: "我有一座恐怖屋",
     author: "I Fix Air-Conditioner",
     description: "Chen Ge inherits a haunted house attraction from his missing parents. He discovers a black phone with missions that lead him to real haunted locations. Completing them gives him ghostly employees for his attraction.",
     totalChapters: 1190,
@@ -291,7 +291,7 @@ const novels = [
   // ============ SCI-FI / GAMING ============
   {
     title: "The Legendary Mechanic",
-    titleChinese: "超神机械师",
+    nativeTitle: "超神机械师",
     author: "Chocolion",
     description: "Han Xiao wakes up inside a sci-fi MMORPG he was beta testing, as an NPC. Using his knowledge of the game's future events, he manipulates players and NPCs alike to become the most legendary mechanic.",
     totalChapters: 1463,
@@ -303,7 +303,7 @@ const novels = [
   },
   {
     title: "Warlock of the Magus World",
-    titleChinese: "巫界术士",
+    nativeTitle: "巫界术士",
     author: "The Plagiarist",
     description: "Leylin Farlier, a scientist reincarnated with an AI chip in his brain, navigates a dark world of Magi where power is everything. Cold, calculating, and ruthlessly efficient.",
     totalChapters: 1200,
@@ -317,7 +317,7 @@ const novels = [
   // ============ COMEDY / SLICE OF LIFE ============
   {
     title: "Library of Heaven's Path",
-    titleChinese: "天道图书馆",
+    nativeTitle: "天道图书馆",
     author: "Heng Sao Tian Ya",
     description: "Zhang Xuan, a transmigrator, becomes the worst teacher in a cultivation academy. He discovers he has a Library of Heaven's Path that reveals all flaws in everything, making him an unparalleled teacher.",
     totalChapters: 2264,
@@ -329,7 +329,7 @@ const novels = [
   },
   {
     title: "History's Strongest Senior Brother",
-    titleChinese: "史上最强师兄",
+    nativeTitle: "史上最强师兄",
     author: "August Eagle",
     description: "Yan Zhaoge transmigrates into a xuanhuan novel — not as the protagonist, but as the arrogant senior brother who's supposed to be face-slapped. He decides to flip the script entirely.",
     totalChapters: 1691,
@@ -343,7 +343,7 @@ const novels = [
   // ============ ROMANCE / DRAMA ============
   {
     title: "My Senior Brother is Too Steady",
-    titleChinese: "我师兄实在太稳健了",
+    nativeTitle: "我师兄实在太稳健了",
     author: "Get to the Point",
     description: "Li Changshou transmigrates into a cultivation world and decides the safest path is the best. He meticulously plans everything, avoids danger at all costs, and somehow becomes incredibly powerful through sheer caution.",
     totalChapters: 758,
@@ -357,7 +357,7 @@ const novels = [
   // ============ SYSTEM / GAME ELEMENTS ============
   {
     title: "Supreme Magus",
-    titleChinese: "至尊法神",
+    nativeTitle: "至尊法神",
     author: "Legion20",
     description: "Derek McCoy was a man who spent his entire life facing every kind of suffering and betrayal. After dying alone and forgotten, he reincarnates as Lith Verhen in a world of magic.",
     totalChapters: 3200,
@@ -369,7 +369,7 @@ const novels = [
   },
   {
     title: "Shadow Slave",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Guiltythree",
     description: "Sunny was born in the slums of a great city. With nothing to his name, he was fated to die. But when he awakened as a Master, he was given a chance to change his destiny — at a terrible price.",
     totalChapters: 1900,
@@ -383,7 +383,7 @@ const novels = [
   // ============ MORE CLASSICS ============
   {
     title: "Sovereign of the Three Realms",
-    titleChinese: "三界独尊",
+    nativeTitle: "三界独尊",
     author: "Li Tian",
     description: "Jiang Chen, son of the Celestial Emperor, is reincarnated into the body of a worthless young master. With his vast knowledge from his previous life, he rises to reclaim his former glory.",
     totalChapters: 2376,
@@ -395,7 +395,7 @@ const novels = [
   },
   {
     title: "Emperor's Domination",
-    titleChinese: "帝霸",
+    nativeTitle: "帝霸",
     author: "Yan Bi Xiao Sheng",
     description: "Li Qiye, an existence that has lived through countless eras as the Dark Crow, finally obtains a mortal body. He begins his journey anew, with millions of years of knowledge and experience.",
     totalChapters: 5880,
@@ -407,7 +407,7 @@ const novels = [
   },
   {
     title: "Martial Peak",
-    titleChinese: "武炼巅峰",
+    nativeTitle: "武炼巅峰",
     author: "Momo",
     description: "Yang Kai, a trial disciple of High Heaven Pavilion, discovers a black book that kickstarts his martial arts journey from the very bottom to the absolute peak of the martial world.",
     totalChapters: 6009,
@@ -419,7 +419,7 @@ const novels = [
   },
   {
     title: "Chaotic Sword God",
-    titleChinese: "混沌剑神",
+    nativeTitle: "混沌剑神",
     author: "Xin Xing Xiao Yao",
     description: "Jian Chen, the publicly recognized number one expert of the Jianghu, dies in a battle and reincarnates into a foreign world. He retains his sword skills and determination to reach the peak.",
     totalChapters: 3462,
@@ -431,7 +431,7 @@ const novels = [
   },
   {
     title: "Invincible",
-    titleChinese: "无敌天下",
+    nativeTitle: "无敌天下",
     author: "Shen Jian",
     description: "Huang Xiaolong is born with a unique martial spirit — a twin-dragon supreme martial spirit. Follow his journey from a small kingdom to the peak of the divine world.",
     totalChapters: 3777,
@@ -443,7 +443,7 @@ const novels = [
   },
   {
     title: "Ancient Godly Monarch",
-    titleChinese: "太古神王",
+    nativeTitle: "太古神王",
     author: "Jing Wu Hen",
     description: "In the Nine Heavens, strong warriors can split mountains and overturn seas. Qin Wentian, with a crippled stellar martial spirit, begins his journey to become the most powerful cultivator.",
     totalChapters: 2052,
@@ -455,7 +455,7 @@ const novels = [
   },
   {
     title: "Peerless Martial God",
-    titleChinese: "绝世武神",
+    nativeTitle: "绝世武神",
     author: "Jing Wu Hen",
     description: "Lin Feng, a modern martial arts enthusiast, transmigrates into the body of a trash cultivator in a world where martial arts reign supreme. He refuses to be trampled upon.",
     totalChapters: 2500,
@@ -467,7 +467,7 @@ const novels = [
   },
   {
     title: "Spirit Realm",
-    titleChinese: "灵域",
+    nativeTitle: "灵域",
     author: "Ni Cang Tian",
     description: "Qin Lie, found with amnesia, slowly uncovers his past as he navigates through a world of spirit realms, ancient mysteries, and powerful factions that all seem connected to his forgotten identity.",
     totalChapters: 1847,
@@ -479,7 +479,7 @@ const novels = [
   },
   {
     title: "Perfect World",
-    titleChinese: "完美世界",
+    nativeTitle: "完美世界",
     author: "Chen Dong",
     description: "A boy born with supreme talent in a village at the edge of wilderness. Shi Hao, who had his supreme bone stolen, begins his rise in a vast and dangerous world of cultivation.",
     totalChapters: 1562,
@@ -491,7 +491,7 @@ const novels = [
   },
   {
     title: "World of Cultivation",
-    titleChinese: "修真世界",
+    nativeTitle: "修真世界",
     author: "Fang Xiang",
     description: "Zuo Mo is a zombie-faced, money-obsessed cultivator who just wants to farm and make money. But fate keeps dragging him into conflicts that force him to become increasingly powerful.",
     totalChapters: 915,
@@ -503,7 +503,7 @@ const novels = [
   },
   {
     title: "Forty Millenniums of Cultivation",
-    titleChinese: "修真四万年",
+    nativeTitle: "修真四万年",
     author: "The Enlightened Master Crouching Cow",
     description: "In a world where cultivation and technology merge, Li Yao, a young man from a junkyard, rises to become a legendary cultivator. A unique blend of sci-fi and xianxia that questions what it means to be human.",
     totalChapters: 3414,
@@ -515,7 +515,7 @@ const novels = [
   },
   {
     title: "Keyboard Immortal",
-    titleChinese: "键盘侠",
+    nativeTitle: "键盘侠",
     author: "Monk of the Six Illusions",
     description: "Zu An transmigrates to a world of cultivation and discovers he has the Keyboard Come system. By making people angry or jealous, he gains Rage Points to use the system. Hilarity ensues.",
     totalChapters: 1600,
@@ -527,7 +527,7 @@ const novels = [
   },
   {
     title: "Cultivation Chat Group",
-    titleChinese: "修真聊天群",
+    nativeTitle: "修真聊天群",
     author: "Legend of the Paladin",
     description: "Song Shuhang accidentally joins a chat group of immortal cultivators. What he thought was a group of delusional people turns out to be actual powerful beings. His ordinary life is turned upside down.",
     totalChapters: 2200,
@@ -539,7 +539,7 @@ const novels = [
   },
   {
     title: "The Grandmaster Strategist",
-    titleChinese: "一代军师",
+    nativeTitle: "一代军师",
     author: "Follow the Crowd",
     description: "Jiang Zhe, a brilliant strategist and poet, gets caught up in the wars of succession in a world inspired by ancient China. A masterfully written story of politics, war, and poetry.",
     totalChapters: 168,
@@ -551,7 +551,7 @@ const novels = [
   },
   {
     title: "City of Sin",
-    titleChinese: "罪恶之城",
+    nativeTitle: "罪恶之城",
     author: "Misty South",
     description: "Richard, son of the legendary mage Gaton, grows up in a school for noble runemasters. He must navigate a world of powerful families, war, and planar conquests to find his place.",
     totalChapters: 1200,
@@ -563,7 +563,7 @@ const novels = [
   },
   {
     title: "Trash of the Count's Family",
-    titleChinese: "백작가의 망나니가 되었다",
+    nativeTitle: "백작가의 망나니가 되었다",
     author: "Yoo Ryeo Han",
     description: "Kim Rok Soo wakes up as Cale Henituse, the trash of a count's family in a fantasy novel. All he wants is a peaceful, slacker life, but he keeps getting dragged into saving the world.",
     totalChapters: 850,
@@ -575,7 +575,7 @@ const novels = [
   },
   {
     title: "Omniscient Reader's Viewpoint",
-    titleChinese: "전지적 독자 시점",
+    nativeTitle: "전지적 독자 시점",
     author: "Sing Shong",
     description: "Kim Dokja is the only reader who completed a 3149-chapter webnovel. When that novel becomes reality, he alone knows how the world ends and how to survive it.",
     totalChapters: 551,
@@ -587,7 +587,7 @@ const novels = [
   },
   {
     title: "The Beginning After the End",
-    titleChinese: null,
+    nativeTitle: null,
     author: "TurtleMe",
     description: "King Grey has unrivaled strength, wealth, and prestige in a world governed by martial ability. However, solitude lingers closely behind those with great power. He is reborn as Arthur Leywin.",
     totalChapters: 500,
@@ -599,7 +599,7 @@ const novels = [
   },
   {
     title: "Second Life Ranker",
-    titleChinese: "두 번 사는 랭커",
+    nativeTitle: "두 번 사는 랭커",
     author: "Sadoyeon",
     description: "Yeon-woo discovers his twin brother's pocket watch after his brother dies in a mysterious tower. Using his brother's diary, he enters the Tower of the Sun God to seek revenge and power.",
     totalChapters: 801,
@@ -613,7 +613,7 @@ const novels = [
   // ============ KOREAN ============
   {
     title: "Solo Leveling",
-    titleChinese: "나 혼자만 레벨업",
+    nativeTitle: "나 혼자만 레벨업",
     author: "Chugong",
     description: "In a world where hunters battle monsters from dimensional gates, Sung Jin-Woo is the weakest E-rank hunter. After nearly dying in a double dungeon, he awakens a mysterious 'System' that lets him level up without limit.",
     totalChapters: 270,
@@ -625,7 +625,7 @@ const novels = [
   },
   {
     title: "The Legendary Moonlight Sculptor",
-    titleChinese: "달빛조각사",
+    nativeTitle: "달빛조각사",
     author: "Nam Hee-sung",
     description: "Lee Hyun, drowning in debt, turns to the virtual reality game Royal Road to earn money. He becomes Weed, a sculptor-class player whose relentless grinding and scheming make him a legend.",
     totalChapters: 1788,
@@ -637,7 +637,7 @@ const novels = [
   },
   {
     title: "Overgeared",
-    titleChinese: "템빨",
+    nativeTitle: "템빨",
     author: "Park Saenal",
     description: "Shin Youngwoo, an unlucky laborer in the VR game Satisfy, stumbles upon the legacy of the legendary blacksmith Pagma. He rises from the bottom to become the strongest 'Overgeared' player.",
     totalChapters: 1840,
@@ -649,7 +649,7 @@ const novels = [
   },
   {
     title: "The Novel's Extra",
-    titleChinese: "소설 속 엑스트라",
+    nativeTitle: "소설 속 엑스트라",
     author: "Jee Gab Song",
     description: "Kim Hajin wakes up inside the world of the web novel he was writing, as a nameless extra. Using his knowledge of the plot, he navigates a story full of dangers he himself created.",
     totalChapters: 336,
@@ -661,7 +661,7 @@ const novels = [
   },
   {
     title: "Return of the Mount Hua Sect",
-    titleChinese: "화산귀환",
+    nativeTitle: "화산귀환",
     author: "Biga",
     description: "Chung Myung, the greatest swordsman of the now-fallen Mount Hua Sect, dies defeating the Heavenly Demon. He awakens a hundred years later in a child's body, determined to restore his sect to glory.",
     totalChapters: 2064,
@@ -673,7 +673,7 @@ const novels = [
   },
   {
     title: "SSS-Class Suicide Hunter",
-    titleChinese: "SSS급 자살헌터",
+    nativeTitle: "SSS급 자살헌터",
     author: "Shin Noah",
     description: "Kim Gongja gains the skill of a legendary hero, but its true power only unlocks when he dies. To grow stronger, he must repeatedly kill himself in increasingly creative ways.",
     totalChapters: 290,
@@ -685,7 +685,7 @@ const novels = [
   },
   {
     title: "Nano Machine",
-    titleChinese: "나노마신",
+    nativeTitle: "나노마신",
     author: "Han Joong Wol Ya",
     description: "Cheon Yeo-Woon, a lowly outcast in the Demonic Cult, is implanted with a nano machine from the future by a descendant. It transforms his body and sets him on a path to the peak of the martial world.",
     totalChapters: 529,
@@ -697,7 +697,7 @@ const novels = [
   },
   {
     title: "A Returner's Magic Should Be Special",
-    titleChinese: "회귀자의 마법은 특별해야 합니다",
+    nativeTitle: "회귀자의 마법은 특별해야 합니다",
     author: "Wahaha Pyon",
     description: "Desir Arman, one of the last survivors of a world consumed by the Shadow Labyrinth, is sent thirteen years into the past. He vows to prevent the catastrophe and save his comrades.",
     totalChapters: 312,
@@ -709,7 +709,7 @@ const novels = [
   },
   {
     title: "Everyone Else is a Returnee",
-    titleChinese: "나 빼고 다 귀환자",
+    nativeTitle: "나 빼고 다 귀환자",
     author: "Toika",
     description: "While thousands of people were whisked away to another world to train as returnees, Yu Ilhan was left behind on Earth alone for a thousand years. When the others return, he has secretly become the strongest of all.",
     totalChapters: 304,
@@ -721,7 +721,7 @@ const novels = [
   },
   {
     title: "The Greatest Estate Developer",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Lee Hyun-min",
     description: "Kim Suho, a hardcore civil engineering student, transmigrates into the body of Lloyd Frontera, a lazy noble drowning in debt. He uses modern engineering knowledge to develop his territory and dodge a doomed fate.",
     totalChapters: 250,
@@ -733,7 +733,7 @@ const novels = [
   },
   {
     title: "Damn Reincarnation",
-    titleChinese: "빌어먹을 환생",
+    nativeTitle: "빌어먹을 환생",
     author: "Mocheon-dang",
     description: "Hamel, a human warrior who died defeating the Demon King, reincarnates as Eugene, the descendant of his old comrade Vermouth. He sets out to finish what his former companions left undone.",
     totalChapters: 320,
@@ -745,7 +745,7 @@ const novels = [
   },
   {
     title: "The Tutorial Is Too Hard",
-    titleChinese: "튜토리얼이 너무 어렵다",
+    nativeTitle: "튜토리얼이 너무 어렵다",
     author: "Gandara",
     description: "An ordinary man is dragged into a brutal tutorial designed to test humanity's strongest. To survive its impossibly difficult trials, he must claw his way through with nothing but grit and cunning.",
     totalChapters: 250,
@@ -759,7 +759,7 @@ const novels = [
   // ============ JAPANESE (SYOSETU / LIGHT NOVEL) ============
   {
     title: "Mushoku Tensei: Jobless Reincarnation",
-    titleChinese: "無職転生",
+    nativeTitle: "無職転生",
     author: "Rifujin na Magonote",
     description: "A 34-year-old shut-in dies and is reborn as Rudeus Greyrat in a world of magic and swords. Determined not to waste his second life, he masters magic from infancy and grows into a powerful mage.",
     totalChapters: 286,
@@ -771,7 +771,7 @@ const novels = [
   },
   {
     title: "That Time I Got Reincarnated as a Slime",
-    titleChinese: "転生したらスライムだった件",
+    nativeTitle: "転生したらスライムだった件",
     author: "Fuse",
     description: "Satoru Mikami is stabbed to death and reincarnates in a fantasy world as a slime monster. Naming himself Rimuru Tempest, he builds a nation of monsters and befriends powerful beings along the way.",
     totalChapters: 247,
@@ -783,7 +783,7 @@ const novels = [
   },
   {
     title: "Re:Zero − Starting Life in Another World",
-    titleChinese: "Re:ゼロから始める異世界生活",
+    nativeTitle: "Re:ゼロから始める異世界生活",
     author: "Tappei Nagatsuki",
     description: "Subaru Natsuki is suddenly transported to a fantasy world, where he discovers his only power: 'Return by Death,' which rewinds time to a save point whenever he dies. He must endure death again and again to protect those he loves.",
     totalChapters: 700,
@@ -795,7 +795,7 @@ const novels = [
   },
   {
     title: "Overlord",
-    titleChinese: "オーバーロード",
+    nativeTitle: "オーバーロード",
     author: "Kugane Maruyama",
     description: "When the popular VR game Yggdrasil shuts down, the player Momonga remains trapped in the game as his skeletal overlord avatar, his NPC servants now sentient. He sets out to dominate the new world he finds himself in.",
     totalChapters: 105,
@@ -807,7 +807,7 @@ const novels = [
   },
   {
     title: "The Rising of the Shield Hero",
-    titleChinese: "盾の勇者の成り上がり",
+    nativeTitle: "盾の勇者の成り上がり",
     author: "Aneko Yusagi",
     description: "Naofumi Iwatani is summoned to another world as the Shield Hero, the weakest of four legendary heroes. Betrayed and branded a criminal on his first day, he grows cynical and strong as he fights to clear his name and protect the world.",
     totalChapters: 379,
@@ -819,7 +819,7 @@ const novels = [
   },
   {
     title: "KonoSuba: God's Blessing on This Wonderful World!",
-    titleChinese: "この素晴らしい世界に祝福を!",
+    nativeTitle: "この素晴らしい世界に祝福を!",
     author: "Natsume Akatsuki",
     description: "After a pathetic death, hikikomori Kazuma Satou is reincarnated in a fantasy world with the useless goddess Aqua. Together with an explosion-obsessed mage and a masochistic crusader, he stumbles through misadventures and debt.",
     totalChapters: 100,
@@ -831,7 +831,7 @@ const novels = [
   },
   {
     title: "Arifureta: From Commonplace to World's Strongest",
-    titleChinese: "ありふれた職業で世界最強",
+    nativeTitle: "ありふれた職業で世界最強",
     author: "Ryo Shirakome",
     description: "Hajime Nagumo, a bullied classmate summoned to another world as a lowly transmutation user, is betrayed and cast into an abyss. He claws his way back from the depths, transformed into a ruthless monster-slaying powerhouse.",
     totalChapters: 523,
@@ -843,7 +843,7 @@ const novels = [
   },
   {
     title: "So I'm a Spider, So What?",
-    titleChinese: "蜘蛛ですが、なにか?",
+    nativeTitle: "蜘蛛ですが、なにか?",
     author: "Okina Baba",
     description: "A high school girl is reincarnated as a lowly spider monster in a deadly dungeon. With sharp wit and sheer determination, she fights to survive, level up, and evolve in a world that wants her dead.",
     totalChapters: 681,
@@ -855,7 +855,7 @@ const novels = [
   },
   {
     title: "Ascendance of a Bookworm",
-    titleChinese: "本好きの下剋上",
+    nativeTitle: "本好きの下剋上",
     author: "Miya Kazuki",
     description: "Urano, a book-loving woman, dies and is reborn as Myne, a sickly child in a medieval world where books are scarce and literacy is rare. Unable to live without books, she resolves to make her own — no matter what it takes.",
     totalChapters: 677,
@@ -867,7 +867,7 @@ const novels = [
   },
   {
     title: "The Saga of Tanya the Evil",
-    titleChinese: "幼女戦記",
+    nativeTitle: "幼女戦記",
     author: "Carlo Zen",
     description: "A coldly rational salaryman is reincarnated as Tanya Degurechaff, a young girl in a war-torn world resembling WWI Europe. As a ruthless mage-soldier, she fights to climb the ranks and secure a safe life, defying the god who cursed her.",
     totalChapters: 100,
@@ -881,7 +881,7 @@ const novels = [
   // ============ ENGLISH / ROYAL ROAD / PROGRESSION FANTASY ============
   {
     title: "The Wandering Inn",
-    titleChinese: null,
+    nativeTitle: null,
     author: "pirateaba",
     description: "Erin Solstice, a young woman from Earth, finds herself stranded in a fantasy world and takes over an abandoned inn. With no combat 'class' to speak of, she survives on wit, courage, and the strange Levels and Skills this world grants.",
     totalChapters: 900,
@@ -893,7 +893,7 @@ const novels = [
   },
   {
     title: "He Who Fights with Monsters",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Shirtaloon",
     description: "Jason Asano is whisked from Earth into a fantasy world of magic, monsters, and adventurers. Sarcastic and out of his depth, he claws his way up as an adventurer with a dark, soul-based power set.",
     totalChapters: 700,
@@ -905,7 +905,7 @@ const novels = [
   },
   {
     title: "Mother of Learning",
-    titleChinese: null,
+    nativeTitle: null,
     author: "nobody103",
     description: "Zorian, a mage-in-training, finds himself trapped in a month-long time loop. To escape it and uncover who is behind it, he must master magic far beyond his years across countless repetitions of the same four weeks.",
     totalChapters: 107,
@@ -917,7 +917,7 @@ const novels = [
   },
   {
     title: "The Primal Hunter",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Zogarth",
     description: "When the world is suddenly integrated into a vast multiversal System, Jake Thayne — an ordinary office worker — discovers a talent for the hunt. He embraces the apocalypse, leveling up as an archer in a deadly new reality.",
     totalChapters: 900,
@@ -929,7 +929,7 @@ const novels = [
   },
   {
     title: "Defiance of the Fall",
-    titleChinese: null,
+    nativeTitle: null,
     author: "TheFirstDefier",
     description: "When cataclysmic blue boxes herald Earth's integration into a brutal cosmic System, Zac fights to survive the apocalypse. Wielding an axe and a mysterious dao, he carves a path through a universe where the strong devour the weak.",
     totalChapters: 1000,
@@ -941,7 +941,7 @@ const novels = [
   },
   {
     title: "Beware of Chicken",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Casualfarmer",
     description: "Jin Rou expects to be reborn into a grand cultivation world as a powerful hero. Instead, he ditches the murderous sect life entirely to become a farmer — accidentally turning his livestock and crops into spiritual powerhouses.",
     totalChapters: 600,
@@ -953,7 +953,7 @@ const novels = [
   },
   {
     title: "Dungeon Crawler Carl",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Matt Dinniman",
     description: "After an alien corporation demolishes most of humanity, Earth becomes a deadly game-show dungeon. Carl and his ex-girlfriend's pampered cat, Princess Donut, must descend through its lethal floors for the entertainment of the galaxy.",
     totalChapters: 700,
@@ -965,7 +965,7 @@ const novels = [
   },
   {
     title: "Cradle",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Will Wight",
     description: "Lindon is born 'Unsouled,' powerless in a world where everyone wields sacred arts. After learning his homeland is doomed, he sets out to grow strong enough to defy fate itself, climbing the ranks of cultivation one realm at a time.",
     totalChapters: null,
@@ -977,7 +977,7 @@ const novels = [
   },
   {
     title: "Delve",
-    titleChinese: null,
+    nativeTitle: null,
     author: "SenescentSoul",
     description: "Rain, an ordinary man, is transported into a world governed by a precise, mathematical leveling System. A self-described min-maxer, he obsessively optimizes his growth as a Wood-affinity mage while uncovering the world's deeper mysteries.",
     totalChapters: 130,
@@ -989,7 +989,7 @@ const novels = [
   },
   {
     title: "Super Supportive",
-    titleChinese: null,
+    nativeTitle: null,
     author: "Sleyca",
     description: "In a world of superpowered 'Supers,' an ordinary teenager named Alden gains a strange, support-oriented power. He enrolls at a prestigious hero academy, navigating friendship, growth, and a system far stranger than it first appears.",
     totalChapters: 180,
@@ -1003,7 +1003,7 @@ const novels = [
   // ============ MORE POPULAR CHINESE ============
   {
     title: "The King's Avatar",
-    titleChinese: "全职高手",
+    nativeTitle: "全职高手",
     author: "Butterfly Blue",
     description: "Ye Xiu, a top-tier pro gamer of the virtual game Glory, is forced into retirement and out of his team. Starting over as a low-level player, he sets out to climb back to the summit of professional esports.",
     totalChapters: 1728,
@@ -1015,7 +1015,7 @@ const novels = [
   },
   {
     title: "Martial God Asura",
-    titleChinese: "修罗武神",
+    nativeTitle: "修罗武神",
     author: "Kindhearted Bee",
     description: "Chu Feng, a young man from the Azure Dragon School, possesses a mysterious power that lets him grow at an unrivaled pace. Hot-blooded and unyielding, he rises through a cruel martial world where only the strong survive.",
     totalChapters: 5061,
@@ -1027,7 +1027,7 @@ const novels = [
   },
   {
     title: "Tales of Herding Gods",
-    titleChinese: "牧神记",
+    nativeTitle: "牧神记",
     author: "Pig Nerd Ginseng Fruit",
     description: "Qin Mu is raised by a village of disabled outcasts on the edge of a haunted land. As he grows, he uncovers his mysterious origins and a world steeped in ancient gods, devils, and forgotten history.",
     totalChapters: 1207,
@@ -1039,7 +1039,7 @@ const novels = [
   },
   {
     title: "Versatile Mage",
-    titleChinese: "全职法师",
+    nativeTitle: "全职法师",
     author: "Chaos",
     description: "Mo Fan wakes up in a parallel world where magic has replaced science and humanity battles monstrous beasts. Born poor, he discovers he can wield multiple elements in a world where mages specialize in only one.",
     totalChapters: 3000,
@@ -1051,7 +1051,7 @@ const novels = [
   },
   {
     title: "Joy of Life",
-    titleChinese: "庆余年",
+    nativeTitle: "庆余年",
     author: "Mao Ni",
     description: "Fan Xian, a boy harboring the memories of a modern man, grows up amid the deadly intrigues of a powerful empire. Armed with wit and hidden martial skill, he navigates court politics, conspiracies, and a mystery tied to his own origins.",
     totalChapters: 746,
@@ -1063,7 +1063,7 @@ const novels = [
   },
   {
     title: "Way of Choices",
-    titleChinese: "择天记",
+    nativeTitle: "择天记",
     author: "Mao Ni",
     description: "Chen Changsheng, born under a fated star of early death, leaves his mountain home to defy his destiny in the imperial capital. In a world ruled by the Dao and the Heavens, he refuses to accept the fate written for him.",
     totalChapters: 1102,
@@ -1075,7 +1075,7 @@ const novels = [
   },
   {
     title: "Heaven Official's Blessing",
-    titleChinese: "天官赐福",
+    nativeTitle: "天官赐福",
     author: "Mo Xiang Tong Xiu",
     description: "Xie Lian, a once-beloved crown prince ascended to godhood, is cast down and ridiculed for centuries before ascending a third time. On a routine mission, he meets a mysterious ghost king whose fate is bound to his own.",
     totalChapters: 252,
@@ -1087,7 +1087,7 @@ const novels = [
   },
   {
     title: "The Grandmaster of Demonic Cultivation",
-    titleChinese: "魔道祖师",
+    nativeTitle: "魔道祖师",
     author: "Mo Xiang Tong Xiu",
     description: "Wei Wuxian, the notorious founder of demonic cultivation, dies in disgrace only to be summoned back into the body of a madman years later. He unravels old mysteries alongside the righteous cultivator Lan Wangji.",
     totalChapters: 126,

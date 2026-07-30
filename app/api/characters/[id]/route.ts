@@ -24,7 +24,7 @@ export async function GET(
           select: {
             id: true,
             title: true,
-            titleChinese: true,
+            nativeTitle: true,
             coverImageUrl: true,
             authorId: true,
             author: true,

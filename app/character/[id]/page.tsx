@@ -49,7 +49,7 @@ export default async function CharacterPage({
         select: {
           id: true,
           title: true,
-          titleChinese: true,
+          nativeTitle: true,
           coverImageUrl: true,
           authorId: true,
           author: true,
@@ -164,8 +164,8 @@ export default async function CharacterPage({
               </div>
               <div>
                 <p className="font-semibold group-hover:text-gold-bright transition">{character.novel.title}</p>
-                {character.novel.titleChinese && (
-                  <p className="font-cjk text-sm text-muted">{character.novel.titleChinese}</p>
+                {character.novel.nativeTitle && (
+                  <p className="font-cjk text-sm text-muted">{character.novel.nativeTitle}</p>
                 )}
                 {character.novel.author && (
                   <p className="text-xs text-faint mt-0.5">{character.novel.author}</p>

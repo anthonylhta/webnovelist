@@ -44,7 +44,7 @@ export default async function AuthorPage({
         select: {
           id: true,
           title: true,
-          titleChinese: true,
+          nativeTitle: true,
           coverImageUrl: true,
           status: true,
           genres: true,

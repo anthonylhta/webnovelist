@@ -16,7 +16,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 interface NovelData {
   id: number;
   title: string;
-  titleChinese: string | null;
+  nativeTitle: string | null;
   author: string | null;
   coverImageUrl: string | null;
   status: string | null;

@@ -32,7 +32,7 @@ export default async function BrowsePage({
         ? {
             OR: [
               { title: { contains: search, mode: "insensitive" as const } },
-              { titleChinese: { contains: search, mode: "insensitive" as const } },
+              { nativeTitle: { contains: search, mode: "insensitive" as const } },
               { author: { contains: search, mode: "insensitive" as const } },
             ],
           }
@@ -169,7 +169,7 @@ export default async function BrowsePage({
               key={novel.id}
               id={novel.id}
               title={novel.title}
-              titleChinese={novel.titleChinese}
+              nativeTitle={novel.nativeTitle}
               coverImageUrl={novel.coverImageUrl}
               bordered
               priority={i < 4}

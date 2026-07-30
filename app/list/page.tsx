@@ -32,7 +32,7 @@ type ListEntry = {
   novel: {
     id: number;
     title: string;
-    titleChinese: string | null;
+    nativeTitle: string | null;
     author: string | null;
     coverImageUrl: string | null;
     totalChapters: number | null;
@@ -272,9 +272,9 @@ export default function ListPage() {
                         className="hover:text-gold-bright transition min-w-0"
                       >
                         <div className="font-medium truncate">{entry.novel.title}</div>
-                        {entry.novel.titleChinese && (
+                        {entry.novel.nativeTitle && (
                           <div className="font-cjk text-muted text-sm truncate">
-                            {entry.novel.titleChinese}
+                            {entry.novel.nativeTitle}
                           </div>
                         )}
                       </Link>

@@ -49,7 +49,7 @@ export const adminUser = {
 export const novelFixture = {
   id: 1,
   title: "Test Novel",
-  titleChinese: null,
+  nativeTitle: null,
   author: "Test Author",
   description: "A great story",
   coverImageUrl: null,
