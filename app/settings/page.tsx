@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
-import { Settings, User, Clock, AlertCircle, CheckCircle, Crown, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Settings, User, Clock, AlertCircle, CheckCircle, Crown, ShieldCheck, Download } from "lucide-react";
 
 interface UserSettings {
   id: string;
@@ -200,6 +201,23 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Import from AniList — admins/mods only (it creates catalog entries) */}
+      {(currentUser?.role === "admin" || currentUser?.role === "moderator") && (
+        <div className="bg-surface border border-hairline rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2 font-serif text-paper">Import from AniList</h2>
+          <p className="text-sm text-muted mb-4">
+            Pull your manga, manhwa, and light novel list from AniList into your reading list.
+          </p>
+          <Link
+            href="/settings/import"
+            className="inline-flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-4 py-2 rounded-lg font-semibold transition text-sm"
+          >
+            <Download className="w-4 h-4" />
+            Open Importer
+          </Link>
+        </div>
+      )}
 
       {/* Change Username */}
       <div className="bg-surface border border-hairline rounded-xl p-6">

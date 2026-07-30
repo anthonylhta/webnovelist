@@ -46,6 +46,7 @@ describe("safeImageSrc", () => {
 
   it("keeps the allowed-host list in sync with what render code expects", () => {
     expect(ALLOWED_IMAGE_HOSTS).toContain("res.cloudinary.com");
+    expect(ALLOWED_IMAGE_HOSTS).toContain("s4.anilist.co");
     expect(ALLOWED_IMAGE_HOSTS).toContain("img.clerk.com");
   });
 });
