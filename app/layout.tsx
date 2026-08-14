@@ -5,6 +5,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ChromeGate from "@/components/ChromeGate";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { getCurrentUser } from "@/lib/current-user";
 import { Analytics } from "@vercel/analytics/next";
@@ -73,11 +74,17 @@ export default async function RootLayout({
       >
         <body className="text-body min-h-screen flex flex-col font-sans antialiased">
           <CurrentUserProvider value={currentUser}>
-            <Navbar />
+            {/* Folio sheet pages carry their own chrome — the gate keeps the
+                classic Navbar/Footer off them. */}
+            <ChromeGate>
+              <Navbar />
+            </ChromeGate>
             <main className="max-w-7xl mx-auto px-4 py-8 flex-1">
               {children}
             </main>
-            <Footer />
+            <ChromeGate>
+              <Footer />
+            </ChromeGate>
           </CurrentUserProvider>
 
           {/* Vercel Monitoring */}

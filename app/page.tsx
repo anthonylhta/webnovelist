@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
 import NovelCard from "@/components/NovelCard";
+import { buildWeekDigest, folioLine, streakDays, weekStart } from "@/lib/folio";
 
 // Genre breakdown + novel count is a full-table scan; it changes rarely, so cache
 // it for an hour rather than re-scanning on every home-page request.
@@ -34,7 +35,12 @@ export default async function Home() {
   const currentUser = await getCurrentUser();
 
   if (currentUser) {
-    const [readingEntries, recentNovels] = await Promise.all([
+    const now = new Date();
+    const since = new Date(now);
+    since.setDate(since.getDate() - 90);
+
+    // One 90-day activity query feeds both the week digest and the streak.
+    const [readingEntries, activities, finishedThisYear] = await Promise.all([
       prisma.userNovelList.findMany({
         where: { userId: currentUser.id, status: "reading" },
         include: {
@@ -43,7 +49,6 @@ export default async function Home() {
               id: true,
               title: true,
               nativeTitle: true,
-              coverImageUrl: true,
               totalChapters: true,
               author: true,
             },
@@ -52,22 +57,52 @@ export default async function Home() {
         orderBy: { updatedAt: "desc" },
         take: 6,
       }),
-      prisma.novel.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 10,
-        select: { id: true, title: true, nativeTitle: true, author: true, coverImageUrl: true },
+      prisma.activity.findMany({
+        where: { userId: currentUser.id, createdAt: { gte: since } },
+        select: { type: true, novelId: true, detail: true, createdAt: true },
+      }),
+      prisma.userNovelList.count({
+        where: {
+          userId: currentUser.id,
+          status: "completed",
+          dateFinished: { gte: new Date(now.getFullYear(), 0, 1) },
+        },
       }),
     ]);
 
+    const digestIds = [
+      ...new Set(
+        activities
+          .map((a) => a.novelId)
+          .filter((id): id is number => id !== null)
+      ),
+    ];
+    const digestNovels = digestIds.length
+      ? await prisma.novel.findMany({
+          where: { id: { in: digestIds } },
+          select: { id: true, title: true },
+        })
+      : [];
+    const titleOf = Object.fromEntries(digestNovels.map((n) => [n.id, n.title]));
+
+    const statusDate = now
+      .toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+      .toLowerCase()
+      .replace(",", "");
+
     return (
       <LoggedInHome
-        userName={currentUser.username || "Reader"}
+        folio={folioLine(currentUser.createdAt, now)}
+        statusDate={statusDate}
+        digest={buildWeekDigest(activities, titleOf, weekStart(now))}
+        streak={streakDays(activities.map((a) => a.createdAt), now)}
+        finishedThisYear={finishedThisYear}
         initialReading={readingEntries.map((e) => ({
           id: e.id,
           currentChapter: e.currentChapter,
+          updatedAt: e.updatedAt.toISOString(),
           novel: e.novel,
         }))}
-        recentNovels={recentNovels}
       />
     );
   }
