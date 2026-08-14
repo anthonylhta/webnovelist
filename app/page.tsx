@@ -3,12 +3,9 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
 import Link from "next/link";
-import {
-  BookOpen, TrendingUp,
-  ChevronRight, Search, Users,
-} from "lucide-react";
 import LoggedInHome from "./LoggedInHome";
-import NovelCard from "@/components/NovelCard";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 import { buildWeekDigest, folioLine, streakDays, weekStart } from "@/lib/folio";
 
 // Genre breakdown + novel count is a full-table scan; it changes rarely, so cache
@@ -107,223 +104,176 @@ export default async function Home() {
     );
   }
 
-  const [trendingNovels, recentNovels, genreStats, userCount, entryCount] =
-    await Promise.all([
-      prisma.novel.findMany({
-        include: {
-          _count: { select: { userEntries: true } },
-        },
-        orderBy: { userEntries: { _count: "desc" } },
-        take: 10,
-      }),
-      prisma.novel.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 10,
-      }),
-      getGenreStats(),
-      prisma.user.count(),
-      prisma.userNovelList.count(),
-    ]);
+  const [trendingNovels, genreStats, userCount, entryCount] = await Promise.all([
+    prisma.novel.findMany({
+      select: {
+        id: true,
+        title: true,
+        nativeTitle: true,
+        _count: { select: { userEntries: true } },
+      },
+      orderBy: { userEntries: { _count: "desc" } },
+      take: 5,
+    }),
+    getGenreStats(),
+    prisma.user.count(),
+    prisma.userNovelList.count(),
+  ]);
 
   const { topGenres, totalNovels } = genreStats;
 
   return (
-    <div className="-mt-8 -mx-4">
-      {/* Hero Section */}
-      <section className="relative px-4 pt-16 sm:pt-24 pb-16 sm:pb-20 flex flex-col items-center text-center">
-        <div className="relative z-10 w-full max-w-2xl mx-auto">
-          <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-gold-dim mb-5">
-            Webnovels · Manga · Manhwa · Light Novels
-          </p>
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-semibold text-paper mb-4">
-            WebNovelist
-          </h1>
-          <div className="rule-gold w-24 mx-auto mb-6" />
-          <p className="text-base sm:text-lg text-muted mb-8 max-w-md mx-auto px-4">
-            Log every chapter, rate what you read, and build a library worth
-            showing off. Never lose your place again.
-          </p>
+    <FolioSheet
+      statusLeft="webnovelist"
+      statusRight={`${totalNovels} titles · ${userCount} readers`}
+      footer="ink & gold · a reading ledger"
+    >
+      {/* Masthead */}
+      <div className="border-b border-hairline px-4 pb-6 pt-8 text-center">
+        <h1 className="font-serif text-4xl font-semibold text-paper">
+          Web<span className="text-gold">Novelist</span>
+        </h1>
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-faint">
+          A reading ledger · webnovels · manga · manhwa · light novels
+        </p>
+      </div>
 
-          {/* Search Bar */}
-          <form action="/browse" className="w-full max-w-lg mx-auto mb-6 px-4">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-faint" />
-              <input
-                type="text"
-                name="search"
-                placeholder="Search for a title…"
-                className="w-full bg-surface/80 border border-hairline rounded-lg pl-12 pr-4 py-3 sm:py-4
-                           text-paper placeholder-faint focus:outline-none focus:border-gold-dim
-                           backdrop-blur-sm text-base"
-              />
-            </div>
-          </form>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center px-4">
-            <Link
-              href="/sign-up"
-              className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-md font-medium transition text-center"
-            >
-              Sign Up Free
-            </Link>
-            <Link
-              href="/browse"
-              className="border border-hairline text-body hover:border-gold-dim hover:text-gold px-6 py-3 rounded-md font-medium transition text-center"
-            >
-              Browse Library
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Trending Novels */}
-      {trendingNovels.length > 0 && (
-        <section className="px-4 mb-12 sm:mb-16">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-5 sm:mb-6">
-              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-paper flex items-center gap-2.5">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
-                Trending
-              </h2>
-              <Link
-                href="/browse"
-                className="text-muted hover:text-gold transition text-sm flex items-center gap-1"
-              >
-                See All <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-              {trendingNovels.map((novel, i) => (
-                <NovelCard
-                  key={novel.id}
-                  id={novel.id}
-                  title={novel.title}
-                  nativeTitle={novel.nativeTitle}
-                  coverImageUrl={novel.coverImageUrl}
-                  priority={i === 0}
-                  footer={
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <Users className="w-3 h-3 text-faint" />
-                      <span className="text-xs text-faint">
-                        {novel._count.userEntries} tracking
-                      </span>
-                    </div>
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Recently Added */}
-      {recentNovels.length > 0 && (
-        <section className="px-4 mb-12 sm:mb-16">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-5 sm:mb-6">
-              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-paper flex items-center gap-2.5">
-                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
-                Recently Added
-              </h2>
-              <Link
-                href="/browse"
-                className="text-muted hover:text-gold transition text-sm flex items-center gap-1"
-              >
-                See All <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-              {recentNovels.map((novel) => (
-                <NovelCard
-                  key={novel.id}
-                  id={novel.id}
-                  title={novel.title}
-                  nativeTitle={novel.nativeTitle}
-                  coverImageUrl={novel.coverImageUrl}
-                  footer={<p className="text-xs text-faint truncate">{novel.author}</p>}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Browse by Genre */}
-      {topGenres.length > 0 && (
-        <section className="px-4 mb-12 sm:mb-16">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-paper mb-5 sm:mb-6">
-              Browse by Genre
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-              {topGenres.map(([genre, count]) => (
-                <Link
-                  key={genre}
-                  href={`/browse?genre=${genre}`}
-                  className="bg-surface border border-hairline rounded-lg p-3 sm:p-4
-                             hover:border-gold-dim hover:bg-elevated transition group"
-                >
-                  <div className="font-serif text-base sm:text-lg text-body group-hover:text-gold transition">
-                    {genre}
-                  </div>
-                  <div className="text-xs sm:text-sm text-faint mt-0.5">
-                    {count} novel{count !== 1 ? "s" : ""}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Site Stats */}
-      <section className="px-4 mb-12 sm:mb-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-surface border border-hairline rounded-lg p-6 sm:p-8">
-            <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center divide-x divide-hairline">
-              <div>
-                <div className="font-serif text-3xl sm:text-4xl font-semibold text-gold">
-                  {totalNovels}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-faint mt-1.5">Novels</div>
-              </div>
-              <div>
-                <div className="font-serif text-3xl sm:text-4xl font-semibold text-gold">
-                  {userCount}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-faint mt-1.5">Readers</div>
-              </div>
-              <div>
-                <div className="font-serif text-3xl sm:text-4xl font-semibold text-gold">
-                  {entryCount.toLocaleString()}
-                </div>
-                <div className="text-xs sm:text-sm uppercase tracking-wider text-faint mt-1.5">Tracked</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="px-4 mb-8">
-        <div className="max-w-7xl mx-auto text-center py-8 sm:py-12">
-          <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-paper mb-3">
-            Ready to start tracking?
-          </h2>
-          <p className="text-muted mb-7 text-sm sm:text-base">
-            Join the community and keep track of every chapter.
-          </p>
+      {/* Pitch */}
+      <div className="border-b border-hairline px-4 py-5 text-center">
+        <p className="mx-auto max-w-md font-serif text-[15px] leading-relaxed text-body">
+          Log every chapter, rate what you read, and build a library worth
+          showing off. Never lose your place again.
+        </p>
+        <p className="mt-4 flex items-center justify-center gap-5 font-mono text-[12px]">
           <Link
             href="/sign-up"
-            className="inline-block bg-gold text-ink hover:bg-gold-bright px-7 sm:px-8 py-3 sm:py-4 rounded-md
-                       font-medium text-base sm:text-lg transition"
+            className="text-gold transition hover:text-gold-bright"
           >
-            Create Free Account
+            [create account]
           </Link>
+          <Link
+            href="/browse"
+            className="text-muted transition hover:text-gold"
+          >
+            [browse the catalog]
+          </Link>
+        </p>
+      </div>
+
+      {/* Search */}
+      <form action="/browse" className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
+        <span aria-hidden className="font-mono text-[11px] text-gold-dim">
+          /
+        </span>
+        <input
+          type="text"
+          name="search"
+          placeholder="search the catalog — title, author…"
+          className="w-full bg-transparent font-mono text-[12px] text-paper placeholder-faint focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="shrink-0 font-mono text-[11px] text-gold transition hover:text-gold-bright"
+        >
+          [search]
+        </button>
+      </form>
+
+      {/* Most tracked */}
+      {trendingNovels.length > 0 && (
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel
+            right={
+              <Link
+                href="/browse"
+                className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+              >
+                [catalog]
+              </Link>
+            }
+          >
+            Most tracked
+          </FolioLabel>
+          <div className="divide-y divide-hairline">
+            {trendingNovels.map((novel) => (
+              <div key={novel.id} className="flex items-baseline gap-2.5 py-2 first:pt-0.5 last:pb-0.5">
+                <Link
+                  href={`/novel/${novel.id}`}
+                  className="min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                >
+                  {novel.title}
+                </Link>
+                {novel.nativeTitle && (
+                  <span className="hidden min-w-0 shrink truncate font-cjk text-[11px] text-faint sm:inline">
+                    {novel.nativeTitle}
+                  </span>
+                )}
+                <span aria-hidden className="leader-dots flex-1" />
+                <span className="shrink-0 font-mono text-[10.5px] text-gold tabular-nums">
+                  {novel._count.userEntries} tracking
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
-    </div>
+      )}
+
+      {/* Genres */}
+      {topGenres.length > 0 && (
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel>Browse by genre</FolioLabel>
+          <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10.5px]">
+            {topGenres.map(([genre, count]) => (
+              <Link
+                key={genre}
+                href={`/browse?genre=${encodeURIComponent(genre)}`}
+                className="text-faint transition hover:text-gold"
+              >
+                {genre.toLowerCase()}
+                <span className="text-faint/60"> · {count}</span>
+              </Link>
+            ))}
+          </p>
+        </div>
+      )}
+
+      {/* Site totals */}
+      <div className="grid grid-cols-3 divide-x divide-hairline border-b border-hairline">
+        {[
+          { label: "titles", value: totalNovels.toLocaleString() },
+          { label: "readers", value: userCount.toLocaleString() },
+          { label: "entries tracked", value: entryCount.toLocaleString() },
+        ].map((cell) => (
+          <div key={cell.label} className="px-4 py-3 text-center">
+            <p className="font-mono text-base text-paper tabular-nums">{cell.value}</p>
+            <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+              {cell.label}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Contact */}
+      <div className="flex items-center justify-center gap-5 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
+        <a
+          href="https://github.com/anthonylhta"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted transition hover:text-gold"
+        >
+          github/
+        </a>
+        <a
+          href="https://discord.com/users/362585609610461185"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-muted transition hover:text-gold"
+        >
+          discord/
+        </a>
+      </div>
+
+      <FolioNav />
+    </FolioSheet>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { AlertTriangle, RotateCcw } from "lucide-react";
 
+// Replaces the root layout when it crashes — no providers, fonts, or global
+// CSS are guaranteed here, so everything stays inline and self-contained.
 export default function GlobalError({
   error,
   reset,
@@ -16,17 +17,52 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <body className="bg-ink text-body min-h-screen flex items-center justify-center">
-        <div className="text-center px-4">
-          <AlertTriangle className="w-12 h-12 text-seal-bright mb-4 mx-auto" />
-          <h2 className="text-2xl font-serif font-bold text-paper mb-2">Something went wrong</h2>
-          <p className="text-muted mb-8">A critical error occurred. Please try again.</p>
+      <body
+        style={{
+          background: "#0d0d0b",
+          color: "#c7c1b8",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "Georgia, serif",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            padding: "2rem",
+            border: "1px solid #2a2519",
+            maxWidth: "24rem",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "Consolas, monospace",
+              fontSize: "10px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "#d9543f",
+            }}
+          >
+            something went wrong
+          </p>
+          <p style={{ marginTop: "1rem", fontSize: "15px", lineHeight: 1.6 }}>
+            A critical error occurred. Please try again.
+          </p>
           <button
             onClick={reset}
-            className="flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-5 py-2.5 rounded-lg transition font-medium mx-auto"
+            style={{
+              marginTop: "1.5rem",
+              fontFamily: "Consolas, monospace",
+              fontSize: "12px",
+              color: "#c9a84c",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
-            <RotateCcw className="w-4 h-4" />
-            Try again
+            [try again]
           </button>
         </div>
       </body>
