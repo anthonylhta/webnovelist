@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucide-react";
 
 interface FavoriteCharacterButtonProps {
   characterId: number;
@@ -45,19 +44,14 @@ export default function FavoriteCharacterButton({
       <button
         onClick={toggle}
         disabled={loading}
-        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition border
-          ${
-            favorited
-              ? "bg-seal/20 hover:bg-seal/30 text-seal border-seal/40"
-              : "bg-elevated hover:bg-hairline text-muted hover:text-gold border-hairline"
-          }
-          ${loading ? "opacity-50 cursor-not-allowed" : ""}
-        `}
+        title={favorited ? "Remove from favourites" : "Add to favourites"}
+        className={`font-mono text-[11px] transition disabled:opacity-50 ${
+          favorited ? "text-seal hover:text-seal-bright" : "text-muted hover:text-seal-bright"
+        }`}
       >
-        <Heart className={`w-4 h-4 ${favorited ? "fill-seal" : ""}`} />
-        {favorited ? "Favourited" : "Add to Favourites"}
+        {favorited ? "[♥ favourited]" : "[♡ favourite]"}
       </button>
-      {error && <p className="text-seal-bright text-xs mt-1">{error}</p>}
+      {error && <p className="mt-1 font-mono text-[10px] text-seal-bright">{error}</p>}
     </div>
   );
 }

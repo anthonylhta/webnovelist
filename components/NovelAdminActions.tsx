@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import ConfirmModal from "./ConfirmModal";
 
@@ -52,26 +51,22 @@ export default function NovelAdminActions({
 
   return (
     <>
-      <div className="flex gap-2">
-        {/* Edit Button */}
+      <div className="flex items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
+        <span className="text-[9.5px] uppercase tracking-[0.2em] text-faint">
+          curation
+        </span>
         <Link
           href={`/novel/${novelId}/edit`}
-          className="flex-1 flex items-center justify-center gap-2 bg-elevated hover:bg-hairline
-                     text-body font-semibold py-2.5 rounded-lg transition text-sm"
+          className="text-muted transition hover:text-gold"
         >
-          <Pencil className="w-4 h-4" />
-          Edit
+          [edit entry]
         </Link>
-
-        {/* Delete Button — Admin Only */}
         {canDelete && (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center justify-center gap-2 bg-seal/20 hover:bg-seal/30
-                       text-seal-bright font-semibold py-2.5 px-4 rounded-lg transition text-sm
-                       border border-seal/40"
+            className="text-muted transition hover:text-seal-bright"
           >
-            <Trash2 className="w-4 h-4" />
+            [delete]
           </button>
         )}
       </div>

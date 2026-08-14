@@ -2,10 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { User, BookOpen, Heart, Layers } from "lucide-react";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import FavoriteAuthorButton from "@/components/FavoriteAuthorButton";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 import { safeImageSrc } from "@/lib/image-hosts";
 
 const PLACEHOLDER = "/default-cover.svg";
@@ -67,135 +68,90 @@ export default async function AuthorPage({
 
   const avatarUrl = author.imageUrl || AVATAR_PLACEHOLDER;
 
-  const STATUS_STYLES: Record<string, string> = {
-    Ongoing: "bg-gold/10 text-gold border-gold/30",
-    Completed: "bg-jade/10 text-jade border-jade/30",
-    Hiatus: "bg-elevated text-muted border-hairline",
-  };
-
   return (
-    <div className="-mt-8 -mx-4">
-      {/* Blurred hero using author image */}
-      <div className="relative h-48 sm:h-60 overflow-hidden">
-        <Image
-          src={avatarUrl}
-          alt=""
-          fill
-          sizes="100vw"
-          priority
-          className="object-cover scale-110 blur-2xl opacity-30"
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent" />
-      </div>
-
-      {/* Content — pulled up to overlap hero */}
-      <div className="relative -mt-28 sm:-mt-36 px-4 sm:px-6 pb-16">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-center sm:items-end">
-
-            {/* Avatar */}
-            <div className="shrink-0">
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-ink shadow-2xl ring-1 ring-white/10 bg-elevated">
-                <Image
-                  src={avatarUrl}
-                  alt={author.name}
-                  fill
-                  sizes="144px"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-
-            {/* Name + meta */}
-            <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
-              <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                <User className="w-4 h-4 text-faint" />
-                <span className="text-xs text-faint uppercase tracking-widest">Author</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-bold font-serif text-paper">{author.name}</h1>
-              <div className="flex items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-faint">
-                <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  {author.novels.length} novel{author.novels.length !== 1 ? "s" : ""}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Heart className="w-3.5 h-3.5" />
-                  {author._count.favorites} favourite{author._count.favorites !== 1 ? "s" : ""}
-                </span>
-              </div>
-            </div>
-
-            {/* Favourite button */}
-            {me && (
-              <div className="shrink-0">
-                <FavoriteAuthorButton authorId={authorId} initialFavorited={isFavorited} />
-              </div>
-            )}
-          </div>
-
-          {/* Bio */}
-          {author.bio && (
-            <div className="mt-8 max-w-3xl">
-              <h2 className="text-xs font-semibold text-faint uppercase tracking-widest mb-3">
-                About
-              </h2>
-              <p className="text-body leading-relaxed whitespace-pre-line text-[15px]">
-                {author.bio}
-              </p>
-            </div>
-          )}
-
-          {/* Novels */}
-          <div className="mt-10">
-            <h2 className="text-xl font-bold mb-5 font-serif text-paper">Novels</h2>
-            {author.novels.length === 0 ? (
-              <p className="text-faint text-sm">No novels linked to this author yet.</p>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {author.novels.map((novel) => {
-                  const statusStyle =
-                    STATUS_STYLES[novel.status ?? ""] ??
-                    "bg-elevated text-muted border-hairline";
-                  return (
-                    <Link
-                      key={novel.id}
-                      href={`/novel/${novel.id}`}
-                      className="group flex flex-col"
-                    >
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden border border-hairline group-hover:border-gold/50 transition">
-                        <Image
-                          fill
-                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
-                          src={safeImageSrc(novel.coverImageUrl, PLACEHOLDER)}
-                          alt={novel.title}
-                          className="object-cover"
-                        />
-                        {novel.status && (
-                          <span
-                            className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[10px] font-medium rounded border ${statusStyle}`}
-                          >
-                            {novel.status}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted mt-2 line-clamp-2 group-hover:text-paper transition leading-snug">
-                        {novel.title}
-                      </p>
-                      {novel.totalChapters && (
-                        <p className="text-[10px] text-faint mt-0.5 flex items-center gap-1">
-                          <Layers className="w-2.5 h-2.5" />
-                          {novel.totalChapters.toLocaleString()} ch
-                        </p>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+    <FolioSheet
+      statusLeft="webnovelist · authors"
+      statusRight={`${author.novels.length} work${author.novels.length !== 1 ? "s" : ""}`}
+      footer="ink & gold"
+    >
+      {/* Nameplate */}
+      <div className="flex items-center gap-5 border-b border-hairline px-4 py-6">
+        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-hairline bg-elevated">
+          <Image src={avatarUrl} alt={author.name} fill sizes="64px" priority className="object-cover" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-gold-dim">
+            Author
+          </p>
+          <h1 className="mt-1 font-serif text-2xl font-semibold text-paper sm:text-[26px]">
+            {author.name}
+          </h1>
+          <p className="mt-1.5 font-mono text-[10px] text-faint tabular-nums">
+            {author.novels.length} work{author.novels.length !== 1 ? "s" : ""} ·{" "}
+            {author._count.favorites} favourite{author._count.favorites !== 1 ? "s" : ""}
+          </p>
         </div>
+        {me && (
+          <FavoriteAuthorButton authorId={authorId} initialFavorited={isFavorited} />
+        )}
       </div>
-    </div>
+
+      {/* Bio */}
+      {author.bio && (
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel>About</FolioLabel>
+          <p className="whitespace-pre-line font-serif text-[14.5px] leading-relaxed text-body">
+            {author.bio}
+          </p>
+        </div>
+      )}
+
+      {/* Works */}
+      <div className="border-b border-hairline px-4 pt-4 pb-1.5">
+        <FolioLabel right={String(author.novels.length)}>Works</FolioLabel>
+        {author.novels.length === 0 ? (
+          <p className="pb-3 font-serif text-[14.5px] text-muted">
+            Nothing linked to this author yet.
+          </p>
+        ) : (
+          <div className="divide-y divide-hairline">
+            {author.novels.map((novel) => (
+              <div key={novel.id} className="flex items-center gap-3 py-2.5">
+                <Link href={`/novel/${novel.id}`} className="shrink-0">
+                  <Image
+                    src={safeImageSrc(novel.coverImageUrl, PLACEHOLDER)}
+                    alt={novel.title}
+                    width={32}
+                    height={44}
+                    className="rounded-[2px] object-cover ring-1 ring-hairline"
+                  />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/novel/${novel.id}`}
+                    className="block min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                  >
+                    {novel.title}
+                  </Link>
+                  {novel.nativeTitle && (
+                    <p className="truncate font-cjk text-[11px] text-faint">
+                      {novel.nativeTitle}
+                    </p>
+                  )}
+                </div>
+                <span className="w-16 shrink-0 text-right font-mono text-[10.5px] text-body tabular-nums">
+                  {novel.totalChapters ? `${novel.totalChapters.toLocaleString()} ch` : "—"}
+                </span>
+                <span className="hidden w-16 shrink-0 text-right font-mono text-[9.5px] text-faint sm:block">
+                  {novel.status?.toLowerCase() ?? ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <FolioNav />
+    </FolioSheet>
   );
 }
