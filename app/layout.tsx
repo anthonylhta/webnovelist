@@ -1,10 +1,11 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { DM_Sans, Shippori_Mincho } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ChromeGate from "@/components/ChromeGate";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { getCurrentUser } from "@/lib/current-user";
 import { Analytics } from "@vercel/analytics/next";
@@ -15,6 +16,15 @@ const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-dm-sans",
+  display: "swap",
+});
+
+// Ledger mono — the Folio sheets' metadata voice (dates, counts, labels,
+// bracket verbs). Never carries prose.
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
   display: "swap",
 });
 
@@ -58,14 +68,23 @@ export default async function RootLayout({
         },
       }}
     >
-      <html lang="en" className={`${dmSans.variable} ${shippori.variable}`}>
+      <html
+        lang="en"
+        className={`${dmSans.variable} ${plexMono.variable} ${shippori.variable}`}
+      >
         <body className="text-body min-h-screen flex flex-col font-sans antialiased">
           <CurrentUserProvider value={currentUser}>
-            <Navbar />
+            {/* Folio sheet pages carry their own chrome — the gate keeps the
+                classic Navbar/Footer off them. */}
+            <ChromeGate>
+              <Navbar />
+            </ChromeGate>
             <main className="max-w-7xl mx-auto px-4 py-8 flex-1">
               {children}
             </main>
-            <Footer />
+            <ChromeGate>
+              <Footer />
+            </ChromeGate>
           </CurrentUserProvider>
 
           {/* Vercel Monitoring */}

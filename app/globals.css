@@ -46,6 +46,9 @@
   --font-cjk:
     "Noto Serif SC", "Source Han Serif SC", "Songti SC", var(--font-shippori),
     "SimSun", serif;
+  /* Ledger mono — Folio sheet metadata (dates, counts, labels, bracket verbs) */
+  --font-mono:
+    var(--font-plex-mono), ui-monospace, "Cascadia Mono", Consolas, monospace;
 }
 
 /* The ink canvas lives on <html> so the fixed texture layers below (z -1) can
@@ -141,6 +144,14 @@ body::after {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Dot leader for the Folio contents rows — the dotted line between a title
+   and its chapter number. Apply on a flex-1 element between the two. */
+.leader-dots {
+  border-bottom: 1px dotted var(--color-faint);
+  transform: translateY(-4px);
+  min-width: 16px;
 }
 
 /* A hairline rule with a gold fade in the middle — used under section headings

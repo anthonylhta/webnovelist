@@ -1,205 +1,217 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { safeImageSrc } from "@/lib/image-hosts";
 import Link from "next/link";
-import { BookOpen, ChevronRight, BookMarked } from "lucide-react";
-import QuickChapterUpdate from "@/components/QuickChapterUpdate";
-import NovelCard from "@/components/NovelCard";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
+import FolioPlusOne from "@/components/FolioPlusOne";
+import type { WeekDigest } from "@/lib/folio";
 
 interface ReadingEntry {
   id: number;
   currentChapter: number;
+  updatedAt: string;
   novel: {
     id: number;
     title: string;
     nativeTitle: string | null;
-    coverImageUrl: string | null;
     totalChapters: number | null;
     author: string | null;
   };
 }
 
-interface RecentNovel {
-  id: number;
-  title: string;
-  nativeTitle: string | null;
-  author: string | null;
-  coverImageUrl: string | null;
+function shortDate(iso: string): string {
+  return new Date(iso)
+    .toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    .toLowerCase();
 }
 
+/** The signed-in home — the Weekly Edition sheet. */
 export default function LoggedInHome({
-  userName,
+  folio,
+  statusDate,
+  digest,
+  streak,
+  finishedThisYear,
   initialReading,
-  recentNovels,
 }: {
-  userName: string;
+  folio: string;
+  statusDate: string;
+  digest: WeekDigest;
+  streak: number;
+  finishedThisYear: number;
   initialReading: ReadingEntry[];
-  recentNovels: RecentNovel[];
 }) {
   const [reading, setReading] = useState<ReadingEntry[]>(initialReading);
 
   const handleChapterUpdate = (entryId: number, newChapter: number) => {
-    setReading(reading.map((e) => e.id === entryId ? { ...e, currentChapter: newChapter } : e));
+    setReading(
+      reading.map((e) =>
+        e.id === entryId ? { ...e, currentChapter: newChapter } : e
+      )
+    );
   };
 
+  const pace =
+    digest.totalChapters > 0 ? (digest.totalChapters / 7).toFixed(1) : "0";
+  const yearShort = String(new Date().getFullYear()).slice(2);
+  const [top, second] = digest.titles;
+  const rating = digest.ratings[0];
+
   return (
-    <div>
-      {/* Welcome */}
-      <div className="mb-8 sm:mb-10">
-        <p className="text-xs uppercase tracking-[0.25em] text-gold-dim mb-2">Welcome back</p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-paper">
-          {userName}
+    <FolioSheet
+      statusLeft="webnovelist"
+      statusRight={`${statusDate} · ${reading.length} reading`}
+      footer="ink & gold · the weekly edition"
+    >
+      {/* Masthead */}
+      <div className="border-b border-hairline px-4 pb-6 pt-7 text-center">
+        <h1 className="font-serif text-3xl font-semibold text-paper">
+          Web<span className="text-gold">Novelist</span>
         </h1>
-        <p className="mt-2 text-sm sm:text-base">
-          <Link href={`/user/${userName}`} className="text-muted hover:text-gold transition">
-            View your profile →
-          </Link>
+        <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-faint">
+          The Weekly Edition · {folio}
         </p>
       </div>
 
-      {/* Continue Reading */}
-      {reading.length > 0 && (
-        <section className="mb-10 sm:mb-12">
-          <div className="flex items-center justify-between mb-5 sm:mb-6">
-            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-paper flex items-center gap-2.5">
-              <BookMarked className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
-              Continue Reading
-            </h2>
-            <Link href="/list" className="text-muted hover:text-gold transition text-sm flex items-center gap-1">
-              Full List <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
+      {/* This week — the digest, written up rather than widgeted */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            digest.totalChapters > 0
+              ? `${digest.totalChapters} chapters`
+              : undefined
+          }
+        >
+          This week
+        </FolioLabel>
+        <p className="font-serif text-[15px] leading-relaxed text-body">
+          {!top && !rating ? (
+            <>A quiet week — no chapters logged yet. The shelf is patient.</>
+          ) : (
+            <>
+              {top && (
+                <>
+                  The week belonged to{" "}
+                  <em className="text-paper">{top.title}</em> —{" "}
+                  {top.chapters} chapter{top.chapters !== 1 && "s"}
+                  {second && (
+                    <>
+                      {" "}
+                      — with <em className="text-paper">{second.title}</em> at{" "}
+                      {second.chapters}
+                    </>
+                  )}
+                  .{" "}
+                </>
+              )}
+              {rating && (
+                <>
+                  {digest.ratings.length === 1
+                    ? "One rating filed"
+                    : `${digest.ratings.length} ratings filed`}
+                  : <em className="text-paper">{rating.title}</em>,{" "}
+                  <span className="text-gold">★ {rating.score}</span>.
+                </>
+              )}
+            </>
+          )}
+        </p>
+      </div>
 
-          {/* Desktop Grid */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {reading.map((entry, i) => (
-              <div key={entry.id} className="bg-surface border border-hairline rounded-lg p-4 hover:border-gold-dim transition">
-                <div className="flex gap-4">
-                  <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-                    <Image
-                      src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
-                      alt={entry.novel.title}
-                      width={64}
-                      height={88}
-                      priority={i === 0}
-                      className="object-cover rounded-md ring-1 ring-hairline"
-                    />
-                  </Link>
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/novel/${entry.novel.id}`} className="font-serif text-paper truncate block hover:text-gold transition">
+      {/* Continuing — dot-leader contents rows */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href="/list"
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [library]
+            </Link>
+          }
+        >
+          Continuing
+        </FolioLabel>
+
+        {reading.length === 0 ? (
+          <p className="font-serif text-[15px] text-muted">
+            Nothing in progress.{" "}
+            <Link
+              href="/browse"
+              className="text-gold transition hover:text-gold-bright"
+            >
+              Browse the catalog
+            </Link>{" "}
+            to pick something up.
+          </p>
+        ) : (
+          <div className="divide-y divide-hairline">
+            {reading.map((entry) => {
+              const total = entry.novel.totalChapters;
+              const pct = total
+                ? Math.min(
+                    Math.round((entry.currentChapter / total) * 100),
+                    100
+                  )
+                : null;
+              return (
+                <div key={entry.id} className="py-2.5 first:pt-0.5 last:pb-0.5">
+                  <div className="flex items-baseline gap-2.5">
+                    <Link
+                      href={`/novel/${entry.novel.id}`}
+                      className="min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                    >
                       {entry.novel.title}
                     </Link>
-                    {entry.novel.nativeTitle ? (
-                      <p className="font-cjk text-xs text-muted truncate">{entry.novel.nativeTitle}</p>
-                    ) : entry.novel.author && (
-                      <p className="text-sm text-faint truncate">{entry.novel.author}</p>
-                    )}
-                    <div className="mt-2">
-                      <QuickChapterUpdate
-                        entryId={entry.id}
-                        currentChapter={entry.currentChapter}
-                        totalChapters={entry.novel.totalChapters}
-                        onUpdate={(ch) => handleChapterUpdate(entry.id, ch)}
-                      />
-                      {entry.novel.totalChapters && (
-                        <div className="w-full bg-hairline rounded-full h-1.5 mt-2">
-                          <div
-                            className="bg-gold rounded-full h-1.5"
-                            style={{ width: `${Math.min((entry.currentChapter / entry.novel.totalChapters) * 100, 100)}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile Stacked */}
-          <div className="md:hidden space-y-3">
-            {reading.map((entry, i) => (
-              <div key={entry.id} className="bg-surface border border-hairline rounded-lg p-3">
-                <div className="flex gap-3 min-w-0">
-                  <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-                    <Image
-                      src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
-                      alt={entry.novel.title}
-                      width={48}
-                      height={64}
-                      priority={i === 0}
-                      className="object-cover rounded-md ring-1 ring-hairline"
+                    <span aria-hidden className="leader-dots flex-1" />
+                    <span className="shrink-0 font-mono text-[11px] text-gold tabular-nums">
+                      ch. {entry.currentChapter}
+                      {total ? `/${total}` : ""}
+                    </span>
+                    <FolioPlusOne
+                      entryId={entry.id}
+                      currentChapter={entry.currentChapter}
+                      totalChapters={total}
+                      onUpdate={(ch) => handleChapterUpdate(entry.id, ch)}
                     />
-                  </Link>
-                  <div className="flex-1 min-w-0 overflow-hidden">
-                    <Link href={`/novel/${entry.novel.id}`} className="font-serif text-sm text-paper truncate block hover:text-gold transition">
-                      {entry.novel.title}
-                    </Link>
-                    <div className="mt-1.5">
-                      <QuickChapterUpdate
-                        entryId={entry.id}
-                        currentChapter={entry.currentChapter}
-                        totalChapters={entry.novel.totalChapters}
-                        onUpdate={(ch) => handleChapterUpdate(entry.id, ch)}
-                      />
-                      {entry.novel.totalChapters && (
-                        <div className="w-full bg-hairline rounded-full h-1 mt-1.5">
-                          <div
-                            className="bg-gold rounded-full h-1"
-                            style={{ width: `${Math.min((entry.currentChapter / entry.novel.totalChapters) * 100, 100)}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
+                  </div>
+                  <div className="mt-0.5 flex items-baseline justify-between gap-3">
+                    <span className="min-w-0 truncate font-cjk text-[11px] text-faint">
+                      {entry.novel.nativeTitle ?? entry.novel.author ?? ""}
+                    </span>
+                    <span className="shrink-0 font-mono text-[9.5px] text-faint tabular-nums">
+                      {pct !== null ? `${pct}% · ` : ""}
+                      {shortDate(entry.updatedAt)}
+                    </span>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </section>
-      )}
+        )}
+      </div>
 
-      {reading.length === 0 && (
-        <section className="mb-10 sm:mb-12">
-          <div className="bg-surface border border-hairline rounded-lg p-6 sm:p-10 text-center">
-            <BookMarked className="w-8 h-8 sm:w-10 sm:h-10 text-faint mx-auto mb-3" />
-            <h3 className="font-serif text-lg text-paper mb-1">Nothing in progress</h3>
-            <p className="text-muted text-xs sm:text-sm mb-5">Start reading a novel and it&apos;ll show up here.</p>
-            <Link href="/browse" className="inline-block bg-gold text-ink hover:bg-gold-bright px-5 py-2 rounded-md text-sm font-medium transition">
-              Browse Library
-            </Link>
+      {/* Stat strip */}
+      <div className="grid grid-cols-3 divide-x divide-hairline border-b border-hairline">
+        {[
+          { label: "pace", value: pace, unit: "ch / day" },
+          { label: "streak", value: String(streak), unit: streak === 1 ? "day" : "days" },
+          { label: `finished ’${yearShort}`, value: String(finishedThisYear), unit: finishedThisYear === 1 ? "title" : "titles" },
+        ].map((cell) => (
+          <div key={cell.label} className="px-4 py-3">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+              {cell.label}
+            </p>
+            <p className="mt-1.5 font-mono text-base text-paper tabular-nums">
+              {cell.value}
+              <span className="ml-1.5 text-[10px] text-muted">{cell.unit}</span>
+            </p>
           </div>
-        </section>
-      )}
+        ))}
+      </div>
 
-      {recentNovels.length > 0 && (
-        <section className="mb-10 sm:mb-12">
-          <div className="flex items-center justify-between mb-5 sm:mb-6">
-            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-paper flex items-center gap-2.5">
-              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-gold" />
-              Recently Added
-            </h2>
-            <Link href="/browse" className="text-muted hover:text-gold transition text-sm flex items-center gap-1">
-              Browse All <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
-            {recentNovels.map((novel) => (
-              <NovelCard
-                key={novel.id}
-                id={novel.id}
-                title={novel.title}
-                nativeTitle={novel.nativeTitle}
-                coverImageUrl={novel.coverImageUrl}
-                footer={novel.nativeTitle ? null : <p className="text-xs text-faint truncate">{novel.author}</p>}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+      <FolioNav />
+    </FolioSheet>
   );
 }

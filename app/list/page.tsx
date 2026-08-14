@@ -2,18 +2,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
-import { safeImageSrc } from "@/lib/image-hosts";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  Star, BookOpen, Edit, Trash2,
-  ArrowUpDown, ExternalLink,
-} from "lucide-react";
+import { ArrowUpDown, ExternalLink } from "lucide-react";
 import AddToListModal from "@/components/AddToListModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import QuickChapterUpdate from "@/components/QuickChapterUpdate";
+import { FolioSheet, StatusSeal } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 type ListEntry = {
   id: number;
   userId: string;
@@ -43,12 +40,12 @@ type ListEntry = {
 };
 
 const STATUS_TABS = [
-  { key: "all", label: "All", icon: "📚" },
-  { key: "reading", label: "Reading", icon: "📖" },
-  { key: "completed", label: "Completed", icon: "✅" },
-  { key: "on_hold", label: "On Hold", icon: "⏸️" },
-  { key: "dropped", label: "Dropped", icon: "❌" },
-  { key: "plan_to_read", label: "Plan to Read", icon: "📋" },
+  { key: "all", label: "all" },
+  { key: "reading", label: "reading" },
+  { key: "completed", label: "completed" },
+  { key: "on_hold", label: "on hold" },
+  { key: "dropped", label: "dropped" },
+  { key: "plan_to_read", label: "plan" },
 ];
 
 type SortKey = "title" | "rating" | "progress" | "updated";
@@ -166,7 +163,7 @@ export default function ListPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading your list...</div>
+        <div className="font-mono text-xs text-muted">loading the library…</div>
       </div>
     );
   }
@@ -174,190 +171,163 @@ export default function ListPage() {
   const SortButton = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (
     <button
       onClick={() => toggleSort(sortKeyName)}
-      className="flex items-center gap-1 hover:text-gold-bright transition"
+      className="flex items-center gap-1 uppercase transition hover:text-gold-bright"
     >
       {label}
       {sortKey === sortKeyName && (
-        <ArrowUpDown className="w-3 h-3 text-gold" />
+        <ArrowUpDown className="w-2.5 h-2.5 text-gold" />
       )}
     </button>
   );
 
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold font-serif text-paper">My List</h1>
-        <div className="text-muted">
-          {list.length} novel{list.length !== 1 ? "s" : ""} total
-        </div>
-      </div>
+  const shortDate = (iso: string) =>
+    new Date(iso)
+      .toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      .toLowerCase();
 
-      {/* Status Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8">
+  return (
+    <FolioSheet
+      statusLeft="webnovelist · library"
+      statusRight={`${list.length} title${list.length !== 1 ? "s" : ""}`}
+      footer={`ink & gold · ${list.length} on the shelf`}
+    >
+      {/* Status tabs */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
         {STATUS_TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
-              ${
-                activeTab === tab.key
-                  ? "bg-gold text-ink"
-                  : "bg-elevated text-muted hover:bg-hairline"
-              }`}
+            className={`transition ${
+              activeTab === tab.key
+                ? "text-gold"
+                : "text-faint hover:text-muted"
+            }`}
           >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
+            {tab.label}
             {counts[tab.key] ? (
-              <span className="bg-hairline text-body px-2 py-0.5 rounded-full text-xs">
-                {counts[tab.key]}
-              </span>
+              <span className="tabular-nums"> · {counts[tab.key]}</span>
             ) : null}
           </button>
         ))}
       </div>
 
-      {/* List */}
       {sortedList.length === 0 ? (
-        <div className="text-center py-16">
-          <BookOpen className="w-12 h-12 text-faint mx-auto mb-4" />
-          <p className="text-faint text-lg">No novels in this category</p>
-          <Link
-            href="/browse"
-            className="inline-block mt-4 bg-gold text-ink hover:bg-gold-bright px-6 py-2 rounded-lg transition"
-          >
-            Browse Library
-          </Link>
+        <div className="px-4 py-14 text-center">
+          <p className="font-serif text-[15px] text-muted">
+            Nothing on this shelf yet.{" "}
+            <Link
+              href="/browse"
+              className="text-gold transition hover:text-gold-bright"
+            >
+              Browse the catalog
+            </Link>{" "}
+            to add something.
+          </p>
         </div>
       ) : (
-        <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-hairline text-muted text-sm">
-                <th className="text-left p-4">
-                  <SortButton label="Novel" sortKeyName="title" />
-                </th>
-                <th className="text-left p-4 hidden md:table-cell">
-                  <SortButton label="Progress" sortKeyName="progress" />
-                </th>
-                <th className="text-left p-4">
-                  <SortButton label="Rating" sortKeyName="rating" />
-                </th>
-                <th className="text-left p-4 hidden lg:table-cell">
-                  <SortButton label="Updated" sortKeyName="updated" />
-                </th>
-                <th className="text-right p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedList.map((entry) => (
-                <tr
-                  key={entry.id}
-                  className="border-b border-hairline/50 hover:bg-elevated/30 transition"
-                >
-                  {/* Novel Title */}
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Link href={`/novel/${entry.novel.id}`} className="shrink-0">
-                        <Image
-                          src={safeImageSrc(entry.novel.coverImageUrl, "/default-cover.svg")}
-                          alt={entry.novel.title}
-                          width={36}
-                          height={48}
-                          className="rounded object-cover"
-                        />
-                      </Link>
-                      <div className="flex items-center gap-2 min-w-0">
-                      <Link
-                        href={`/novel/${entry.novel.id}`}
-                        className="hover:text-gold-bright transition min-w-0"
-                      >
-                        <div className="font-medium truncate">{entry.novel.title}</div>
-                        {entry.novel.nativeTitle && (
-                          <div className="font-cjk text-muted text-sm truncate">
-                            {entry.novel.nativeTitle}
-                          </div>
-                        )}
-                      </Link>
-                      {entry.readingUrl && (
-                        <a
-                          href={entry.readingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-faint hover:text-gold transition shrink-0"
-                          title="Open reading link"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                      </div>
-                    </div>
-                  </td>
+        <>
+          {/* Sort header */}
+          <div className="hidden items-center gap-3 border-b border-hairline px-4 py-2 font-mono text-[9px] tracking-[0.15em] text-muted md:flex">
+            <span className="w-5 shrink-0" />
+            <span className="min-w-0 flex-1">
+              <SortButton label="title" sortKeyName="title" />
+            </span>
+            <span className="w-44 shrink-0">
+              <SortButton label="progress" sortKeyName="progress" />
+            </span>
+            <span className="w-12 shrink-0">
+              <SortButton label="rating" sortKeyName="rating" />
+            </span>
+            <span className="hidden w-14 shrink-0 lg:block">
+              <SortButton label="updated" sortKeyName="updated" />
+            </span>
+            <span className="w-[76px] shrink-0" />
+          </div>
 
-                  {/* Progress with Quick Update */}
-                  <td className="p-4 hidden md:table-cell">
-                    <QuickChapterUpdate
-                      entryId={entry.id}
-                      currentChapter={entry.currentChapter}
-                      totalChapters={entry.novel.totalChapters}
-                      onUpdate={(newCh) => handleChapterUpdate(entry.id, newCh)}
-                    />
-                    {entry.novel.totalChapters && (
-                      <div className="w-24 bg-hairline rounded-full h-1.5 mt-1">
-                        <div
-                          className="bg-gold rounded-full h-1.5"
-                          style={{
-                            width: `${Math.min(
-                              (entry.currentChapter / entry.novel.totalChapters) * 100,
-                              100
-                            )}%`,
-                          }}
-                        />
-                      </div>
+          {/* Rows */}
+          <div className="divide-y divide-hairline">
+            {sortedList.map((entry) => (
+              <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5">
+                <StatusSeal status={entry.status} />
+
+                {/* Title + native title */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Link
+                      href={`/novel/${entry.novel.id}`}
+                      className="min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                    >
+                      {entry.novel.title}
+                    </Link>
+                    {entry.readingUrl && (
+                      <a
+                        href={entry.readingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 text-faint transition hover:text-gold"
+                        title="Open reading link"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     )}
-                  </td>
-
-                  {/* Rating */}
-                  <td className="p-4">
-                    {entry.rating ? (
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-gold fill-gold" />
-                        <span>{entry.rating}</span>
-                      </div>
-                    ) : (
-                      <span className="text-faint">—</span>
-                    )}
-                  </td>
-
-                  {/* Last Updated */}
-                  <td className="p-4 text-sm text-muted hidden lg:table-cell">
-                    {new Date(entry.updatedAt).toLocaleDateString()}
-                  </td>
-
-                  {/* Actions */}
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => setEditingEntry(entry)}
-                        className="p-2 text-muted hover:text-gold transition"
-                        title="Edit"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeletingEntry(entry)}
-                        className="p-2 text-muted hover:text-seal-bright transition"
-                        title="Remove"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                  </div>
+                  {entry.novel.nativeTitle && (
+                    <div className="truncate font-cjk text-[11px] text-faint">
+                      {entry.novel.nativeTitle}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  )}
+                </div>
+
+                {/* Progress with quick update */}
+                <div className="hidden w-44 shrink-0 md:block">
+                  <QuickChapterUpdate
+                    entryId={entry.id}
+                    currentChapter={entry.currentChapter}
+                    totalChapters={entry.novel.totalChapters}
+                    onUpdate={(newCh) => handleChapterUpdate(entry.id, newCh)}
+                  />
+                </div>
+
+                {/* Rating */}
+                <div className="w-12 shrink-0 font-mono text-[11px] tabular-nums">
+                  {entry.rating ? (
+                    <span className="text-body">
+                      <span className="text-gold">★</span> {entry.rating}
+                    </span>
+                  ) : (
+                    <span className="text-faint">—</span>
+                  )}
+                </div>
+
+                {/* Last updated */}
+                <div className="hidden w-14 shrink-0 text-right font-mono text-[9.5px] text-faint tabular-nums lg:block">
+                  {shortDate(entry.updatedAt)}
+                </div>
+
+                {/* Actions */}
+                <div className="flex w-[76px] shrink-0 items-center justify-end gap-2 font-mono text-[11px]">
+                  <button
+                    onClick={() => setEditingEntry(entry)}
+                    className="text-muted transition hover:text-gold"
+                    title="Edit entry"
+                  >
+                    [edit]
+                  </button>
+                  <button
+                    onClick={() => setDeletingEntry(entry)}
+                    className="text-muted transition hover:text-seal-bright"
+                    title="Remove from library"
+                  >
+                    [rm]
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
+
+      <FolioNav />
 
       {/* Edit Modal */}
       {editingEntry && (
@@ -387,8 +357,8 @@ export default function ListPage() {
       {/* Confirm Delete Modal */}
       {deletingEntry && (
         <ConfirmModal
-          title="Remove Novel"
-          message={`Are you sure you want to remove "${deletingEntry.novel.title}" from your list? This action cannot be undone.`}
+          title="Remove Title"
+          message={`Are you sure you want to remove "${deletingEntry.novel.title}" from your library? This action cannot be undone.`}
           confirmText="Remove"
           cancelText="Keep it"
           danger={true}
@@ -397,6 +367,6 @@ export default function ListPage() {
           onCancel={() => setDeletingEntry(null)}
         />
       )}
-    </div>
+    </FolioSheet>
   );
 }
