@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { DM_Sans, Shippori_Mincho } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
@@ -15,6 +15,15 @@ const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-dm-sans",
+  display: "swap",
+});
+
+// Ledger mono — the Folio sheets' metadata voice (dates, counts, labels,
+// bracket verbs). Never carries prose.
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
   display: "swap",
 });
 
@@ -58,7 +67,10 @@ export default async function RootLayout({
         },
       }}
     >
-      <html lang="en" className={`${dmSans.variable} ${shippori.variable}`}>
+      <html
+        lang="en"
+        className={`${dmSans.variable} ${plexMono.variable} ${shippori.variable}`}
+      >
         <body className="text-body min-h-screen flex flex-col font-sans antialiased">
           <CurrentUserProvider value={currentUser}>
             <Navbar />
