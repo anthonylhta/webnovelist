@@ -61,6 +61,18 @@ export function FolioLabel({
   );
 }
 
+/** Hairline distribution bar for ledger modules — square, quiet, gold. */
+export function LedgerBar({ value, max }: { value: number; max: number }) {
+  return (
+    <span className="h-2 flex-1 overflow-hidden bg-elevated">
+      <span
+        className="block h-full bg-gold-dim"
+        style={{ width: `${max > 0 ? (value / max) * 100 : 0}%` }}
+      />
+    </span>
+  );
+}
+
 // One glyph per reading status, in the app-wide status colors. The square
 // bordered form echoes the seal stamps on anthonyta's aperture page — the
 // sibling site this design language extends.

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { Share2, Check } from "lucide-react";
 
 export default function CopyLinkButton({ username }: { username: string }) {
   const [copied, setCopied] = useState(false);
@@ -23,21 +22,12 @@ export default function CopyLinkButton({ username }: { username: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-2 bg-elevated hover:bg-hairline px-4 py-2
-                 rounded-lg transition text-sm text-muted hover:text-paper shrink-0"
+      className={`shrink-0 font-mono text-[11px] transition ${
+        copied ? "text-jade" : "text-muted hover:text-gold"
+      }`}
       title="Copy profile link"
     >
-      {copied ? (
-        <>
-          <Check className="w-4 h-4 text-jade" />
-          <span className="text-jade">Copied!</span>
-        </>
-      ) : (
-        <>
-          <Share2 className="w-4 h-4" />
-          Share
-        </>
-      )}
+      {copied ? "[copied ✓]" : "[share]"}
     </button>
   );
 }

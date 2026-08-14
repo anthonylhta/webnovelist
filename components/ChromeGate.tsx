@@ -6,9 +6,14 @@ import { useCurrentUser } from "@/components/CurrentUserProvider";
 // Pages rebuilt as Folio sheets carry their own chrome (status bar + in-sheet
 // nav), so the global Navbar/Footer must stay off them. Transitional: the gate
 // and the route list die when the last classic page migrates to the sheet.
-const FOLIO_ROUTES = new Set(["/list", "/browse"]);
+const FOLIO_ROUTES = new Set(["/list", "/browse", "/stats"]);
 // Detail pages are sheets; their /edit sub-routes migrate with the admin pass.
-const FOLIO_PATTERNS = [/^\/novel\/[^/]+$/, /^\/author\/[^/]+$/, /^\/character\/[^/]+$/];
+const FOLIO_PATTERNS = [
+  /^\/novel\/[^/]+$/,
+  /^\/author\/[^/]+$/,
+  /^\/character\/[^/]+$/,
+  /^\/user\/[^/]+$/,
+];
 
 export default function ChromeGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

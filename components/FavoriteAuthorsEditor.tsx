@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, X, BookMarked } from "lucide-react";
+import { X } from "lucide-react";
 
 interface AuthorItem {
   id: number;
@@ -69,22 +69,18 @@ export default function FavoriteAuthorsEditor({
   };
 
   return (
-    <div className="bg-surface border border-hairline rounded-xl p-4 sm:p-5">
+    <div className="border-b border-hairline px-4 py-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base sm:text-lg font-semibold font-serif flex items-center gap-2">
-          <BookMarked className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-          Favourite Authors
-        </h2>
+      <div className="mb-2.5 flex items-center gap-2.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+        <span className="shrink-0">Favourite authors</span>
+        <span aria-hidden className="h-px flex-1 bg-hairline" />
         {isOwner && favorites.length < 5 && !showPicker && (
           <button
             onClick={() => { setShowPicker(true); setSearch(""); }}
             disabled={loading || availableAuthors.length === 0}
-            className="flex items-center gap-1 text-sm text-gold hover:text-gold-bright
-                       disabled:opacity-40 transition"
+            className="shrink-0 normal-case tracking-normal text-[11px] text-gold transition hover:text-gold-bright disabled:opacity-40"
           >
-            <Plus className="w-3.5 h-3.5" />
-            Add
+            [+ add]
           </button>
         )}
       </div>
