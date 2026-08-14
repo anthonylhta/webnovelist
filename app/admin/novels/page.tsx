@@ -7,11 +7,9 @@ import { safeImageSrc } from "@/lib/image-hosts";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  BookOpen, Plus, Pencil, Trash2, ChevronLeft,
-  CheckCircle, Clock, PauseCircle,
-} from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 interface NovelData {
   id: number;
@@ -24,10 +22,10 @@ interface NovelData {
   genres: string[];
 }
 
-const STATUS_STYLES: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
-  Ongoing:   { label: "Ongoing",   className: "text-gold bg-gold/10 border-gold/30",  icon: <Clock className="w-3 h-3" /> },
-  Completed: { label: "Completed", className: "text-jade bg-jade/10 border-jade/30",    icon: <CheckCircle className="w-3 h-3" /> },
-  Hiatus:    { label: "Hiatus",    className: "text-muted bg-elevated border-hairline", icon: <PauseCircle className="w-3 h-3" /> },
+const STATUS_COLORS: Record<string, string> = {
+  Ongoing: "text-gold",
+  Completed: "text-jade",
+  Hiatus: "text-muted",
 };
 
 export default function AdminNovelsPage() {
@@ -90,7 +88,7 @@ export default function AdminNovelsPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">opening the catalog…</div>
       </div>
     );
   }
@@ -102,73 +100,63 @@ export default function AdminNovelsPage() {
   }, {});
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/admin" className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm">
-          <ChevronLeft className="w-4 h-4" />
-          Admin Panel
+    <FolioSheet
+      wide
+      statusLeft="webnovelist · curation · titles"
+      statusRight={`${novels.length} title${novels.length !== 1 ? "s" : ""}`}
+      footer="ink & gold · admin"
+    >
+      {/* Sections */}
+      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
+        <Link href="/admin" className="text-faint transition hover:text-muted">
+          users
         </Link>
-        <span className="text-faint">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
-          <BookOpen className="w-6 h-6 text-gold" />
-          Novels
-        </h1>
+        <span className="text-gold">titles</span>
+        <Link href="/admin/authors" className="text-faint transition hover:text-muted">
+          authors
+        </Link>
+        <span className="flex-1" />
+        <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
+          [+ add title]
+        </Link>
       </div>
 
-      {/* Stats + action bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-surface border border-hairline rounded-xl px-4 py-2 text-center">
-            <div className="text-lg font-bold">{novels.length}</div>
-            <div className="text-xs text-faint">Total</div>
-          </div>
-          {Object.entries(statusCounts).map(([status, count]) => {
-            const s = STATUS_STYLES[status];
-            return (
-              <div key={status} className="bg-surface border border-hairline rounded-xl px-4 py-2 text-center">
-                <div className="text-lg font-bold">{count}</div>
-                <div className={`text-xs ${s?.className.split(" ")[0] ?? "text-faint"}`}>{status}</div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search novels or authors…"
-            className="flex-1 sm:w-72 bg-surface border border-hairline rounded-lg px-3 py-2 text-sm text-paper placeholder-faint focus:outline-none focus:border-gold-dim"
-          />
-          <Link
-            href="/admin/novels/new"
-            className="flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-4 py-2 rounded-lg text-sm font-medium transition shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            Add Novel
-          </Link>
-        </div>
+      {/* Counts + search */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-hairline px-4 py-2 font-mono text-[10px] tabular-nums">
+        <span className="text-muted">total · {novels.length}</span>
+        {Object.entries(statusCounts).map(([status, count]) => (
+          <span key={status} className={STATUS_COLORS[status] ?? "text-faint"}>
+            {status.toLowerCase()} · {count}
+          </span>
+        ))}
+      </div>
+      <div className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
+        <span aria-hidden className="font-mono text-[11px] text-gold-dim">
+          /
+        </span>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="filter by title or author…"
+          className="w-full bg-transparent font-mono text-[12px] text-paper placeholder-faint focus:outline-none"
+        />
       </div>
 
-      {/* Novel list */}
+      {/* Rows */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-faint">
-          {novels.length === 0 ? "No novels yet." : "No novels match your search."}
+        <div className="px-4 py-14 text-center">
+          <p className="font-serif text-[14.5px] text-muted">
+            {novels.length === 0 ? "The catalog is empty." : "Nothing matches the filter."}
+          </p>
         </div>
       ) : (
-        <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
-          {filtered.map((novel, i) => {
-            const status = STATUS_STYLES[novel.status ?? ""] ?? STATUS_STYLES.Ongoing;
-            return (
-              <div
-                key={novel.id}
-                className={`flex items-center gap-4 px-4 py-3 hover:bg-elevated/40 transition ${
-                  i !== filtered.length - 1 ? "border-b border-hairline" : ""
-                }`}
-              >
-                {/* Cover */}
-                <div className="relative w-9 h-12 rounded overflow-hidden shrink-0 border border-hairline bg-elevated">
+        <div className="border-b border-hairline px-4 pt-3 pb-1.5">
+          <FolioLabel right={String(filtered.length)}>Titles</FolioLabel>
+          <div className="divide-y divide-hairline">
+            {filtered.map((novel) => (
+              <div key={novel.id} className="flex items-center gap-3 py-2.5">
+                <div className="relative h-12 w-9 shrink-0 overflow-hidden rounded-[2px] border border-hairline bg-elevated">
                   <Image
                     fill
                     sizes="36px"
@@ -177,50 +165,49 @@ export default function AdminNovelsPage() {
                     className="object-cover"
                   />
                 </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <Link href={`/novel/${novel.id}`} className="font-medium font-serif text-paper hover:text-gold-bright transition truncate block text-sm">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/novel/${novel.id}`}
+                    className="block min-w-0 truncate font-serif text-[14.5px] text-paper transition hover:text-gold"
+                  >
                     {novel.title}
                   </Link>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    {novel.author && (
-                      <span className="text-xs text-faint truncate">{novel.author}</span>
-                    )}
-                    {novel.totalChapters && (
-                      <span className="text-xs text-faint">{novel.totalChapters.toLocaleString()} ch</span>
-                    )}
-                  </div>
+                  <p className="truncate font-mono text-[10px] text-faint">
+                    {novel.author ?? ""}
+                    {novel.author && novel.totalChapters ? " · " : ""}
+                    {novel.totalChapters ? `${novel.totalChapters.toLocaleString()} ch` : ""}
+                  </p>
                 </div>
-
-                {/* Status badge */}
-                <span className={`hidden sm:flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border shrink-0 ${status.className}`}>
-                  {status.icon}
-                  {novel.status}
+                <span
+                  className={`hidden w-20 shrink-0 text-right font-mono text-[9.5px] uppercase tracking-[0.12em] sm:block ${
+                    STATUS_COLORS[novel.status ?? ""] ?? "text-faint"
+                  }`}
+                >
+                  {novel.status?.toLowerCase() ?? ""}
                 </span>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex w-[88px] shrink-0 items-center justify-end gap-2 font-mono text-[11px]">
                   <Link
                     href={`/novel/${novel.id}/edit`}
-                    className="p-1.5 text-faint hover:text-gold-bright transition"
+                    className="text-muted transition hover:text-gold"
                     title="Edit"
                   >
-                    <Pencil className="w-4 h-4" />
+                    [edit]
                   </Link>
                   <button
                     onClick={() => setDeletingNovel(novel)}
-                    className="p-1.5 text-faint hover:text-seal-bright transition"
+                    className="text-muted transition hover:text-seal-bright"
                     title="Delete"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    [rm]
                   </button>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       )}
+
+      <FolioNav />
 
       {deletingNovel && (
         <ConfirmModal
@@ -234,6 +221,6 @@ export default function AdminNovelsPage() {
           onCancel={() => setDeletingNovel(null)}
         />
       )}
-    </div>
+    </FolioSheet>
   );
 }

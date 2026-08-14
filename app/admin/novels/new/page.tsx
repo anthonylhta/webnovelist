@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
-import { Plus, ShieldX, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 import ImageUpload from "@/components/ImageUpload";
 import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/media-types";
 
@@ -43,7 +44,7 @@ export default function AddNovelPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">loading…</div>
       </div>
     );
   }
@@ -56,14 +57,22 @@ export default function AddNovelPage() {
   const userRole = currentUser?.role;
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <ShieldX className="w-16 h-16 text-seal-bright mb-4" />
-        <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
-        <p className="text-muted mb-6">Only admins and moderators can add novels.</p>
-        <Link href="/browse" className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition">
-          Browse Library
-        </Link>
-      </div>
+      <FolioSheet statusLeft="webnovelist · curation" footer="ink & gold">
+        <div className="px-4 py-14 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-seal-bright">
+            access denied
+          </p>
+          <p className="mx-auto mt-4 max-w-sm font-serif text-[14.5px] leading-relaxed text-muted">
+            Only admins and moderators can add titles.
+          </p>
+          <p className="mt-5 font-mono text-[12px]">
+            <Link href="/browse" className="text-gold transition hover:text-gold-bright">
+              [browse the catalog]
+            </Link>
+          </p>
+        </div>
+        <FolioNav />
+      </FolioSheet>
     );
   }
 
@@ -111,53 +120,53 @@ export default function AddNovelPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/novels" className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm">
-          <ChevronLeft className="w-4 h-4" />
-          Manage Novels
-        </Link>
-        <span className="text-faint">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
-          <Plus className="w-6 h-6 text-gold" />
-          Add Novel
-        </h1>
-      </div>
-
-      <div className="bg-surface border border-hairline rounded-xl p-6">
+    <FolioSheet statusLeft="webnovelist · curation · new title" footer="ink & gold · admin">
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href="/admin/novels"
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [back to titles]
+            </Link>
+          }
+        >
+          Add a title
+        </FolioLabel>
         {error && (
-          <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-6 text-sm">
+          <p className="mb-4 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
             {error}
-          </div>
+          </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-muted mb-1">Title (English) <span className="text-seal-bright">*</span></label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Title (English) <span className="text-seal-bright">*</span></label>
             <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="e.g., Reverend Insanity"
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" required />
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" required />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Title (Native)</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Title (Native)</label>
             <input type="text" value={form.nativeTitle} onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
               placeholder="e.g., 蛊真人"
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-muted font-cjk focus:outline-none focus:border-gold-dim" />
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 font-cjk text-[13.5px] text-muted focus:border-gold-dim focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Author</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Author</label>
             <input type="text" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })}
               placeholder="e.g., Er Gen"
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Description</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Description</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4} placeholder="Brief synopsis..."
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim resize-none" />
+              className="w-full resize-none rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
           </div>
 
           <ImageUpload
@@ -167,33 +176,33 @@ export default function AddNovelPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-muted mb-1">Total Chapters</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Total Chapters</label>
               <input type="number" min="0" value={form.totalChapters} onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
                 placeholder="e.g., 1394"
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
             </div>
             <div>
-              <label className="block text-sm text-muted mb-1">Year Published</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Year Published</label>
               <input type="number" min="1990" max="2030" value={form.yearPublished} onChange={(e) => setForm({ ...form, yearPublished: e.target.value })}
                 placeholder="e.g., 2018"
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-muted mb-1">Media Type</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Media Type</label>
               <select value={form.mediaType} onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim">
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none">
                 {MEDIA_TYPES.map((t) => (
                   <option key={t} value={t}>{MEDIA_TYPE_LABELS[t]}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-muted mb-1">Status</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Status</label>
               <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim">
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none">
                 <option value="Ongoing">Ongoing</option>
                 <option value="Completed">Completed</option>
                 <option value="Hiatus">Hiatus</option>
@@ -202,19 +211,21 @@ export default function AddNovelPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Original Source</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Original Source</label>
             <input type="text" value={form.originalSource} onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
               placeholder="e.g., Qidian"
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-2">Genres</label>
+            <label className="mb-2 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Genres</label>
             <div className="flex flex-wrap gap-2">
               {GENRE_OPTIONS.map((genre) => (
                 <button key={genre} type="button" onClick={() => toggleGenre(genre)}
-                  className={`px-3 py-1.5 rounded-lg text-sm transition ${
-                    form.genres.includes(genre) ? "bg-gold text-ink" : "bg-elevated text-muted hover:bg-hairline"
+                  className={`rounded-[2px] border px-2.5 py-1 font-mono text-[10.5px] transition ${
+                    form.genres.includes(genre)
+                      ? "border-gold text-gold"
+                      : "border-hairline text-muted hover:border-gold-dim"
                   }`}>
                   {form.genres.includes(genre) && "✓ "}{genre}
                 </button>
@@ -223,18 +234,19 @@ export default function AddNovelPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Tags (comma separated)</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Tags (comma separated)</label>
             <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })}
               placeholder="e.g., Smart MC, Rebirth, Cultivation"
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3 text-paper focus:outline-none focus:border-gold-dim" />
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
           </div>
 
           <button type="submit" disabled={loading}
-            className="w-full bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50 font-semibold py-3 rounded-lg transition mt-2">
-            {loading ? "Adding..." : "Add Novel"}
+            className="mt-2 w-full rounded-[2px] bg-gold py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink transition hover:bg-gold-bright disabled:bg-gold/50">
+            {loading ? "adding…" : "add title"}
           </button>
         </form>
       </div>
-    </div>
+      <FolioNav />
+    </FolioSheet>
   );
 }

@@ -6,15 +6,15 @@ import { usePathname } from "next/navigation";
 // nav), so the global Navbar/Footer must stay off them. Transitional: the gate
 // and the route list die when the last classic page migrates to the sheet.
 const FOLIO_ROUTES = new Set(["/", "/list", "/browse", "/stats"]);
-// Detail pages are sheets; their /edit sub-routes migrate with the admin pass.
 const FOLIO_PATTERNS = [
-  /^\/novel\/[^/]+$/,
+  /^\/novel\//,
   /^\/author\/[^/]+$/,
   /^\/character\/[^/]+$/,
   /^\/user\/[^/]+$/,
   /^\/sign-in/,
   /^\/sign-up/,
   /^\/settings/,
+  /^\/admin/,
 ];
 
 export default function ChromeGate({ children }: { children: React.ReactNode }) {
