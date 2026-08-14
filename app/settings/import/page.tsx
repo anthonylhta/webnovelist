@@ -6,7 +6,8 @@ import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Download, ShieldX, CheckCircle, AlertCircle } from "lucide-react";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 interface ImportSummary {
   total: number;
@@ -29,7 +30,7 @@ export default function AniListImportPage() {
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">loading…</div>
       </div>
     );
   }
@@ -42,16 +43,23 @@ export default function AniListImportPage() {
   const userRole = currentUser?.role;
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <ShieldX className="w-16 h-16 text-seal-bright mb-4" />
-        <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
-        <p className="text-muted mb-6">
-          Importing creates catalog entries, so only admins and moderators can run it.
-        </p>
-        <Link href="/settings" className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition">
-          Back to Settings
-        </Link>
-      </div>
+      <FolioSheet statusLeft="webnovelist · import" footer="ink & gold">
+        <div className="px-4 py-14 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-seal-bright">
+            access denied
+          </p>
+          <p className="mx-auto mt-4 max-w-sm font-serif text-[14.5px] leading-relaxed text-muted">
+            Importing creates catalog entries, so only admins and moderators can
+            run it.
+          </p>
+          <p className="mt-5 font-mono text-[12px]">
+            <Link href="/settings" className="text-gold transition hover:text-gold-bright">
+              [back to settings]
+            </Link>
+          </p>
+        </div>
+        <FolioNav />
+      </FolioSheet>
     );
   }
 
@@ -84,76 +92,84 @@ export default function AniListImportPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Link href="/settings" className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm">
-          <ChevronLeft className="w-4 h-4" />
-          Settings
-        </Link>
-        <span className="text-faint">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
-          <Download className="w-6 h-6 text-gold" />
+    <FolioSheet
+      statusLeft="webnovelist · settings · import"
+      statusRight={currentUser?.username}
+      footer="ink & gold"
+    >
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href="/settings"
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [back]
+            </Link>
+          }
+        >
           Import from AniList
-        </h1>
-      </div>
-
-      <div className="bg-surface border border-hairline rounded-xl p-6">
-        <p className="text-sm text-muted mb-6">
-          Pulls your public AniList manga list — manga, manhwa, manhua, and light novels —
-          into your reading list, with statuses, chapter progress, scores, and dates.
-          Titles missing from the catalog are added automatically. Entries already on your
-          list are left untouched.
+        </FolioLabel>
+        <p className="font-serif text-[14px] leading-relaxed text-muted">
+          Pulls your public AniList manga list — manga, manhwa, manhua, and
+          light novels — into your library, with statuses, chapter progress,
+          scores, and dates. Titles missing from the catalog are added
+          automatically. Entries already on your list are left untouched.
         </p>
 
         {error && (
-          <div className="flex items-center gap-2 bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-6 text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <p className="mt-4 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
             {error}
-          </div>
+          </p>
         )}
 
-        <form onSubmit={handleImport} className="flex gap-3">
+        <form onSubmit={handleImport} className="mt-4 flex items-center gap-3">
+          <span aria-hidden className="font-mono text-[11px] text-gold-dim">
+            /
+          </span>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="AniList username"
-            className="flex-1 bg-surface border border-hairline rounded-lg px-4 py-3 text-paper
-                       placeholder-faint focus:outline-none focus:border-gold-dim"
+            placeholder="anilist username"
+            className="flex-1 border-b border-hairline bg-transparent px-1 py-1.5 font-mono
+                       text-[12.5px] text-paper placeholder-faint focus:border-gold-dim focus:outline-none"
           />
           <button
             type="submit"
             disabled={importing}
-            className="bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50 font-semibold px-6 py-3 rounded-lg transition"
+            className="shrink-0 font-mono text-[12px] text-gold transition hover:text-gold-bright
+                       disabled:cursor-default disabled:text-faint"
           >
-            {importing ? "Importing…" : "Import"}
+            {importing ? "[importing…]" : "[import]"}
           </button>
         </form>
-
-        {summary && (
-          <div className="mt-6 border border-hairline rounded-lg p-4">
-            <div className="flex items-center gap-2 text-jade mb-3">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-semibold text-paper">
-                Imported {summary.entriesAdded} of {summary.total} entries
-              </span>
-            </div>
-            <ul className="text-sm text-muted space-y-1">
-              <li>{summary.entriesAdded} added to your reading list</li>
-              <li>{summary.entriesSkipped} skipped (already on your list)</li>
-              <li>{summary.novelsCreated} new titles added to the catalog</li>
-              {summary.failures.length > 0 && (
-                <li className="text-seal-bright">
-                  {summary.failures.length} failed: {summary.failures.join(", ")}
-                </li>
-              )}
-            </ul>
-            <Link href="/list" className="inline-block mt-4 text-gold hover:text-gold-bright transition text-sm font-medium">
-              View your list →
-            </Link>
-          </div>
-        )}
       </div>
-    </div>
+
+      {summary && (
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel right={`${summary.entriesAdded} / ${summary.total}`}>
+            Import complete
+          </FolioLabel>
+          <div className="space-y-1 font-mono text-[11.5px] tabular-nums">
+            <p className="text-jade">{summary.entriesAdded} added to your library</p>
+            <p className="text-muted">{summary.entriesSkipped} skipped (already on your list)</p>
+            <p className="text-muted">{summary.novelsCreated} new titles added to the catalog</p>
+            {summary.failures.length > 0 && (
+              <p className="text-seal-bright">
+                {summary.failures.length} failed: {summary.failures.join(", ")}
+              </p>
+            )}
+          </div>
+          <p className="mt-3 font-mono text-[12px]">
+            <Link href="/list" className="text-gold transition hover:text-gold-bright">
+              [view your library →]
+            </Link>
+          </p>
+        </div>
+      )}
+
+      <FolioNav />
+    </FolioSheet>
   );
 }

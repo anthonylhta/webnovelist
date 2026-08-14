@@ -14,6 +14,7 @@ const FOLIO_PATTERNS = [
   /^\/user\/[^/]+$/,
   /^\/sign-in/,
   /^\/sign-up/,
+  /^\/settings/,
 ];
 
 export default function ChromeGate({ children }: { children: React.ReactNode }) {
