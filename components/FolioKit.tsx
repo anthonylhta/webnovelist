@@ -10,15 +10,20 @@ export function FolioSheet({
   statusLeft,
   statusRight,
   footer,
+  wide = false,
   children,
 }: {
   statusLeft: ReactNode;
   statusRight?: ReactNode;
   footer?: ReactNode;
+  /** Data-heavy sheets (admin tables, profile) get a wider column. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
+    <div
+      className={`mx-auto flex w-full flex-col items-center ${wide ? "max-w-4xl" : "max-w-3xl"}`}
+    >
       <div className="w-full border border-hairline bg-surface/20">
         <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2 font-mono text-[11px] tracking-wide text-muted tabular-nums">
           <span className="flex min-w-0 items-center gap-2">

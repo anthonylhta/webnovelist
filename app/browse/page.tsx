@@ -1,10 +1,12 @@
 // app/browse/page.tsx
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import NovelCard from "@/components/NovelCard";
+import { safeImageSrc } from "@/lib/image-hosts";
 import { MEDIA_TYPES, MEDIA_TYPE_LABELS, isMediaType } from "@/lib/media-types";
+import { FolioSheet } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 const getAllGenres = unstable_cache(
   async () => {
@@ -83,7 +85,7 @@ export default async function BrowsePage({
     return `/browse?${params.toString()}`;
   };
 
-  // Helper for the filter pills — genre and type compose with each other
+  // Helper for the filter rows — genre and type compose with each other
   const filterUrl = (nextGenre?: string, nextType?: string) => {
     const params = new URLSearchParams();
     if (nextGenre) params.set("genre", nextGenre);
@@ -95,7 +97,7 @@ export default async function BrowsePage({
   // Generate page numbers to show
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
-    
+
     if (totalPages <= 7) {
       // Show all pages if 7 or fewer
       for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -119,208 +121,189 @@ export default async function BrowsePage({
     return pages;
   };
 
+  const typeLabel = (t: string) =>
+    isMediaType(t) ? MEDIA_TYPE_LABELS[t].toLowerCase() : t;
+
   return (
-    <div>
-      <h1 className="font-serif text-4xl font-semibold text-paper mb-2">Browse Library</h1>
-      <div className="rule-gold w-20 mb-8" />
-
-      {/* Search Bar */}
-      <form className="mb-6">
-        {/* Preserve genre + type filters when searching */}
-        {genre && <input type="hidden" name="genre" value={genre} />}
-        {mediaType && <input type="hidden" name="type" value={mediaType} />}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-faint" />
-          <input
-            type="text"
-            name="search"
-            defaultValue={search || ""}
-            placeholder="Search by title, author…"
-            className="w-full bg-surface border border-hairline rounded-lg pl-10 pr-4 py-3
-                       text-paper placeholder-faint focus:outline-none focus:border-gold-dim"
-          />
-        </div>
-      </form>
-
-      {/* Media Type Filters — only once the catalog has more than one type */}
+    <FolioSheet
+      statusLeft="webnovelist · catalog"
+      statusRight={`${totalCount} title${totalCount !== 1 ? "s" : ""}`}
+      footer={`ink & gold · page ${currentPage} of ${totalPages}`}
+    >
+      {/* Media-type tabs — only once the catalog has more than one type */}
       {allMediaTypes.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
           <Link
             href={filterUrl(genre, undefined)}
-            className={`px-3 py-1 rounded-full text-sm border transition ${
-              !mediaType
-                ? "bg-gold text-ink border-gold font-medium"
-                : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
-            }`}
+            className={`transition ${!mediaType ? "text-gold" : "text-faint hover:text-muted"}`}
           >
-            All Types
+            all
           </Link>
           {allMediaTypes.map((t) => (
             <Link
               key={t}
               href={filterUrl(genre, t)}
-              className={`px-3 py-1 rounded-full text-sm border transition ${
-                mediaType === t
-                  ? "bg-gold text-ink border-gold font-medium"
-                  : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
-              }`}
+              className={`transition ${mediaType === t ? "text-gold" : "text-faint hover:text-muted"}`}
             >
-              {MEDIA_TYPE_LABELS[t]}
+              {typeLabel(t)}
             </Link>
           ))}
         </div>
       )}
 
-      {/* Genre Filters */}
-      <div className="flex flex-wrap gap-2 mb-8">
+      {/* Search */}
+      <form className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
+        {/* Preserve genre + type filters when searching */}
+        {genre && <input type="hidden" name="genre" value={genre} />}
+        {mediaType && <input type="hidden" name="type" value={mediaType} />}
+        <span aria-hidden className="font-mono text-[11px] text-gold-dim">
+          /
+        </span>
+        <input
+          type="text"
+          name="search"
+          defaultValue={search || ""}
+          placeholder="title, author…"
+          className="w-full bg-transparent font-mono text-[12px] text-paper placeholder-faint focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="shrink-0 font-mono text-[11px] text-gold transition hover:text-gold-bright"
+        >
+          [search]
+        </button>
+      </form>
+
+      {/* Genre index */}
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-hairline px-4 py-2.5 font-mono text-[10.5px]">
         <Link
           href={filterUrl(undefined, mediaType)}
-          className={`px-3 py-1 rounded-full text-sm border transition ${
-            !genre
-              ? "bg-gold text-ink border-gold font-medium"
-              : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
-          }`}
+          className={`transition ${!genre ? "text-gold" : "text-faint hover:text-muted"}`}
         >
-          All
+          all genres
         </Link>
         {allGenres.map((g) => (
           <Link
             key={g}
             href={filterUrl(g, mediaType)}
-            className={`px-3 py-1 rounded-full text-sm border transition ${
-              genre === g
-                ? "bg-gold text-ink border-gold font-medium"
-                : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
-            }`}
+            className={`transition ${genre === g ? "text-gold" : "text-faint hover:text-muted"}`}
           >
-            {g}
+            {g.toLowerCase()}
           </Link>
         ))}
       </div>
 
-      {/* Results Count */}
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-muted text-sm">
-          {totalCount} title{totalCount !== 1 ? "s" : ""} found
-          {totalCount > NOVELS_PER_PAGE && (
-            <span className="text-faint">
-              {" "}· showing {(currentPage - 1) * NOVELS_PER_PAGE + 1}–
-              {Math.min(currentPage * NOVELS_PER_PAGE, totalCount)}
-            </span>
-          )}
-        </p>
+      {/* Results line */}
+      <div className="flex items-baseline justify-between border-b border-hairline px-4 py-2 font-mono text-[9.5px] tracking-[0.1em] text-faint tabular-nums">
+        <span>
+          {totalCount} title{totalCount !== 1 ? "s" : ""}
+          {totalCount > NOVELS_PER_PAGE &&
+            ` · showing ${(currentPage - 1) * NOVELS_PER_PAGE + 1}–${Math.min(
+              currentPage * NOVELS_PER_PAGE,
+              totalCount
+            )}`}
+        </span>
         {totalPages > 1 && (
-          <p className="text-faint text-sm">
-            Page {currentPage} of {totalPages}
-          </p>
+          <span>
+            page {currentPage} / {totalPages}
+          </span>
         )}
       </div>
 
-      {/* Novel Grid */}
+      {/* Catalog rows */}
       {novels.length === 0 ? (
-        <p className="text-muted text-center py-12">No titles found.</p>
+        <div className="px-4 py-14 text-center">
+          <p className="font-serif text-[15px] text-muted">
+            Nothing in the catalog matches.{" "}
+            <Link href="/browse" className="text-gold transition hover:text-gold-bright">
+              Clear the filters
+            </Link>
+            .
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="divide-y divide-hairline">
           {novels.map((novel, i) => (
-            <NovelCard
-              key={novel.id}
-              id={novel.id}
-              title={novel.title}
-              nativeTitle={novel.nativeTitle}
-              mediaType={novel.mediaType}
-              coverImageUrl={novel.coverImageUrl}
-              bordered
-              priority={i < 4}
-              footer={
-                <>
-                  <p className="text-faint text-sm mt-1 truncate">{novel.author}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {novel.genres.slice(0, 2).map((g) => (
-                      <span key={g} className="px-2 py-0.5 bg-elevated border border-hairline rounded text-xs text-muted">
-                        {g}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between mt-3 text-xs text-faint">
-                    <span className="capitalize">{novel.status}</span>
-                    <span>{novel.totalChapters} ch.</span>
-                  </div>
-                </>
-              }
-            />
+            <div key={novel.id} className="flex items-center gap-3 px-4 py-2.5">
+              <Link href={`/novel/${novel.id}`} className="shrink-0">
+                <Image
+                  src={safeImageSrc(novel.coverImageUrl, "/default-cover.svg")}
+                  alt={novel.title}
+                  width={32}
+                  height={44}
+                  priority={i === 0}
+                  className="rounded-[2px] object-cover ring-1 ring-hairline"
+                />
+              </Link>
+              <div className="min-w-0 flex-1">
+                <Link
+                  href={`/novel/${novel.id}`}
+                  className="block min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                >
+                  {novel.title}
+                </Link>
+                <div className="truncate text-[11px]">
+                  {novel.nativeTitle ? (
+                    <span className="font-cjk text-faint">{novel.nativeTitle}</span>
+                  ) : (
+                    <span className="text-faint">{novel.author}</span>
+                  )}
+                </div>
+              </div>
+              <span className="hidden w-24 shrink-0 text-right font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted sm:block">
+                {typeLabel(novel.mediaType)}
+              </span>
+              <span className="w-16 shrink-0 text-right font-mono text-[10.5px] text-body tabular-nums">
+                {novel.totalChapters ? `${novel.totalChapters} ch` : "—"}
+              </span>
+              <span className="hidden w-16 shrink-0 text-right font-mono text-[9.5px] text-faint md:block">
+                {novel.status ?? ""}
+              </span>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-10">
-          {/* First Page */}
-          {currentPage > 2 && (
-            <Link
-              href={buildPageUrl(1)}
-              className="p-2 bg-surface border border-hairline rounded-md transition text-muted hover:border-gold-dim hover:text-gold"
-              title="First page"
-            >
-              <ChevronsLeft className="w-4 h-4" />
-            </Link>
-          )}
-
-          {/* Previous */}
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-hairline px-4 py-2.5 font-mono text-[11px] tabular-nums">
           {currentPage > 1 && (
             <Link
               href={buildPageUrl(currentPage - 1)}
-              className="p-2 bg-surface border border-hairline rounded-md transition text-muted hover:border-gold-dim hover:text-gold"
-              title="Previous page"
+              className="text-gold transition hover:text-gold-bright"
             >
-              <ChevronLeft className="w-4 h-4" />
+              [prev]
             </Link>
           )}
-
-          {/* Page Numbers */}
           {getPageNumbers().map((pageNum, i) =>
             pageNum === "..." ? (
-              <span key={`dots-${i}`} className="px-2 text-faint">
+              <span key={`dots-${i}`} className="text-faint">
                 …
               </span>
             ) : (
               <Link
                 key={pageNum}
                 href={buildPageUrl(pageNum as number)}
-                className={`px-3 py-2 rounded-md text-sm font-medium border transition ${
-                  currentPage === pageNum
-                    ? "bg-gold text-ink border-gold"
-                    : "bg-surface text-muted border-hairline hover:border-gold-dim hover:text-gold"
+                className={`transition ${
+                  currentPage === pageNum ? "text-gold" : "text-faint hover:text-muted"
                 }`}
               >
                 {pageNum}
               </Link>
             )
           )}
-
-          {/* Next */}
           {currentPage < totalPages && (
             <Link
               href={buildPageUrl(currentPage + 1)}
-              className="p-2 bg-surface border border-hairline rounded-md transition text-muted hover:border-gold-dim hover:text-gold"
-              title="Next page"
+              className="text-gold transition hover:text-gold-bright"
             >
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          )}
-
-          {/* Last Page */}
-          {currentPage < totalPages - 1 && (
-            <Link
-              href={buildPageUrl(totalPages)}
-              className="p-2 bg-surface border border-hairline rounded-md transition text-muted hover:border-gold-dim hover:text-gold"
-              title="Last page"
-            >
-              <ChevronsRight className="w-4 h-4" />
+              [next]
             </Link>
           )}
         </div>
       )}
-    </div>
+
+      <FolioNav />
+    </FolioSheet>
   );
 }
