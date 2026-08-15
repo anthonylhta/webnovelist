@@ -6,7 +6,8 @@ import { useAuth, useClerk } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Settings, User, Clock, AlertCircle, CheckCircle, Crown, ShieldCheck, Download } from "lucide-react";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 interface UserSettings {
   id: string;
@@ -116,32 +117,10 @@ export default function SettingsPage() {
   const isAdmin = currentUser?.role === "admin";
   const canChange = isAdmin || !settings?.daysUntilChange;
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "admin":
-        return <Crown className="w-4 h-4 text-seal-bright" />;
-      case "moderator":
-        return <ShieldCheck className="w-4 h-4 text-gold" />;
-      default:
-        return <User className="w-4 h-4 text-muted" />;
-    }
-  };
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-seal/20 text-seal-bright border border-seal/50";
-      case "moderator":
-        return "bg-gold/20 text-gold border border-gold/50";
-      default:
-        return "bg-hairline text-muted border border-hairline";
-    }
-  };
-
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading settings...</div>
+        <div className="font-mono text-xs text-muted">opening settings…</div>
       </div>
     );
   }
@@ -149,163 +128,153 @@ export default function SettingsPage() {
   if (!settings) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Failed to load settings.</div>
+        <div className="font-mono text-xs text-muted">failed to load settings.</div>
       </div>
     );
   }
 
+  const ROLE_COLORS: Record<string, string> = {
+    admin: "text-seal-bright",
+    moderator: "text-gold",
+    user: "text-body",
+  };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 font-serif text-paper">
-        <Settings className="w-8 h-8 text-gold" />
-        Settings
-      </h1>
-
-      {/* Account Info */}
-      <div className="bg-surface border border-hairline rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4 font-serif text-paper">Account Info</h2>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-muted">Email</div>
-              <div>{settings.email}</div>
-            </div>
+    <FolioSheet
+      statusLeft="webnovelist · settings"
+      statusRight={settings.username}
+      footer="ink & gold"
+    >
+      {/* Account */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel>Account</FolioLabel>
+        <div className="space-y-1.5 font-mono text-[11.5px]">
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-muted">email</span>
+            <span className="min-w-0 truncate text-body">{settings.email}</span>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-muted">Role</div>
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm mt-1 ${getRoleBadge(
-                  settings.role
-                )}`}
-              >
-                {getRoleIcon(settings.role)}
-                {settings.role}
-              </span>
-            </div>
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-muted">role</span>
+            <span className={ROLE_COLORS[settings.role] ?? "text-body"}>
+              {settings.role}
+            </span>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-muted">Member Since</div>
-              <div>
-                {new Date(settings.createdAt).toLocaleDateString("en-US", {
-                  month: "long",
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="text-muted">member since</span>
+            <span className="text-body tabular-nums">
+              {new Date(settings.createdAt)
+                .toLocaleDateString("en-US", {
+                  month: "short",
                   day: "numeric",
                   year: "numeric",
-                })}
-              </div>
-            </div>
+                })
+                .toLowerCase()}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Import from AniList — admins/mods only (it creates catalog entries) */}
       {(currentUser?.role === "admin" || currentUser?.role === "moderator") && (
-        <div className="bg-surface border border-hairline rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-2 font-serif text-paper">Import from AniList</h2>
-          <p className="text-sm text-muted mb-4">
-            Pull your manga, manhwa, and light novel list from AniList into your reading list.
-          </p>
-          <Link
-            href="/settings/import"
-            className="inline-flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-4 py-2 rounded-lg font-semibold transition text-sm"
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel
+            right={
+              <Link
+                href="/settings/import"
+                className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+              >
+                [open importer]
+              </Link>
+            }
           >
-            <Download className="w-4 h-4" />
-            Open Importer
-          </Link>
+            AniList import
+          </FolioLabel>
+          <p className="font-serif text-[14px] leading-relaxed text-muted">
+            Pull your manga, manhwa, and light-novel list from AniList into
+            your library.
+          </p>
         </div>
       )}
 
-      {/* Change Username */}
-      <div className="bg-surface border border-hairline rounded-xl p-6">
-        <h2 className="text-lg font-semibold mb-4 font-serif text-paper">Change Username</h2>
+      {/* Change username */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel>Username</FolioLabel>
 
-        {/* Cooldown Notice */}
         {!isAdmin && settings.daysUntilChange > 0 && (
-          <div className="flex items-center gap-2 bg-warn/10 border border-warn/30 text-warn rounded-lg p-3 mb-4 text-sm">
-            <Clock className="w-4 h-4 shrink-0" />
-            You can change your username again in {settings.daysUntilChange} day
+          <p className="mb-3 border-l-2 border-warn pl-3 font-mono text-[11px] text-warn">
+            you can change your username again in {settings.daysUntilChange} day
             {settings.daysUntilChange !== 1 ? "s" : ""}.
-          </div>
+          </p>
         )}
 
         {isAdmin && (
-          <div className="flex items-center gap-2 bg-seal/10 border border-seal/30 text-seal-bright rounded-lg p-3 mb-4 text-sm">
-            <Crown className="w-4 h-4 shrink-0" />
-            Admin — no cooldown applied.
-          </div>
+          <p className="mb-3 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
+            admin — no cooldown applied.
+          </p>
         )}
 
         {error && (
-          <div className="flex items-center gap-2 bg-seal/10 border border-seal/50 text-seal-bright rounded-lg p-3 mb-4 text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <p className="mb-3 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
             {error}
-          </div>
+          </p>
         )}
 
         {success && (
-          <div className="flex items-center gap-2 bg-jade/10 border border-jade/50 text-jade rounded-lg p-3 mb-4 text-sm">
-            <CheckCircle className="w-4 h-4 shrink-0" />
+          <p className="mb-3 border-l-2 border-jade pl-3 font-mono text-[11px] text-jade">
             {success}
-          </div>
+          </p>
         )}
 
-        <form onSubmit={handleUsernameChange} className="space-y-4">
-          <div>
-            <label className="block text-sm text-muted mb-1">
-              Username
-            </label>
-            <input
-              type="text"
-              value={newUsername}
-              onChange={(e) => {
-                setNewUsername(e.target.value);
-                setError("");
-                setSuccess("");
-              }}
-              disabled={!canChange || !!success}
-              minLength={3}
-              maxLength={30}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                         text-paper focus:outline-none focus:border-gold-dim
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <p className="text-xs text-faint mt-1">
-              3-30 characters. Letters, numbers, hyphens, and underscores only.
-              {!isAdmin && (
-                <span> Can be changed once every {settings.cooldownDays} days.</span>
-              )}
-            </p>
-          </div>
+        <form onSubmit={handleUsernameChange}>
+          <input
+            type="text"
+            value={newUsername}
+            onChange={(e) => {
+              setNewUsername(e.target.value);
+              setError("");
+              setSuccess("");
+            }}
+            disabled={!canChange || !!success}
+            minLength={3}
+            maxLength={30}
+            className="w-full max-w-sm border border-hairline bg-transparent px-3 py-2 font-mono
+                       text-[12.5px] text-paper focus:border-gold-dim focus:outline-none
+                       disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          <p className="mt-1.5 font-mono text-[9.5px] text-faint">
+            3–30 characters. letters, numbers, hyphens, and underscores only.
+            {!isAdmin && <span> one change every {settings.cooldownDays} days.</span>}
+          </p>
 
           <button
             type="submit"
             disabled={saving || !canChange || !!success}
-            className="bg-gold hover:bg-gold-bright disabled:bg-gold/50
-                       text-ink font-semibold py-3 px-6 rounded-lg transition"
+            className="mt-3 font-mono text-[12px] text-gold transition hover:text-gold-bright
+                       disabled:cursor-default disabled:text-faint"
           >
             {saving
-              ? "Updating..."
+              ? "[updating…]"
               : success
-              ? "Signing out..."
-              : "Update Username"}
+              ? "[signing out…]"
+              : "[update username]"}
           </button>
         </form>
 
         {settings.usernameChangedAt && (
-          <p className="text-xs text-faint mt-4">
-            Last changed:{" "}
-            {new Date(settings.usernameChangedAt).toLocaleDateString("en-US", {
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
+          <p className="mt-3 font-mono text-[9.5px] text-faint">
+            last changed{" "}
+            {new Date(settings.usernameChangedAt)
+              .toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+              .toLowerCase()}
           </p>
         )}
       </div>
-    </div>
+
+      <FolioNav />
+    </FolioSheet>
   );
 }

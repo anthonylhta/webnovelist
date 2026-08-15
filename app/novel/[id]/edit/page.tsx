@@ -5,11 +5,12 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter, useParams } from "next/navigation";
-import { Pencil, ShieldX } from "lucide-react";
 import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/media-types";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
 import NovelCharactersManager from "@/components/NovelCharactersManager";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 
 const GENRE_OPTIONS = [
@@ -82,7 +83,7 @@ export default function EditNovelPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">loading…</div>
       </div>
     );
   }
@@ -95,19 +96,22 @@ export default function EditNovelPage() {
   const userRole = currentUser?.role;
   if (userRole !== "admin" && userRole !== "moderator") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-        <ShieldX className="w-16 h-16 text-seal-bright mb-4" />
-        <h1 className="text-2xl font-bold mb-2 font-serif text-paper">Access Denied</h1>
-        <p className="text-muted mb-6">
-          Only admins and moderators can edit novels.
-        </p>
-        <Link
-          href={`/novel/${novelId}`}
-          className="bg-gold text-ink hover:bg-gold-bright px-6 py-3 rounded-lg font-semibold transition"
-        >
-          Back to Novel
-        </Link>
-      </div>
+      <FolioSheet statusLeft="webnovelist · curation" footer="ink & gold">
+        <div className="px-4 py-14 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-seal-bright">
+            access denied
+          </p>
+          <p className="mx-auto mt-4 max-w-sm font-serif text-[14.5px] leading-relaxed text-muted">
+            Only admins and moderators can edit titles.
+          </p>
+          <p className="mt-5 font-mono text-[12px]">
+            <Link href={`/novel/${novelId}`} className="text-gold transition hover:text-gold-bright">
+              [back to the title]
+            </Link>
+          </p>
+        </div>
+        <FolioNav />
+      </FolioSheet>
     );
   }
 
@@ -171,30 +175,37 @@ export default function EditNovelPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 font-serif text-paper">
-        <Pencil className="w-8 h-8 text-gold" />
-        Edit Novel
-      </h1>
-
-      <div className="bg-surface border border-hairline rounded-xl p-6">
+    <FolioSheet statusLeft="webnovelist · curation · edit title" footer="ink & gold · admin">
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href={`/novel/${novelId}`}
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [view title]
+            </Link>
+          }
+        >
+          Edit title
+        </FolioLabel>
         {error && (
-          <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-6 text-sm">
+          <p className="mb-4 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
             {error}
-          </div>
+          </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Title */}
           <div>
-            <label className="block text-sm text-muted mb-1">
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
               Title (English) <span className="text-seal-bright">*</span>
             </label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-paper focus:outline-none focus:border-gold-dim"
               required
             />
@@ -202,24 +213,24 @@ export default function EditNovelPage() {
 
           {/* Native Title */}
           <div>
-            <label className="block text-sm text-muted mb-1">Title (Native)</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Title (Native)</label>
             <input
               type="text"
               value={form.nativeTitle}
               onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-muted font-cjk focus:outline-none focus:border-gold-dim"
             />
           </div>
 
           {/* Author */}
           <div>
-            <label className="block text-sm text-muted mb-1">Author (display name)</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Author (display name)</label>
             <input
               type="text"
               value={form.author}
               onChange={(e) => setForm({ ...form, author: e.target.value })}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
@@ -227,7 +238,7 @@ export default function EditNovelPage() {
           {/* Link to Author entity */}
           {allAuthors.length > 0 && (
             <div>
-              <label className="block text-sm text-muted mb-1">
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                 Link to Author page
                 <span className="text-faint ml-1">(optional)</span>
               </label>
@@ -236,7 +247,7 @@ export default function EditNovelPage() {
                 onChange={(e) =>
                   setForm({ ...form, authorId: e.target.value ? parseInt(e.target.value) : null })
                 }
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               >
                 <option value="">— None —</option>
@@ -251,12 +262,12 @@ export default function EditNovelPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-sm text-muted mb-1">Description</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={4}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-paper focus:outline-none focus:border-gold-dim resize-none"
             />
           </div>
@@ -271,25 +282,25 @@ export default function EditNovelPage() {
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-muted mb-1">Total Chapters</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Total Chapters</label>
               <input
                 type="number"
                 min="0"
                 value={form.totalChapters}
                 onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
             <div>
-              <label className="block text-sm text-muted mb-1">Year Published</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Year Published</label>
               <input
                 type="number"
                 min="1990"
                 max="2030"
                 value={form.yearPublished}
                 onChange={(e) => setForm({ ...form, yearPublished: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               />
             </div>
@@ -298,11 +309,11 @@ export default function EditNovelPage() {
           {/* Two columns */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-muted mb-1">Media Type</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Media Type</label>
               <select
                 value={form.mediaType}
                 onChange={(e) => setForm({ ...form, mediaType: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               >
                 {MEDIA_TYPES.map((t) => (
@@ -311,11 +322,11 @@ export default function EditNovelPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-muted mb-1">Novel Status</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Novel Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               >
                 <option value="Ongoing">Ongoing</option>
@@ -326,29 +337,29 @@ export default function EditNovelPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-1">Original Source</label>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Original Source</label>
             <input
               type="text"
               value={form.originalSource}
               onChange={(e) => setForm({ ...form, originalSource: e.target.value })}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
 
           {/* Genres */}
           <div>
-            <label className="block text-sm text-muted mb-2">Genres</label>
+            <label className="mb-2 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Genres</label>
             <div className="flex flex-wrap gap-2">
               {GENRE_OPTIONS.map((genre) => (
                 <button
                   key={genre}
                   type="button"
                   onClick={() => toggleGenre(genre)}
-                  className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                  className={`rounded-[2px] border px-2.5 py-1 font-mono text-[10.5px] transition ${
                     form.genres.includes(genre)
-                      ? "bg-gold text-ink"
-                      : "bg-elevated text-muted hover:bg-hairline"
+                      ? "border-gold text-gold"
+                      : "border-hairline text-muted hover:border-gold-dim"
                   }`}
                 >
                   {form.genres.includes(genre) && "✓ "}
@@ -360,14 +371,14 @@ export default function EditNovelPage() {
 
           {/* Tags */}
           <div>
-            <label className="block text-sm text-muted mb-1">
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
               Tags (comma separated)
             </label>
             <input
               type="text"
               value={form.tags}
               onChange={(e) => setForm({ ...form, tags: e.target.value })}
-              className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
+              className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
@@ -377,22 +388,23 @@ export default function EditNovelPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50
-                         font-semibold py-3 rounded-lg transition"
+              className="flex-1 rounded-[2px] bg-gold py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink transition hover:bg-gold-bright disabled:bg-gold/50"
             >
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? "saving…" : "save changes"}
             </button>
             <Link
               href={`/novel/${novelId}`}
-              className="px-6 bg-elevated hover:bg-hairline text-body
-                         font-semibold py-3 rounded-lg transition text-center"
+              className="rounded-[2px] border border-hairline px-6 py-2.5 text-center font-mono text-[12px] uppercase tracking-[0.14em] text-muted transition hover:border-gold-dim hover:text-gold"
             >
-              Cancel
+              cancel
             </Link>
           </div>
         </form>
       </div>
-      <NovelCharactersManager novelId={novelId} />
-    </div>
+      <div className="border-b border-hairline px-4 py-4">
+        <NovelCharactersManager novelId={novelId} />
+      </div>
+      <FolioNav />
+    </FolioSheet>
   );
 }

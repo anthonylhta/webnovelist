@@ -10,15 +10,20 @@ export function FolioSheet({
   statusLeft,
   statusRight,
   footer,
+  wide = false,
   children,
 }: {
   statusLeft: ReactNode;
   statusRight?: ReactNode;
   footer?: ReactNode;
+  /** Data-heavy sheets (admin tables, profile) get a wider column. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col items-center">
+    <div
+      className={`mx-auto flex w-full flex-col items-center ${wide ? "max-w-4xl" : "max-w-3xl"}`}
+    >
       <div className="w-full border border-hairline bg-surface/20">
         <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-2 font-mono text-[11px] tracking-wide text-muted tabular-nums">
           <span className="flex min-w-0 items-center gap-2">
@@ -53,6 +58,18 @@ export function FolioLabel({
       <span aria-hidden className="h-px flex-1 bg-hairline" />
       {right != null && <span className="shrink-0 text-gold-dim tabular-nums">{right}</span>}
     </div>
+  );
+}
+
+/** Hairline distribution bar for ledger modules — square, quiet, gold. */
+export function LedgerBar({ value, max }: { value: number; max: number }) {
+  return (
+    <span className="h-2 flex-1 overflow-hidden bg-elevated">
+      <span
+        className="block h-full bg-gold-dim"
+        style={{ width: `${max > 0 ? (value / max) * 100 : 0}%` }}
+      />
+    </span>
   );
 }
 

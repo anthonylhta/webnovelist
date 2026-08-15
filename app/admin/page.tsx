@@ -6,10 +6,9 @@ import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  Shield, Users, BookOpen, Crown, ShieldCheck, User, Trash2,
-} from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 interface UserData {
   id: string;
@@ -128,168 +127,119 @@ export default function AdminPage() {
     return false;
   };
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "admin":
-        return <Crown className="w-4 h-4 text-gold" />;
-      case "moderator":
-        return <ShieldCheck className="w-4 h-4 text-gold-dim" />;
-      default:
-        return <User className="w-4 h-4 text-muted" />;
-    }
-  };
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-gold/10 text-gold border border-gold/30";
-      case "moderator":
-        return "bg-gold/10 text-gold-dim border border-gold/30";
-      default:
-        return "bg-elevated text-muted border border-hairline";
-    }
+  const ROLE_COLORS: Record<string, string> = {
+    admin: "text-gold",
+    moderator: "text-gold-dim",
+    user: "text-muted",
   };
 
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">opening the back room…</div>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8 flex items-center gap-3 font-serif text-paper">
-        <Shield className="w-8 h-8 text-gold" />
-        Admin Panel
-      </h1>
-
-      {/* Quick links */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        <Link
-          href="/admin/novels"
-          className="flex items-center gap-2 bg-surface border border-hairline hover:border-gold-dim rounded-xl px-4 py-3 text-sm text-body hover:text-gold-bright transition"
-        >
-          <BookOpen className="w-4 h-4 text-gold" />
-          Manage Novels
+    <FolioSheet
+      wide
+      statusLeft="webnovelist · curation"
+      statusRight={`${users.length} reader${users.length !== 1 ? "s" : ""}`}
+      footer="ink & gold · admin"
+    >
+      {/* Sections */}
+      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
+        <span className="text-gold">users</span>
+        <Link href="/admin/novels" className="text-faint transition hover:text-muted">
+          titles
         </Link>
-        <Link
-          href="/admin/authors"
-          className="flex items-center gap-2 bg-surface border border-hairline hover:border-gold-dim rounded-xl px-4 py-3 text-sm text-body hover:text-gold-bright transition"
-        >
-          <User className="w-4 h-4 text-gold" />
-          Manage Authors
+        <Link href="/admin/authors" className="text-faint transition hover:text-muted">
+          authors
+        </Link>
+        <span className="flex-1" />
+        <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
+          [+ add title]
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
-          <Users className="w-5 h-5 text-gold mx-auto mb-2" />
-          <div className="text-2xl font-bold">{users.length}</div>
-          <div className="text-xs text-faint">Total Users</div>
-        </div>
-        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
-          <Crown className="w-5 h-5 text-gold mx-auto mb-2" />
-          <div className="text-2xl font-bold">
-            {users.filter((u) => u.role === "admin").length}
+      {/* Counts */}
+      <div className="grid grid-cols-2 divide-x divide-hairline border-b border-hairline sm:grid-cols-4">
+        {[
+          { label: "readers", value: users.length },
+          { label: "admins", value: users.filter((u) => u.role === "admin").length },
+          { label: "moderators", value: users.filter((u) => u.role === "moderator").length },
+          { label: "list entries", value: users.reduce((sum, u) => sum + u._count.novelList, 0) },
+        ].map((cell) => (
+          <div key={cell.label} className="px-4 py-3">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+              {cell.label}
+            </p>
+            <p className="mt-1.5 font-mono text-base text-paper tabular-nums">{cell.value}</p>
           </div>
-          <div className="text-xs text-faint">Admins</div>
-        </div>
-        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
-          <ShieldCheck className="w-5 h-5 text-gold-dim mx-auto mb-2" />
-          <div className="text-2xl font-bold">
-            {users.filter((u) => u.role === "moderator").length}
-          </div>
-          <div className="text-xs text-faint">Moderators</div>
-        </div>
-        <div className="bg-surface border border-hairline rounded-xl p-4 text-center">
-          <BookOpen className="w-5 h-5 text-jade mx-auto mb-2" />
-          <div className="text-2xl font-bold">
-            {users.reduce((sum, u) => sum + u._count.novelList, 0)}
-          </div>
-          <div className="text-xs text-faint">Total List Entries</div>
-        </div>
+        ))}
       </div>
 
-      {/* Users Table */}
-      <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-hairline text-muted text-sm">
-              <th className="text-left p-4">User</th>
-              <th className="text-left p-4">Role</th>
-              <th className="text-left p-4 hidden md:table-cell">Novels</th>
-              <th className="text-left p-4 hidden lg:table-cell">Joined</th>
-              <th className="text-right p-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b border-hairline hover:bg-elevated/30 transition"
+      {/* Users */}
+      <div className="border-b border-hairline px-4 pt-4 pb-1.5">
+        <FolioLabel right={String(users.length)}>Readers</FolioLabel>
+        <div className="divide-y divide-hairline">
+          {users.map((user) => (
+            <div key={user.id} className="flex items-center gap-3 py-2.5">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13.5px] text-paper">{user.username}</p>
+                <p className="truncate font-mono text-[10px] text-faint">{user.email}</p>
+              </div>
+              <span
+                className={`w-20 shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                  ROLE_COLORS[user.role] ?? "text-muted"
+                }`}
               >
-                <td className="p-4">
-                  <div className="font-medium">{user.username}</div>
-                  <div className="text-faint text-sm">{user.email}</div>
-                </td>
-                <td className="p-4">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${getRoleBadge(
-                      user.role
-                    )}`}
-                  >
-                    {getRoleIcon(user.role)}
-                    {user.role}
-                  </span>
-                </td>
-                <td className="p-4 hidden md:table-cell text-muted">
-                  {user._count.novelList}
-                </td>
-                <td className="p-4 hidden lg:table-cell text-muted text-sm">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-                <td className="p-4 text-right">
-                  {user.id === currentUserId ? (
-                    <span className="text-faint text-sm">You</span>
-                  ) : (
-                    <div className="flex items-center justify-end gap-2">
-                      {/* Role Change — Admin Only */}
-                      {currentRole === "admin" && (
-                        <select
-                          value={user.role}
-                          onChange={(e) =>
-                            setChangingRole({ user, newRole: e.target.value })
-                          }
-                          className="bg-surface border border-hairline rounded-lg px-3 py-1.5
-                                     text-sm text-paper focus:outline-none focus:border-gold-dim"
-                        >
-                          <option value="user">User</option>
-                          <option value="moderator">Moderator</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      )}
-
-                      {/* Delete Button */}
-                      {canDelete(user) && (
-                        <button
-                          onClick={() => setDeletingUser(user)}
-                          className="p-2 text-muted hover:text-seal-bright transition"
-                          title={`Delete ${user.username}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                {user.role}
+              </span>
+              <span className="hidden w-14 shrink-0 text-right font-mono text-[10.5px] text-body tabular-nums md:block">
+                {user._count.novelList}
+              </span>
+              <span className="hidden w-20 shrink-0 text-right font-mono text-[9.5px] text-faint tabular-nums lg:block">
+                {new Date(user.createdAt).toLocaleDateString()}
+              </span>
+              <div className="flex w-40 shrink-0 items-center justify-end gap-3">
+                {user.id === currentUserId ? (
+                  <span className="font-mono text-[10px] text-faint">you</span>
+                ) : (
+                  <>
+                    {currentRole === "admin" && (
+                      <select
+                        value={user.role}
+                        onChange={(e) =>
+                          setChangingRole({ user, newRole: e.target.value })
+                        }
+                        className="border border-hairline bg-transparent px-2 py-1 font-mono
+                                   text-[10.5px] text-paper focus:border-gold-dim focus:outline-none"
+                      >
+                        <option value="user">user</option>
+                        <option value="moderator">moderator</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    )}
+                    {canDelete(user) && (
+                      <button
+                        onClick={() => setDeletingUser(user)}
+                        className="font-mono text-[11px] text-muted transition hover:text-seal-bright"
+                        title={`Delete ${user.username}`}
+                      >
+                        [rm]
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      <FolioNav />
 
       {/* Confirm Role Change Modal */}
       {changingRole && (
@@ -318,6 +268,6 @@ export default function AdminPage() {
           onCancel={() => setDeletingUser(null)}
         />
       )}
-    </div>
+    </FolioSheet>
   );
 }

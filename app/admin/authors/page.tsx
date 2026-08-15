@@ -6,11 +6,10 @@ import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  User, Plus, Edit2, Trash2, BookOpen, X, Check, Upload,
-  ChevronLeft, AlertCircle,
-} from "lucide-react";
+import { X, Check, Upload, AlertCircle } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 
 interface AuthorData {
   id: number;
@@ -172,120 +171,108 @@ export default function AdminAuthorsPage() {
   if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-muted">Loading...</div>
+        <div className="font-mono text-xs text-muted">opening the author files…</div>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link
-          href="/admin"
-          className="flex items-center gap-1.5 text-muted hover:text-paper transition text-sm"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Admin Panel
+    <FolioSheet
+      wide
+      statusLeft="webnovelist · curation · authors"
+      statusRight={`${authors.length} author${authors.length !== 1 ? "s" : ""}`}
+      footer="ink & gold · admin"
+    >
+      {/* Sections */}
+      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
+        <Link href="/admin" className="text-faint transition hover:text-muted">
+          users
         </Link>
-        <span className="text-faint">/</span>
-        <h1 className="text-2xl font-bold flex items-center gap-2 font-serif text-paper">
-          <User className="w-6 h-6 text-gold" />
-          Authors
-        </h1>
+        <Link href="/admin/novels" className="text-faint transition hover:text-muted">
+          titles
+        </Link>
+        <span className="text-gold">authors</span>
+        <span className="flex-1" />
+        <button onClick={openCreate} className="text-gold transition hover:text-gold-bright">
+          [+ new author]
+        </button>
       </div>
 
-      {/* Stats + action bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-surface border border-hairline rounded-xl px-4 py-2 text-center">
-            <div className="text-lg font-bold">{authors.length}</div>
-            <div className="text-xs text-faint">Total Authors</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search authors…"
-            className="flex-1 sm:w-64 bg-surface border border-hairline rounded-lg px-3 py-2 text-sm text-paper placeholder-faint focus:outline-none focus:border-gold-dim"
-          />
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-gold text-ink hover:bg-gold-bright px-4 py-2 rounded-lg text-sm font-medium transition shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            New Author
-          </button>
-        </div>
+      {/* Search */}
+      <div className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
+        <span aria-hidden className="font-mono text-[11px] text-gold-dim">
+          /
+        </span>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="filter authors…"
+          className="w-full bg-transparent font-mono text-[12px] text-paper placeholder-faint focus:outline-none"
+        />
       </div>
 
-      {/* Author grid */}
+      {/* Rows */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-faint">
-          {authors.length === 0 ? "No authors yet. Create one to get started." : "No authors match your search."}
+        <div className="px-4 py-14 text-center">
+          <p className="font-serif text-[14.5px] text-muted">
+            {authors.length === 0
+              ? "No authors on file yet."
+              : "Nothing matches the filter."}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((author) => (
-            <div
-              key={author.id}
-              className="bg-surface border border-hairline rounded-xl p-4 flex items-start gap-4"
-            >
-              {/* Avatar */}
-              <div className="relative w-14 h-14 rounded-full overflow-hidden border border-hairline shrink-0 bg-elevated">
-                <Image
-                  fill
-                  sizes="56px"
-                  src={author.imageUrl || AVATAR_PLACEHOLDER}
-                  alt={author.name}
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <Link
-                  href={`/author/${author.id}`}
-                  className="font-semibold text-paper hover:text-gold-bright transition truncate block"
-                >
-                  {author.name}
-                </Link>
-                <div className="flex items-center gap-3 mt-1 text-xs text-faint">
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="w-3 h-3" />
-                    {author._count.novels} novel{author._count.novels !== 1 ? "s" : ""}
-                  </span>
+        <div className="border-b border-hairline px-4 pt-3 pb-1.5">
+          <FolioLabel right={String(filtered.length)}>Authors</FolioLabel>
+          <div className="divide-y divide-hairline">
+            {filtered.map((author) => (
+              <div key={author.id} className="flex items-center gap-3 py-2.5">
+                <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-hairline bg-elevated">
+                  <Image
+                    fill
+                    sizes="36px"
+                    src={author.imageUrl || AVATAR_PLACEHOLDER}
+                    alt={author.name}
+                    className="object-cover"
+                  />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/author/${author.id}`}
+                    className="block min-w-0 truncate font-serif text-[14.5px] text-paper transition hover:text-gold"
+                  >
+                    {author.name}
+                  </Link>
+                  {author.bio && (
+                    <p className="truncate font-mono text-[10px] text-faint">{author.bio}</p>
+                  )}
                 </div>
-                {author.bio && (
-                  <p className="text-xs text-muted mt-1.5 line-clamp-2 leading-snug">
-                    {author.bio}
-                  </p>
-                )}
+                <span className="w-16 shrink-0 text-right font-mono text-[10.5px] text-body tabular-nums">
+                  {author._count.novels} title{author._count.novels !== 1 ? "s" : ""}
+                </span>
+                <div className="flex w-[88px] shrink-0 items-center justify-end gap-2 font-mono text-[11px]">
+                  <button
+                    onClick={() => openEdit(author)}
+                    className="text-muted transition hover:text-gold"
+                    title="Edit"
+                  >
+                    [edit]
+                  </button>
+                  <button
+                    onClick={() => setDeletingAuthor(author)}
+                    className="text-muted transition hover:text-seal-bright"
+                    title="Delete"
+                  >
+                    [rm]
+                  </button>
+                </div>
               </div>
-
-              {/* Actions */}
-              <div className="flex flex-col gap-1 shrink-0">
-                <button
-                  onClick={() => openEdit(author)}
-                  className="p-1.5 text-faint hover:text-gold-bright transition"
-                  title="Edit"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setDeletingAuthor(author)}
-                  className="p-1.5 text-faint hover:text-seal-bright transition"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
+
+      <FolioNav />
 
       {/* Create / Edit form modal */}
       {formOpen && (
@@ -415,6 +402,6 @@ export default function AdminAuthorsPage() {
           onCancel={() => setDeletingAuthor(null)}
         />
       )}
-    </div>
+    </FolioSheet>
   );
 }

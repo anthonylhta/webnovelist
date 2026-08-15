@@ -2,20 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { BookOpen, Heart, User } from "lucide-react";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import FavoriteCharacterButton from "@/components/FavoriteCharacterButton";
+import { FolioSheet, FolioLabel } from "@/components/FolioKit";
+import FolioNav from "@/components/FolioNav";
 import { safeImageSrc } from "@/lib/image-hosts";
 
 const PLACEHOLDER = "/default-cover.svg";
 const AVATAR_PLACEHOLDER = "/default-avatar.svg";
 
-const ROLE_STYLES: Record<string, string> = {
-  Protagonist: "bg-gold/10 text-gold-bright border-gold/30",
-  "Main Character": "bg-gold/10 text-gold border-gold/30",
-  Antagonist: "bg-seal/10 text-seal-bright border-seal/30",
-  Supporting: "bg-elevated text-muted border-hairline",
+const ROLE_COLORS: Record<string, string> = {
+  Protagonist: "text-gold-bright",
+  "Main Character": "text-gold",
+  Antagonist: "text-seal-bright",
+  Supporting: "text-muted",
 };
 
 export async function generateMetadata({
@@ -71,110 +72,84 @@ export default async function CharacterPage({
 
   const avatarUrl = character.imageUrl || AVATAR_PLACEHOLDER;
   const coverUrl = safeImageSrc(character.novel.coverImageUrl, PLACEHOLDER);
-  const roleStyle = ROLE_STYLES[character.role ?? ""] ?? ROLE_STYLES.Supporting;
+  const roleColor = ROLE_COLORS[character.role ?? ""] ?? ROLE_COLORS.Supporting;
 
   return (
-    <div className="-mt-8 -mx-4">
-      {/* Blurred hero using novel cover */}
-      <div className="relative h-48 sm:h-60 overflow-hidden">
-        <Image
-          src={coverUrl}
-          alt=""
-          fill
-          sizes="100vw"
-          priority
-          className="object-cover scale-110 blur-2xl opacity-30"
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent" />
+    <FolioSheet
+      statusLeft="webnovelist · characters"
+      statusRight={`${character._count.favorites} ♥`}
+      footer="ink & gold"
+    >
+      {/* Nameplate */}
+      <div className="flex items-center gap-5 border-b border-hairline px-4 py-6">
+        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-hairline bg-elevated">
+          <Image src={avatarUrl} alt={character.name} fill sizes="64px" priority className="object-cover" />
+        </span>
+        <div className="min-w-0 flex-1">
+          {character.role && (
+            <p className={`font-mono text-[9.5px] uppercase tracking-[0.22em] ${roleColor}`}>
+              {character.role}
+            </p>
+          )}
+          <h1 className="mt-1 font-serif text-2xl font-semibold text-paper sm:text-[26px]">
+            {character.name}
+          </h1>
+          <p className="mt-1.5 font-mono text-[10px] text-faint tabular-nums">
+            {character._count.favorites} favourite{character._count.favorites !== 1 ? "s" : ""}
+          </p>
+        </div>
+        {me && (
+          <FavoriteCharacterButton
+            characterId={characterId}
+            initialFavorited={isFavorited}
+          />
+        )}
       </div>
 
-      <div className="relative -mt-28 sm:-mt-36 px-4 sm:px-6 pb-16">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-center sm:items-end">
-
-            {/* Avatar */}
-            <div className="shrink-0">
-              <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-ink shadow-2xl ring-1 ring-white/10 bg-elevated">
-                <Image
-                  src={avatarUrl}
-                  alt={character.name}
-                  fill
-                  sizes="144px"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-
-            {/* Name + meta */}
-            <div className="flex-1 text-center sm:text-left pb-0 sm:pb-2">
-              {character.role && (
-                <span className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full border mb-2 ${roleStyle}`}>
-                  {character.role}
-                </span>
-              )}
-              <h1 className="text-3xl sm:text-4xl font-bold font-serif text-paper">{character.name}</h1>
-
-              {/* Novel link */}
-              <Link
-                href={`/novel/${character.novel.id}`}
-                className="flex items-center justify-center sm:justify-start gap-1.5 mt-2 text-sm text-muted hover:text-gold transition"
-              >
-                <BookOpen className="w-3.5 h-3.5" />
-                {character.novel.title}
-              </Link>
-
-              {/* Author link */}
-              {character.novel.author && (
-                <Link
-                  href={character.novel.authorId ? `/author/${character.novel.authorId}` : "#"}
-                  className="flex items-center justify-center sm:justify-start gap-1.5 mt-1 text-xs text-faint hover:text-gold transition"
-                >
-                  <User className="w-3 h-3" />
-                  {character.novel.author}
-                </Link>
-              )}
-
-              <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-2 text-xs text-faint">
-                <Heart className="w-3 h-3" />
-                {character._count.favorites} favourite{character._count.favorites !== 1 ? "s" : ""}
-              </div>
-            </div>
-
-            {/* Favourite button */}
-            {me && (
-              <div className="shrink-0">
-                <FavoriteCharacterButton characterId={characterId} initialFavorited={isFavorited} />
-              </div>
-            )}
-          </div>
-
-          {/* Novel card */}
-          <div className="mt-10">
-            <h2 className="text-xs font-semibold text-faint uppercase tracking-widest mb-4">From</h2>
-            <Link href={`/novel/${character.novel.id}`} className="flex items-center gap-4 bg-surface border border-hairline hover:border-gold-dim rounded-xl p-4 transition group">
-              <div className="relative w-12 h-16 rounded-lg overflow-hidden shrink-0 border border-hairline">
-                <Image
-                  fill
-                  sizes="48px"
-                  src={coverUrl}
-                  alt={character.novel.title}
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <p className="font-semibold group-hover:text-gold-bright transition">{character.novel.title}</p>
-                {character.novel.nativeTitle && (
-                  <p className="font-cjk text-sm text-muted">{character.novel.nativeTitle}</p>
-                )}
-                {character.novel.author && (
-                  <p className="text-xs text-faint mt-0.5">{character.novel.author}</p>
-                )}
-              </div>
+      {/* From */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel>From</FolioLabel>
+        <div className="flex items-center gap-3">
+          <Link href={`/novel/${character.novel.id}`} className="shrink-0">
+            <Image
+              src={coverUrl}
+              alt={character.novel.title}
+              width={40}
+              height={56}
+              className="rounded-[2px] object-cover ring-1 ring-hairline"
+            />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <Link
+              href={`/novel/${character.novel.id}`}
+              className="block min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+            >
+              {character.novel.title}
             </Link>
+            {character.novel.nativeTitle && (
+              <p className="truncate font-cjk text-[11px] text-faint">
+                {character.novel.nativeTitle}
+              </p>
+            )}
+            {character.novel.author && (
+              <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                {character.novel.authorId ? (
+                  <Link
+                    href={`/author/${character.novel.authorId}`}
+                    className="transition hover:text-gold"
+                  >
+                    {character.novel.author}
+                  </Link>
+                ) : (
+                  character.novel.author
+                )}
+              </p>
+            )}
           </div>
         </div>
       </div>
-    </div>
+
+      <FolioNav />
+    </FolioSheet>
   );
 }
