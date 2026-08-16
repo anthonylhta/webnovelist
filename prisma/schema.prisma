@@ -59,6 +59,7 @@ model Novel {
   description    String?   @db.Text
   coverImageUrl  String?   @map("cover_image_url")
   totalChapters  Int?      @map("total_chapters")
+  latestChapter  Int?      @map("latest_chapter") // latest released chapter, for ongoing series
   status         String?
   genres         String[]
   tags           String[]

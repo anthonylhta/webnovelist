@@ -80,6 +80,15 @@ describe("POST /api/novels", () => {
     expect(vi.mocked(prisma.novel.create).mock.calls[0][0].data.mediaType).toBe("manhwa");
   });
 
+  it("stores the latest released chapter, and nulls it when blank", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    vi.mocked(prisma.novel.create).mockResolvedValue(novelFixture as never);
+    await POST(makeRequest("POST", { title: "Ongoing", latestChapter: 353, genres: [], tags: [] }));
+    expect(vi.mocked(prisma.novel.create).mock.calls[0][0].data.latestChapter).toBe(353);
+    await POST(makeRequest("POST", { title: "Finished", latestChapter: "", genres: [], tags: [] }));
+    expect(vi.mocked(prisma.novel.create).mock.calls[1][0].data.latestChapter).toBeNull();
+  });
+
   it("allows admin to create a novel", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
     vi.mocked(prisma.novel.create).mockResolvedValue(novelFixture as never);

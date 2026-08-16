@@ -91,6 +91,7 @@ export async function PUT(
         description: body.description ? sanitizeString(body.description) : null,
         coverImageUrl: body.coverImageUrl || null,
         totalChapters: body.totalChapters ? parseInt(body.totalChapters) : null,
+        latestChapter: body.latestChapter ? parseInt(body.latestChapter) : null,
         status: body.status ? sanitizeString(body.status) : null,
         genres: Array.isArray(body.genres) ? body.genres.map(sanitizeString) : [],
         tags: Array.isArray(body.tags) ? body.tags.map(sanitizeString) : [],

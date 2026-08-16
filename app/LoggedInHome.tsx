@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
 import FolioPlusOne from "@/components/FolioPlusOne";
-import type { WeekDigest } from "@/lib/folio";
+import { chaptersBehind, type WeekDigest } from "@/lib/folio";
 
 interface ReadingEntry {
   id: number;
@@ -16,6 +16,7 @@ interface ReadingEntry {
     title: string;
     nativeTitle: string | null;
     totalChapters: number | null;
+    latestChapter: number | null;
     author: string | null;
   };
 }
@@ -155,6 +156,7 @@ export default function LoggedInHome({
                     100
                   )
                 : null;
+              const behind = chaptersBehind(entry.currentChapter, entry.novel.latestChapter);
               return (
                 <div key={entry.id} className="py-2.5 first:pt-0.5 last:pb-0.5">
                   <div className="flex items-baseline gap-2.5">
@@ -182,6 +184,7 @@ export default function LoggedInHome({
                     </span>
                     <span className="shrink-0 font-mono text-[9.5px] text-faint tabular-nums">
                       {pct !== null ? `${pct}% · ` : ""}
+                      {behind !== null && behind > 0 ? `${behind} behind · ` : ""}
                       {shortDate(entry.updatedAt)}
                     </span>
                   </div>

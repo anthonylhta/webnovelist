@@ -47,6 +47,7 @@ export default async function Home() {
               title: true,
               nativeTitle: true,
               totalChapters: true,
+              latestChapter: true,
               author: true,
             },
           },

@@ -165,3 +165,12 @@ export function buildMonthLedger(activities: ActivityRow[], now: Date): MonthLed
 
   return { days, chapters: days.reduce((sum, n) => sum + n, 0), finished, ratings };
 }
+
+/**
+ * How far behind the latest released chapter a reader is — null when the
+ * title has no known latest chapter, 0 when caught up (or ahead of stale data).
+ */
+export function chaptersBehind(current: number, latest: number | null): number | null {
+  if (latest == null) return null;
+  return Math.max(0, latest - current);
+}

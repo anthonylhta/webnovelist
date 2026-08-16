@@ -37,6 +37,7 @@ export default function EditNovelPage() {
     description: "",
     coverImageUrl: "",
     totalChapters: "",
+    latestChapter: "",
     status: "Ongoing",
     genres: [] as string[],
     tags: "",
@@ -65,6 +66,7 @@ export default function EditNovelPage() {
           description: novel.description || "",
           coverImageUrl: novel.coverImageUrl || "",
           totalChapters: novel.totalChapters?.toString() || "",
+          latestChapter: novel.latestChapter?.toString() || "",
           status: novel.status || "Ongoing",
           genres: novel.genres || [],
           tags: novel.tags?.join(", ") || "",
@@ -148,6 +150,7 @@ export default function EditNovelPage() {
           description: form.description.trim() || null,
           coverImageUrl: form.coverImageUrl.trim() || null,
           totalChapters: form.totalChapters ? parseInt(form.totalChapters) : null,
+          latestChapter: form.latestChapter ? parseInt(form.latestChapter) : null,
           status: form.status,
           genres: form.genres,
           tags: form.tags
@@ -279,8 +282,8 @@ export default function EditNovelPage() {
             onUpload={(url) => setForm({ ...form, coverImageUrl: url })}
             />
 
-          {/* Two columns */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Three columns */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Total Chapters</label>
               <input
@@ -288,6 +291,18 @@ export default function EditNovelPage() {
                 min="0"
                 value={form.totalChapters}
                 onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
+                           text-paper focus:outline-none focus:border-gold-dim"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Latest Released</label>
+              <input
+                type="number"
+                min="0"
+                value={form.latestChapter}
+                onChange={(e) => setForm({ ...form, latestChapter: e.target.value })}
+                placeholder="ongoing only"
                 className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                            text-paper focus:outline-none focus:border-gold-dim"
               />

@@ -31,6 +31,7 @@ export default function AddNovelPage() {
     description: "",
     coverImageUrl: "",
     totalChapters: "",
+    latestChapter: "",
     status: "Ongoing",
     genres: [] as string[],
     tags: "",
@@ -102,6 +103,7 @@ export default function AddNovelPage() {
           description: form.description.trim() || null,
           coverImageUrl: form.coverImageUrl.trim() || null,
           totalChapters: form.totalChapters ? parseInt(form.totalChapters) : null,
+          latestChapter: form.latestChapter ? parseInt(form.latestChapter) : null,
           status: form.status,
           genres: form.genres,
           tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
@@ -174,11 +176,17 @@ export default function AddNovelPage() {
             onUpload={(url) => setForm({ ...form, coverImageUrl: url })}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Total Chapters</label>
               <input type="number" min="0" value={form.totalChapters} onChange={(e) => setForm({ ...form, totalChapters: e.target.value })}
                 placeholder="e.g., 1394"
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
+            </div>
+            <div>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Latest Released</label>
+              <input type="number" min="0" value={form.latestChapter} onChange={(e) => setForm({ ...form, latestChapter: e.target.value })}
+                placeholder="ongoing only"
                 className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
             </div>
             <div>
