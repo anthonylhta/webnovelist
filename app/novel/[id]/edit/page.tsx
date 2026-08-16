@@ -9,6 +9,7 @@ import { MEDIA_TYPES, MEDIA_TYPE_LABELS } from "@/lib/media-types";
 import Link from "next/link";
 import ImageUpload from "@/components/ImageUpload";
 import NovelCharactersManager from "@/components/NovelCharactersManager";
+import NovelRelationsManager from "@/components/NovelRelationsManager";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
 
@@ -415,6 +416,9 @@ export default function EditNovelPage() {
             </Link>
           </div>
         </form>
+      </div>
+      <div className="border-b border-hairline px-4 py-4">
+        <NovelRelationsManager novelId={novelId} />
       </div>
       <div className="border-b border-hairline px-4 py-4">
         <NovelCharactersManager novelId={novelId} />
