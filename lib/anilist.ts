@@ -23,6 +23,8 @@ export interface AniListEntry {
   completedAt: AniListFuzzyDate;
   media: {
     id: number;
+    /** MyAnimeList id, when AniList knows it — lets a later MAL import match by id. */
+    idMal: number | null;
     format: string | null;
     countryOfOrigin: string;
     chapters: number | null;
@@ -48,6 +50,7 @@ const LIST_QUERY = `query ($userName: String) {
         completedAt { year month day }
         media {
           id
+          idMal
           format
           countryOfOrigin
           chapters

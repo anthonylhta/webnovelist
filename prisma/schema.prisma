@@ -70,6 +70,7 @@ model Novel {
   originalSource String?   @map("original_source")
   yearPublished  Int?      @map("year_published")
   anilistId      Int?      @unique @map("anilist_id")
+  malId          Int?      @unique @map("mal_id")
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
