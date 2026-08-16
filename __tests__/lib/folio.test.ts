@@ -10,6 +10,7 @@ import {
   buildWeekDigest,
   streakDays,
   buildMonthLedger,
+  chaptersBehind,
   type ActivityRow,
 } from "@/lib/folio";
 
@@ -188,5 +189,20 @@ describe("buildMonthLedger", () => {
   it("returns a blank ledger for a quiet month", () => {
     const ledger = buildMonthLedger([], new Date(2026, 7, 1));
     expect(ledger).toEqual({ days: [0], chapters: 0, finished: 0, ratings: 0 });
+  });
+});
+
+describe("chaptersBehind", () => {
+  it("counts the gap to the latest released chapter", () => {
+    expect(chaptersBehind(341, 353)).toBe(12);
+  });
+
+  it("is zero when caught up or ahead of stale data", () => {
+    expect(chaptersBehind(353, 353)).toBe(0);
+    expect(chaptersBehind(360, 353)).toBe(0);
+  });
+
+  it("is null when the latest chapter is unknown", () => {
+    expect(chaptersBehind(341, null)).toBeNull();
   });
 });

@@ -254,7 +254,11 @@ export default async function BrowsePage({
                 {typeLabel(novel.mediaType)}
               </span>
               <span className="w-16 shrink-0 text-right font-mono text-[10.5px] text-body tabular-nums">
-                {novel.totalChapters ? `${novel.totalChapters} ch` : "—"}
+                {novel.totalChapters
+                  ? `${novel.totalChapters} ch`
+                  : novel.latestChapter
+                    ? `${novel.latestChapter}+ ch`
+                    : "—"}
               </span>
               <span className="hidden w-16 shrink-0 text-right font-mono text-[9.5px] text-faint md:block">
                 {novel.status ?? ""}

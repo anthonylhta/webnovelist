@@ -56,7 +56,13 @@ export default async function NovelPage({
     <FolioSheet
       statusLeft="webnovelist · catalog"
       statusRight={`${typeLabel}${novel.status ? ` · ${novel.status.toLowerCase()}` : ""}`}
-      footer={`ink & gold${novel.totalChapters ? ` · ${novel.totalChapters.toLocaleString()} chapters` : ""}`}
+      footer={`ink & gold${
+        novel.totalChapters
+          ? ` · ${novel.totalChapters.toLocaleString()} chapters`
+          : novel.latestChapter
+            ? ` · ${novel.latestChapter.toLocaleString()} chapters so far`
+            : ""
+      }`}
     >
       {/* Title page */}
       <div className="flex gap-5 border-b border-hairline px-4 py-6">
@@ -123,6 +129,7 @@ export default async function NovelPage({
           novelId={novel.id}
           novelTitle={novel.title}
           totalChapters={novel.totalChapters}
+          latestChapter={novel.latestChapter}
           signedIn={currentUser !== null}
           entry={
             entry

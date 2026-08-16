@@ -5,6 +5,7 @@ import Link from "next/link";
 import AddToListModal from "@/components/AddToListModal";
 import FolioPlusOne from "@/components/FolioPlusOne";
 import { StatusSeal } from "@/components/FolioKit";
+import { chaptersBehind } from "@/lib/folio";
 
 // The novel page's "your reading" module — the chapter number is the hero.
 // The entry comes from the server (no client /api/list roundtrip); the modal
@@ -27,12 +28,15 @@ export default function NovelProgress({
   novelId,
   novelTitle,
   totalChapters,
+  latestChapter,
   signedIn,
   entry,
 }: {
   novelId: number;
   novelTitle: string;
   totalChapters: number | null;
+  /** Latest released chapter for ongoing series; drives the "behind" line. */
+  latestChapter: number | null;
   signedIn: boolean;
   entry: ProgressEntry | null;
 }) {
@@ -98,6 +102,7 @@ export default function NovelProgress({
   const pct = totalChapters
     ? Math.min(Math.round((chapter / totalChapters) * 100), 100)
     : null;
+  const behind = chaptersBehind(chapter, latestChapter);
 
   return (
     <>
@@ -115,6 +120,16 @@ export default function NovelProgress({
               {pct !== null ? ` · ${pct}%` : ""}
             </span>
           </p>
+          {latestChapter !== null && behind !== null && (
+            <p className="mt-2 font-mono text-[11px] text-muted tabular-nums">
+              latest ch. {latestChapter.toLocaleString()} ·{" "}
+              {behind > 0 ? (
+                <span className="text-gold-dim">{behind} behind</span>
+              ) : (
+                <span className="text-jade">caught up</span>
+              )}
+            </p>
+          )}
           {entry.rating != null && (
             <p className="mt-2 font-mono text-[11px] text-body tabular-nums">
               <span className="text-gold">★</span> {entry.rating} — your rating
