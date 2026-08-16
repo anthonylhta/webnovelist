@@ -58,9 +58,9 @@ export default async function RootLayout({
       appearance={{
         variables: {
           colorBackground: "#16140f",
-          colorInputBackground: "#211e17",
-          colorText: "#f0ede8",
-          colorInputText: "#f0ede8",
+          colorInput: "#211e17",
+          colorForeground: "#f0ede8",
+          colorInputForeground: "#f0ede8",
           colorPrimary: "#c9a84c",
         },
       }}
