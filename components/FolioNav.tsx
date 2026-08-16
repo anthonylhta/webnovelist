@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useClerk } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 
@@ -31,7 +32,23 @@ function NavLink({
 export default function FolioNav() {
   const currentUser = useCurrentUser();
   const pathname = usePathname();
+  const router = useRouter();
   const { signOut } = useClerk();
+
+  // `/` jumps to the catalog search from any sheet; browse's own SearchBox
+  // handles the key once you're there.
+  useEffect(() => {
+    if (pathname === "/browse") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      e.preventDefault();
+      router.push("/browse#search");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [pathname, router]);
 
   const left = [
     { href: "/", label: "home" },

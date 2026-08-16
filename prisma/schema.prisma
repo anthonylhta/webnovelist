@@ -2,14 +2,16 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [pg_trgm]
 }
 
 // ============== USERS ==============
@@ -72,6 +74,10 @@ model Novel {
   characters     Character[]
   userEntries    UserNovelList[]
 
+  // Trigram indexes back both ILIKE '%q%' and the % similarity operator (see lib/search.ts).
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "novels_title_trgm_idx")
+  @@index([nativeTitle(ops: raw("gin_trgm_ops"))], type: Gin, map: "novels_native_title_trgm_idx")
+  @@index([author(ops: raw("gin_trgm_ops"))], type: Gin, map: "novels_author_trgm_idx")
   @@map("novels")
 }
 

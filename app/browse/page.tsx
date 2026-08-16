@@ -7,6 +7,8 @@ import { safeImageSrc } from "@/lib/image-hosts";
 import { MEDIA_TYPES, MEDIA_TYPE_LABELS, isMediaType } from "@/lib/media-types";
 import { FolioSheet } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import SearchBox from "./SearchBox";
+import { normalizeQuery, searchNovelIds } from "@/lib/search";
 
 const getAllGenres = unstable_cache(
   async () => {
@@ -38,38 +40,40 @@ export default async function BrowsePage({
 }: {
   searchParams: Promise<{ search?: string; genre?: string; type?: string; page?: string }>;
 }) {
-  const { search, genre, type, page } = await searchParams;
+  const { search: rawSearch, genre, type, page } = await searchParams;
+  const search = normalizeQuery(rawSearch);
 
   const mediaType = isMediaType(type) ? type : undefined;
   const currentPage = Math.max(1, parseInt(page || "1") || 1);
+  const skip = (currentPage - 1) * NOVELS_PER_PAGE;
 
-  // Build the where clause once so we reuse it for both queries
-  const whereClause = {
-    AND: [
-      search
-        ? {
-            OR: [
-              { title: { contains: search, mode: "insensitive" as const } },
-              { nativeTitle: { contains: search, mode: "insensitive" as const } },
-              { author: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {},
-      genre ? { genres: { has: genre } } : {},
-      mediaType ? { mediaType } : {},
-    ],
+  // Filters shared by both paths
+  const filterWhere = {
+    AND: [genre ? { genres: { has: genre } } : {}, mediaType ? { mediaType } : {}],
   };
 
-  // Fetch novels for current page + total count in parallel
-  const [novels, totalCount] = await Promise.all([
-    prisma.novel.findMany({
-      where: whereClause,
-      orderBy: { title: "asc" },
-      skip: (currentPage - 1) * NOVELS_PER_PAGE,
-      take: NOVELS_PER_PAGE,
-    }),
-    prisma.novel.count({ where: whereClause }),
-  ]);
+  let novels;
+  let totalCount: number;
+  if (search) {
+    // Ranked search: trigram SQL picks and orders the ids, Prisma hydrates the rows.
+    const ranked = await searchNovelIds({ query: search, genre, mediaType, skip, take: NOVELS_PER_PAGE });
+    const rows = ranked.ids.length
+      ? await prisma.novel.findMany({ where: { id: { in: ranked.ids } } })
+      : [];
+    const byId = new Map(rows.map((n) => [n.id, n]));
+    novels = ranked.ids.map((id) => byId.get(id)).filter((n) => n !== undefined);
+    totalCount = ranked.total;
+  } else {
+    [novels, totalCount] = await Promise.all([
+      prisma.novel.findMany({
+        where: filterWhere,
+        orderBy: { title: "asc" },
+        skip,
+        take: NOVELS_PER_PAGE,
+      }),
+      prisma.novel.count({ where: filterWhere }),
+    ]);
+  }
 
   const totalPages = Math.max(1, Math.ceil(totalCount / NOVELS_PER_PAGE));
 
@@ -159,13 +163,7 @@ export default async function BrowsePage({
         <span aria-hidden className="font-mono text-[11px] text-gold-dim">
           /
         </span>
-        <input
-          type="text"
-          name="search"
-          defaultValue={search || ""}
-          placeholder="title, author…"
-          className="w-full bg-transparent font-mono text-[12px] text-paper placeholder-faint focus:outline-none"
-        />
+        <SearchBox defaultValue={search} />
         <button
           type="submit"
           className="shrink-0 font-mono text-[11px] text-gold transition hover:text-gold-bright"
