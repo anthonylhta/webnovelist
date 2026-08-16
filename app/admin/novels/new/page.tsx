@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,16 @@ const GENRE_OPTIONS = [
   "Mecha", "Psychological", "Supernatural", "Kingdom Building",
   "Game", "Sports",
 ];
+
+/** "novelupdates.com" from a source link — a sensible default for Original Source. */
+function hostOf(url: unknown): string {
+  if (typeof url !== "string" || !url) return "";
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
 
 export default function AddNovelPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -41,6 +51,33 @@ export default function AddNovelPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Approving a reader's submission: ?submission=ID prefills the form and the
+  // submission is marked approved once the title exists.
+  const [submissionId, setSubmissionId] = useState<number | null>(null);
+  const [submittedBy, setSubmittedBy] = useState<string | null>(null);
+
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("submission");
+    const id = raw ? parseInt(raw) : NaN;
+    if (!Number.isInteger(id)) return;
+    fetch(`/api/submissions/${id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((sub) => {
+        if (!sub || sub.status !== "pending") return;
+        setSubmissionId(sub.id);
+        setSubmittedBy(sub.user?.username ?? null);
+        setForm((prev) => ({
+          ...prev,
+          title: sub.title ?? "",
+          nativeTitle: sub.nativeTitle ?? "",
+          mediaType: sub.mediaType ?? prev.mediaType,
+          author: sub.author ?? "",
+          description: sub.description ?? "",
+          originalSource: hostOf(sub.sourceUrl) || prev.originalSource,
+        }));
+      })
+      .catch(() => {});
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -113,6 +150,15 @@ export default function AddNovelPage() {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to add novel"); return; }
+      if (submissionId !== null) {
+        await fetch(`/api/submissions/${submissionId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "approve", novelId: data.id }),
+        });
+        router.push("/admin/submissions");
+        return;
+      }
       router.push(`/novel/${data.id}`);
     } catch {
       setError("Something went wrong");
@@ -136,6 +182,12 @@ export default function AddNovelPage() {
         >
           Add a title
         </FolioLabel>
+        {submissionId !== null && (
+          <p className="mb-4 border-l-2 border-gold-dim pl-3 font-mono text-[11px] text-gold-dim">
+            approving submission #{submissionId}
+            {submittedBy ? ` from ${submittedBy}` : ""} — saving marks it approved
+          </p>
+        )}
         {error && (
           <p className="mb-4 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
             {error}

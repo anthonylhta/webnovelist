@@ -73,7 +73,7 @@ export default async function RootLayout({
           <CurrentUserProvider value={currentUser}>
             {/* Every page is a Folio sheet carrying its own chrome (status
                 bar + in-sheet nav) — there is no global navbar or footer. */}
-            <main className="max-w-7xl mx-auto px-4 py-8 flex-1">
+            <main className="w-full max-w-7xl mx-auto px-4 py-8 flex-1">
               {children}
             </main>
           </CurrentUserProvider>

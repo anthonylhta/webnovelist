@@ -192,6 +192,9 @@ export default function AdminAuthorsPage() {
           titles
         </Link>
         <span className="text-gold">authors</span>
+        <Link href="/admin/submissions" className="text-faint transition hover:text-muted">
+          submissions
+        </Link>
         <span className="flex-1" />
         <button onClick={openCreate} className="text-gold transition hover:text-gold-bright">
           [+ new author]
