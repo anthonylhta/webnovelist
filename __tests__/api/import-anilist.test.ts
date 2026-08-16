@@ -31,6 +31,7 @@ const aniListEntry = {
   completedAt: { year: null, month: null, day: null },
   media: {
     id: 119257,
+    idMal: 121496,
     format: "MANGA",
     countryOfOrigin: "KR",
     chapters: null,

@@ -71,16 +71,20 @@ export async function POST(request: NextRequest) {
           where: {
             OR: [
               { anilistId: entry.media.id },
+              ...(entry.media.idMal ? [{ malId: entry.media.idMal }] : []),
               { title: { equals: title, mode: "insensitive" } },
             ],
           },
         });
 
         if (novel) {
-          if (!novel.anilistId) {
+          if (!novel.anilistId || (!novel.malId && entry.media.idMal)) {
             novel = await prisma.novel.update({
               where: { id: novel.id },
-              data: { anilistId: entry.media.id },
+              data: {
+                anilistId: novel.anilistId ?? entry.media.id,
+                malId: novel.malId ?? entry.media.idMal ?? null,
+              },
             });
           }
         } else {
@@ -99,6 +103,7 @@ export async function POST(request: NextRequest) {
               status: novelStatusFromAniList(entry.media.status),
               genres: entry.media.genres,
               anilistId: entry.media.id,
+              malId: entry.media.idMal ?? null,
             },
           });
           novelsCreated++;

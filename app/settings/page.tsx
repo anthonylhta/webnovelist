@@ -174,27 +174,50 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Import from AniList — admins/mods only (it creates catalog entries) */}
-      {(currentUser?.role === "admin" || currentUser?.role === "moderator") && (
-        <div className="border-b border-hairline px-4 py-4">
-          <FolioLabel
-            right={
-              <Link
-                href="/settings/import"
-                className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
-              >
-                [open importer]
-              </Link>
-            }
-          >
-            AniList import
-          </FolioLabel>
-          <p className="font-serif text-[14px] leading-relaxed text-muted">
-            Pull your manga, manhwa, and light-novel list from AniList into
-            your library.
-          </p>
-        </div>
-      )}
+      {/* Import — MyAnimeList for everyone (link-only); AniList for admins/mods */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href="/settings/import"
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [open importer]
+            </Link>
+          }
+        >
+          Import your list
+        </FolioLabel>
+        <p className="font-serif text-[14px] leading-relaxed text-muted">
+          Bring your MyAnimeList manga list into your library
+          {currentUser?.role === "admin" || currentUser?.role === "moderator"
+            ? ", or pull a public AniList list"
+            : ""}
+          . Entries already on your list are never touched.
+        </p>
+      </div>
+
+      {/* Export — the whole library as a file */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <span className="flex gap-3 normal-case tracking-normal">
+              <a href="/api/export?format=json" className="text-gold transition hover:text-gold-bright">
+                [json]
+              </a>
+              <a href="/api/export?format=csv" className="text-gold transition hover:text-gold-bright">
+                [csv]
+              </a>
+            </span>
+          }
+        >
+          Export your list
+        </FolioLabel>
+        <p className="font-serif text-[14px] leading-relaxed text-muted">
+          Download everything on your shelf — titles, statuses, chapters, ratings,
+          dates, notes — as JSON or a spreadsheet-friendly CSV. Your data is yours.
+        </p>
+      </div>
 
       {/* Change username */}
       <div className="border-b border-hairline px-4 py-4">

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
-import { MEDIA_TYPES, MEDIA_TYPE_LABELS, mediaTypeLabel } from "@/lib/media-types";
+import { MEDIA_TYPES, MEDIA_TYPE_LABELS, isMediaType, mediaTypeLabel } from "@/lib/media-types";
 import { SUBMISSION_STATUS_LABELS, type SubmissionStatus } from "@/lib/submissions";
 
 type Submission = {
@@ -51,6 +51,19 @@ export default function SubmitPage() {
     if (isLoaded && !isSignedIn) router.push("/sign-in");
     if (isLoaded && isSignedIn) fetchSubmissions();
   }, [isLoaded, isSignedIn, router]);
+
+  // Arriving from an importer's "not in the catalog" list: ?title=…&type=…
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const title = params.get("title");
+    const type = params.get("type");
+    if (!title && !type) return;
+    setForm((prev) => ({
+      ...prev,
+      title: title ? title.slice(0, 500) : prev.title,
+      mediaType: type && isMediaType(type) ? type : prev.mediaType,
+    }));
+  }, []);
 
   const fetchSubmissions = async () => {
     try {
