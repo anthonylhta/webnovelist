@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon, AlertCircle } from "lucide-react";
+import { X } from "lucide-react";
 
 interface ImageUploadProps {
   currentUrl: string;
@@ -84,14 +84,13 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
 
   return (
     <div>
-      <label className="block text-sm text-muted mb-2">Cover Image</label>
+      <label className="mb-2 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Cover Image</label>
 
       {/* Error Message */}
       {error && (
-        <div className="flex items-center gap-2 bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 mb-3 text-sm">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <p className="mb-3 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
           {error}
-        </div>
+        </p>
       )}
 
       {preview ? (
@@ -100,7 +99,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
           <img
             src={preview}
             alt="Cover preview"
-            className="w-32 h-44 object-cover rounded-lg border border-hairline"
+            className="h-44 w-32 border border-hairline object-cover"
             onError={() => {
               setError("Failed to load image preview");
             }}
@@ -108,14 +107,14 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
           <button
             type="button"
             onClick={clearImage}
-            className="absolute -top-2 -right-2 bg-seal hover:bg-seal-bright
-                       rounded-full p-1 transition"
+            className="absolute -right-2 -top-2 rounded-[2px] bg-seal p-1 text-paper transition hover:bg-seal-bright"
+            title="Clear image"
           >
             <X className="w-3 h-3" />
           </button>
           {uploading && (
-            <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center">
-              <div className="text-sm text-paper">Uploading...</div>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+              <div className="font-mono text-[11px] text-paper">uploading…</div>
             </div>
           )}
         </div>
@@ -128,23 +127,19 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`w-full border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-            ${
-              dragOver
-                ? "border-gold bg-gold/10"
-                : "border-hairline hover:border-gold-dim"
-            }`}
+          className={`w-full cursor-pointer rounded-[2px] border border-dashed p-6 text-center transition ${
+            dragOver ? "border-gold bg-gold/10" : "border-hairline hover:border-gold-dim"
+          }`}
         >
           {uploading ? (
-            <div className="text-muted">Uploading...</div>
+            <div className="font-mono text-[11px] text-muted">uploading…</div>
           ) : (
             <>
-              <Upload className="w-8 h-8 text-faint mx-auto mb-2" />
-              <p className="text-muted text-sm">
-                Drag & drop an image or click to browse
+              <p className="font-serif text-[14px] text-muted">
+                Drag &amp; drop an image or click to browse
               </p>
-              <p className="text-faint text-xs mt-1">
-                Max 5MB · JPG, PNG, WebP, GIF
+              <p className="mt-1 font-mono text-[10px] text-faint">
+                max 5mb · jpg, png, webp, gif
               </p>
             </>
           )}
@@ -161,10 +156,9 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
 
       {/* Manual URL input */}
       <div className="mt-3">
-        <div className="flex items-center gap-2 mb-1">
-          <ImageIcon className="w-3 h-3 text-faint" />
-          <span className="text-xs text-faint">Or paste image URL</span>
-        </div>
+        <p className="mb-1 font-mono text-[9.5px] uppercase tracking-[0.16em] text-faint">
+          Or paste image URL
+        </p>
         <input
           type="url"
           value={preview}
@@ -174,8 +168,7 @@ export default function ImageUpload({ currentUrl, onUpload }: ImageUploadProps) 
             onUpload(e.target.value);
           }}
           placeholder="https://example.com/cover.jpg"
-          className="w-full bg-surface border border-hairline rounded-lg px-3 py-2
-                     text-paper text-sm focus:outline-none focus:border-gold-dim"
+          className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
         />
       </div>
     </div>

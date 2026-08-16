@@ -1,8 +1,6 @@
 // components/ConfirmModal.tsx
 "use client";
 
-import { AlertTriangle, X } from "lucide-react";
-
 interface ConfirmModalProps {
   title: string;
   message: string;
@@ -25,45 +23,48 @@ export default function ConfirmModal({
   danger = true,
 }: ConfirmModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-surface border border-hairline rounded-xl w-full max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-md border border-hairline bg-surface">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-hairline">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${danger ? "bg-seal/10" : "bg-gold/10"}`}>
-              <AlertTriangle className={`w-5 h-5 ${danger ? "text-seal-bright" : "text-gold"}`} />
-            </div>
-            <h2 className="text-lg font-bold font-serif">{title}</h2>
+        <div className="flex items-center justify-between gap-4 border-b border-hairline px-4 py-3">
+          <div className="min-w-0">
+            <p
+              className={`font-mono text-[9.5px] uppercase tracking-[0.22em] ${
+                danger ? "text-seal-bright" : "text-gold-dim"
+              }`}
+            >
+              {danger ? "Confirm removal" : "Confirm"}
+            </p>
+            <h2 className="mt-1 truncate font-serif text-[17px] text-paper">{title}</h2>
           </div>
-          <button onClick={onCancel} className="text-muted hover:text-paper transition">
-            <X className="w-5 h-5" />
+          <button
+            onClick={onCancel}
+            className="shrink-0 font-mono text-[11px] text-muted transition hover:text-gold"
+          >
+            [close]
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6">
-          <p className="text-body">{message}</p>
-        </div>
+        <p className="px-4 py-4 font-serif text-[14.5px] leading-relaxed text-body">{message}</p>
 
         {/* Buttons */}
-        <div className="flex gap-3 p-6 pt-0">
+        <div className="flex gap-3 px-4 pb-4">
           <button
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 bg-elevated hover:bg-hairline text-body
-                       font-semibold py-3 rounded-lg transition"
+            className="flex-1 rounded-[2px] border border-hairline py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-muted transition hover:border-gold-dim hover:text-paper disabled:opacity-50"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`flex-1 font-semibold py-3 rounded-lg transition
-              ${
-                danger
-                  ? "bg-seal text-paper hover:bg-seal-bright disabled:bg-seal/50"
-                  : "bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50"
-              }`}
+            className={`flex-1 rounded-[2px] py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] transition ${
+              danger
+                ? "bg-seal text-paper hover:bg-seal-bright disabled:bg-seal/50"
+                : "bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50"
+            }`}
           >
             {loading ? "Removing..." : confirmText}
           </button>

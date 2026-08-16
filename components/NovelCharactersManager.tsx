@@ -1,18 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, X, Check, Users } from "lucide-react";
 import Image from "next/image";
 import ImageUpload from "@/components/ImageUpload";
+import { FolioLabel } from "@/components/FolioKit";
 
 const ROLES = ["Protagonist", "Main Character", "Antagonist", "Supporting"];
 
 const ROLE_COLORS: Record<string, string> = {
-  Protagonist: "text-gold bg-gold/10 border-gold/30",
-  "Main Character": "text-gold-dim bg-gold/10 border-gold/30",
-  Antagonist: "text-seal-bright bg-seal/10 border-seal/30",
-  Supporting: "text-muted bg-elevated border-hairline",
+  Protagonist: "border-gold text-gold",
+  "Main Character": "border-gold-dim text-gold-dim",
+  Antagonist: "border-seal-bright text-seal-bright",
+  Supporting: "border-hairline text-muted",
 };
+
+const INPUT =
+  "w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none";
+const LABEL = "mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted";
+const VERB = "font-mono text-[11px] transition";
 
 interface Character {
   id: number;
@@ -138,129 +143,132 @@ export default function NovelCharactersManager({ novelId }: NovelCharactersManag
 
   if (loading) return null;
 
-  return (
-    <div className="mt-8 border-t border-hairline pt-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2 font-serif text-paper">
-          <Users className="w-5 h-5 text-gold" />
-          Characters
-          {characters.length > 0 && (
-            <span className="text-sm font-normal text-faint">({characters.length})</span>
-          )}
-        </h2>
-        {!showAddForm && (
-          <button
-            type="button"
-            onClick={() => { setShowAddForm(true); setEditingId(null); setConfirmDeleteId(null); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gold/10 hover:bg-gold/20
-                       text-gold border border-gold/30 rounded-lg text-sm font-medium transition"
+  const characterForm = (
+    mode: "add" | "edit",
+    form: typeof EMPTY_FORM,
+    setForm: (f: typeof EMPTY_FORM) => void,
+    onSubmit: (e: React.FormEvent) => void,
+    onCancel: () => void,
+    busy: boolean,
+    formError: string
+  ) => (
+    <form onSubmit={onSubmit} className={`space-y-3 border border-gold-dim/40 p-4 ${mode === "add" ? "mt-4" : ""}`}>
+      <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-gold-dim">
+        {mode === "add" ? "New character" : "Edit character"}
+      </p>
+      {formError && (
+        <p className="border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">{formError}</p>
+      )}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={LABEL}>Name <span className="text-seal-bright">*</span></label>
+          <input
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className={INPUT}
+            placeholder="Character name"
+            required
+            autoFocus={mode === "add"}
+          />
+        </div>
+        <div>
+          <label className={LABEL}>Role</label>
+          <select
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            className={INPUT}
           >
-            <Plus className="w-3.5 h-3.5" />
-            Add Character
-          </button>
-        )}
+            <option value="">— None —</option>
+            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
       </div>
+      <ImageUpload
+        currentUrl={form.imageUrl}
+        onUpload={(url) => setForm({ ...form, imageUrl: url })}
+      />
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={busy}
+          className="rounded-[2px] bg-gold px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink transition hover:bg-gold-bright disabled:bg-gold/50"
+        >
+          {busy ? "Saving..." : mode === "add" ? "Add character" : "Save"}
+        </button>
+        <button type="button" onClick={onCancel} className={`${VERB} text-muted hover:text-paper`}>
+          [cancel]
+        </button>
+      </div>
+    </form>
+  );
 
-      {error && <p className="text-seal-bright text-sm mb-3">{error}</p>}
+  return (
+    <div>
+      <FolioLabel
+        right={
+          showAddForm ? undefined : (
+            <button
+              type="button"
+              onClick={() => { setShowAddForm(true); setEditingId(null); setConfirmDeleteId(null); }}
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [+ add character]
+            </button>
+          )
+        }
+      >
+        Characters{characters.length > 0 && ` · ${characters.length}`}
+      </FolioLabel>
+
+      {error && (
+        <p className="mb-3 border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">{error}</p>
+      )}
 
       {/* Character list */}
       {characters.length > 0 && (
-        <div className="space-y-2 mb-4">
+        <div className="divide-y divide-hairline border border-hairline">
           {characters.map((char) =>
             editingId === char.id ? (
-              <div key={char.id} className="bg-elevated/60 border border-gold/30 rounded-xl p-4">
-                <form onSubmit={handleEdit} className="space-y-3">
-                  {editError && (
-                    <p className="text-seal-bright text-xs">{editError}</p>
-                  )}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs text-faint mb-1">Name *</label>
-                      <input
-                        type="text"
-                        value={editForm.name}
-                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-sm
-                                   text-paper focus:outline-none focus:border-gold-dim"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-faint mb-1">Role</label>
-                      <select
-                        value={editForm.role}
-                        onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                        className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-sm
-                                   text-paper focus:outline-none focus:border-gold-dim"
-                      >
-                        <option value="">— None —</option>
-                        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                  <ImageUpload
-                    currentUrl={editForm.imageUrl}
-                    onUpload={(url) => setEditForm({ ...editForm, imageUrl: url })}
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      type="submit"
-                      disabled={editLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gold hover:bg-gold-bright
-                                 disabled:opacity-50 text-ink rounded-lg text-sm font-medium transition"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                      {editLoading ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingId(null)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-elevated hover:bg-hairline
-                                 text-body rounded-lg text-sm transition"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+              <div key={char.id} className="p-2">
+                {characterForm("edit", editForm, setEditForm, handleEdit, () => setEditingId(null), editLoading, editError)}
               </div>
             ) : (
-              <div key={char.id} className="flex items-center gap-3 bg-elevated/40 border border-hairline rounded-xl px-4 py-3">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-hairline border border-hairline shrink-0">
-                  <Image fill sizes="40px" src={char.imageUrl || "/default-avatar.svg"} alt={char.name} className="object-cover" />
+              <div key={char.id} className="flex items-center gap-3 px-3 py-2.5">
+                <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-hairline bg-hairline">
+                  <Image fill sizes="36px" src={char.imageUrl || "/default-avatar.svg"} alt={char.name} className="object-cover" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-paper truncate">{char.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-serif text-[15px] text-paper">{char.name}</p>
+                  <div className="mt-0.5 flex items-center gap-2 font-mono text-[9.5px]">
                     {char.role && (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${ROLE_COLORS[char.role] ?? ROLE_COLORS.Supporting}`}>
+                      <span className={`rounded-[2px] border px-1.5 py-px uppercase tracking-[0.12em] ${ROLE_COLORS[char.role] ?? ROLE_COLORS.Supporting}`}>
                         {char.role}
                       </span>
                     )}
-                    <span className="text-[10px] text-faint">
+                    <span className="text-faint tabular-nums">
                       {char._count.favorites} fav{char._count.favorites !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex shrink-0 items-center gap-2 font-mono text-[11px]">
                   {confirmDeleteId === char.id ? (
                     <>
-                      <span className="text-xs text-seal-bright mr-1">Delete?</span>
+                      <span className="text-seal-bright">delete?</span>
                       <button
                         type="button"
                         onClick={() => handleDelete(char.id)}
                         disabled={deleteLoading}
-                        className="px-2.5 py-1 bg-seal hover:bg-seal-bright disabled:opacity-50
-                                   text-paper rounded-lg text-xs transition"
+                        className={`${VERB} text-seal-bright hover:text-paper disabled:opacity-50`}
                       >
-                        Yes
+                        [yes]
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteId(null)}
-                        className="px-2.5 py-1 bg-elevated hover:bg-hairline text-body rounded-lg text-xs transition"
+                        className={`${VERB} text-muted hover:text-paper`}
                       >
-                        No
+                        [no]
                       </button>
                     </>
                   ) : (
@@ -268,18 +276,18 @@ export default function NovelCharactersManager({ novelId }: NovelCharactersManag
                       <button
                         type="button"
                         onClick={() => startEdit(char)}
-                        className="p-1.5 text-faint hover:text-body hover:bg-hairline rounded-lg transition"
+                        className={`${VERB} text-muted hover:text-gold`}
                         title="Edit"
                       >
-                        <Pencil className="w-3.5 h-3.5" />
+                        [edit]
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDeleteId(char.id)}
-                        className="p-1.5 text-faint hover:text-seal-bright hover:bg-seal/10 rounded-lg transition"
+                        className={`${VERB} text-muted hover:text-seal-bright`}
                         title="Delete"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        [rm]
                       </button>
                     </>
                   )}
@@ -291,69 +299,20 @@ export default function NovelCharactersManager({ novelId }: NovelCharactersManag
       )}
 
       {characters.length === 0 && !showAddForm && (
-        <p className="text-faint text-sm mb-4">No characters added yet.</p>
+        <p className="font-serif text-[14px] text-muted">No characters added yet.</p>
       )}
 
       {/* Add form */}
-      {showAddForm && (
-        <div className="bg-elevated/60 border border-gold/30 rounded-xl p-4">
-          <p className="text-sm font-medium text-body mb-3">New Character</p>
-          <form onSubmit={handleAdd} className="space-y-3">
-            {addError && <p className="text-seal-bright text-xs">{addError}</p>}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-faint mb-1">Name *</label>
-                <input
-                  type="text"
-                  value={addForm.name}
-                  onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}
-                  className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-sm
-                             text-paper focus:outline-none focus:border-gold-dim"
-                  placeholder="Character name"
-                  required
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-faint mb-1">Role</label>
-                <select
-                  value={addForm.role}
-                  onChange={(e) => setAddForm({ ...addForm, role: e.target.value })}
-                  className="w-full bg-surface border border-hairline rounded-lg px-3 py-2 text-sm
-                             text-paper focus:outline-none focus:border-gold-dim"
-                >
-                  <option value="">— None —</option>
-                  {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-            </div>
-            <ImageUpload
-              currentUrl={addForm.imageUrl}
-              onUpload={(url) => setAddForm({ ...addForm, imageUrl: url })}
-            />
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={addLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gold hover:bg-gold-bright
-                           disabled:opacity-50 text-ink rounded-lg text-sm font-medium transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {addLoading ? "Adding..." : "Add Character"}
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowAddForm(false); setAddForm(EMPTY_FORM); setAddError(""); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-elevated hover:bg-hairline
-                           text-body rounded-lg text-sm transition"
-              >
-                <X className="w-3.5 h-3.5" />
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      {showAddForm &&
+        characterForm(
+          "add",
+          addForm,
+          setAddForm,
+          handleAdd,
+          () => { setShowAddForm(false); setAddForm(EMPTY_FORM); setAddError(""); },
+          addLoading,
+          addError
+        )}
     </div>
   );
 }
