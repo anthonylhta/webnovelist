@@ -157,6 +157,9 @@ export default function AdminPage() {
         <Link href="/admin/authors" className="text-faint transition hover:text-muted">
           authors
         </Link>
+        <Link href="/admin/submissions" className="text-faint transition hover:text-muted">
+          submissions
+        </Link>
         <span className="flex-1" />
         <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
           [+ add title]

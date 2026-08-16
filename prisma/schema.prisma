@@ -29,6 +29,8 @@ model User {
   novelList         UserNovelList[]
   activities        Activity[]
   favoriteAuthors   UserFavoriteAuthor[]
+  submissions         NovelSubmission[] @relation("SubmittedBy")
+  reviewedSubmissions NovelSubmission[] @relation("ReviewedBy")
 
   favoriteCharacters UserFavoriteCharacter[]
 
@@ -76,6 +78,7 @@ model Novel {
   userEntries    UserNovelList[]
   relationsFrom  NovelRelation[] @relation("RelationFrom")
   relationsTo    NovelRelation[] @relation("RelationTo")
+  submissions    NovelSubmission[]
 
   // Trigram indexes back both ILIKE '%q%' and the % similarity operator (see lib/search.ts).
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "novels_title_trgm_idx")
@@ -101,6 +104,36 @@ model NovelRelation {
   @@unique([fromId, toId, kind])
   @@index([toId])
   @@map("novel_relations")
+}
+
+// ============== TITLE SUBMISSIONS ==============
+// Readers propose titles that aren't in the catalog; mods approve (creating a
+// Novel), merge into an existing Novel, or reject. Kept apart from Novel so the
+// catalog never carries unreviewed rows.
+model NovelSubmission {
+  id           Int       @id @default(autoincrement())
+  userId       String    @map("user_id")
+  title        String
+  nativeTitle  String?   @map("native_title")
+  mediaType    String    @default("webnovel") @map("media_type")
+  author       String?
+  sourceUrl    String?   @map("source_url")   // where it can be read / verified
+  description  String?   @db.Text
+  note         String?   @db.Text             // submitter's note to the mods
+  status       String    @default("pending")  // pending | approved | merged | rejected
+  novelId      Int?      @map("novel_id")     // the catalog title it became or was merged into
+  reviewNote   String?   @map("review_note") @db.Text
+  reviewedById String?   @map("reviewed_by_id")
+  reviewedAt   DateTime? @map("reviewed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  user         User      @relation("SubmittedBy", fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy   User?     @relation("ReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  novel        Novel?    @relation(fields: [novelId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("novel_submissions")
 }
 
 // ============== USER'S NOVEL LIST ==============

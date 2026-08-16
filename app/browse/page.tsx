@@ -201,11 +201,16 @@ export default async function BrowsePage({
               totalCount
             )}`}
         </span>
-        {totalPages > 1 && (
-          <span>
-            page {currentPage} / {totalPages}
-          </span>
-        )}
+        <span className="flex items-baseline gap-3">
+          {totalPages > 1 && (
+            <span>
+              page {currentPage} / {totalPages}
+            </span>
+          )}
+          <Link href="/submit" className="normal-case text-gold-dim transition hover:text-gold">
+            [suggest a title]
+          </Link>
+        </span>
       </div>
 
       {/* Catalog rows */}
@@ -215,6 +220,10 @@ export default async function BrowsePage({
             Nothing in the catalog matches.{" "}
             <Link href="/browse" className="text-gold transition hover:text-gold-bright">
               Clear the filters
+            </Link>
+            , or{" "}
+            <Link href="/submit" className="text-gold transition hover:text-gold-bright">
+              suggest the title
             </Link>
             .
           </p>
