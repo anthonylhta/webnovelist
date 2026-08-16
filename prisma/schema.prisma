@@ -71,8 +71,29 @@ model Novel {
   authorEntity   Author?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
   characters     Character[]
   userEntries    UserNovelList[]
+  relationsFrom  NovelRelation[] @relation("RelationFrom")
+  relationsTo    NovelRelation[] @relation("RelationTo")
 
   @@map("novels")
+}
+
+// ============== NOVEL RELATIONS ==============
+// One row per link, read from `from`'s side: `to` is the `kind` of `from`
+// (e.g. kind "adaptation" — the manhwa is an adaptation of the webnovel).
+// The other direction is derived via the inverse kind (lib/relations.ts).
+model NovelRelation {
+  id        Int      @id @default(autoincrement())
+  fromId    Int      @map("from_id")
+  toId      Int      @map("to_id")
+  kind      String   // see RELATION_KINDS in lib/relations.ts
+  createdAt DateTime @default(now()) @map("created_at")
+
+  from      Novel    @relation("RelationFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        Novel    @relation("RelationTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, kind])
+  @@index([toId])
+  @@map("novel_relations")
 }
 
 // ============== USER'S NOVEL LIST ==============

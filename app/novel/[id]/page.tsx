@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { listRelations, relationLabel } from "@/lib/relations";
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
 import NovelAdminActions from "@/components/NovelAdminActions";
@@ -30,11 +31,12 @@ export default async function NovelPage({
   const novelId = parseInt(id);
   const currentUser = await getCurrentUser();
 
-  const [novel, characters, entry] = await Promise.all([
+  const [novel, related, characters, entry] = await Promise.all([
     prisma.novel.findUnique({
       where: { id: novelId },
       include: { authorEntity: { select: { id: true, name: true } } },
     }),
+    listRelations(novelId),
     prisma.character.findMany({
       where: { novelId },
       orderBy: [{ role: "asc" }, { name: "asc" }],
@@ -150,6 +152,34 @@ export default async function NovelPage({
           {novel.description || "No description available."}
         </p>
       </div>
+
+      {/* Related titles — adaptations, sequels, source material */}
+      {related.length > 0 && (
+        <div className="border-b border-hairline px-4 py-4">
+          <FolioLabel right={String(related.length)}>Related titles</FolioLabel>
+          <div className="divide-y divide-hairline">
+            {related.map((r) => (
+              <div key={r.relationId} className="flex items-baseline gap-3 py-2 first:pt-0 last:pb-0">
+                <span className="w-32 shrink-0 font-mono text-[9.5px] uppercase tracking-[0.14em] text-gold-dim">
+                  {relationLabel(r.kind)}
+                </span>
+                <Link
+                  href={`/novel/${r.novel.id}`}
+                  className="min-w-0 flex-1 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                >
+                  {r.novel.title}
+                  {r.novel.nativeTitle && (
+                    <span className="ml-2 font-cjk text-[11px] text-faint">{r.novel.nativeTitle}</span>
+                  )}
+                </Link>
+                <span className="shrink-0 font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
+                  {mediaTypeLabel(r.novel.mediaType).toLowerCase()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Characters */}
       {characters.length > 0 && (
