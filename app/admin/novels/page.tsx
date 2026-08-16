@@ -10,6 +10,7 @@ import Link from "next/link";
 import ConfirmModal from "@/components/ConfirmModal";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import AdminSections from "@/components/AdminSections";
 
 interface NovelData {
   id: number;
@@ -106,23 +107,7 @@ export default function AdminNovelsPage() {
       statusRight={`${novels.length} title${novels.length !== 1 ? "s" : ""}`}
       footer="ink & gold · admin"
     >
-      {/* Sections */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
-        <Link href="/admin" className="text-faint transition hover:text-muted">
-          users
-        </Link>
-        <span className="text-gold">titles</span>
-        <Link href="/admin/authors" className="text-faint transition hover:text-muted">
-          authors
-        </Link>
-        <Link href="/admin/submissions" className="text-faint transition hover:text-muted">
-          submissions
-        </Link>
-        <span className="flex-1" />
-        <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
-          [+ add title]
-        </Link>
-      </div>
+      <AdminSections active="titles" />
 
       {/* Counts + search */}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-hairline px-4 py-2 font-mono text-[10px] tabular-nums">
