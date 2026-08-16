@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
+import { parseAltTitles } from "@/lib/alt-titles";
+import { normalizeQuery, searchNovelIds } from "@/lib/search";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { sanitizeString, isValidUrl, containsSuspiciousContent } from "@/lib/sanitize";
 import { isMediaType } from "@/lib/media-types";
@@ -16,21 +18,19 @@ export async function GET(request: NextRequest) {
     const genre = searchParams.get("genre") || "";
     const recent = searchParams.get("recent") === "true";
 
+    if (search) {
+      // Same ranked, typo-tolerant search as browse — the pickers (relations,
+      // merge, "already in the catalog?") get the same results the reader sees.
+      const ranked = await searchNovelIds({ query: normalizeQuery(search), genre: genre || undefined, skip: 0, take: 50 });
+      const rows = ranked.ids.length
+        ? await prisma.novel.findMany({ where: { id: { in: ranked.ids } } })
+        : [];
+      const byId = new Map(rows.map((n) => [n.id, n]));
+      return NextResponse.json(ranked.ids.map((id) => byId.get(id)).filter((n) => n !== undefined));
+    }
+
     const novels = await prisma.novel.findMany({
-      where: {
-        AND: [
-          search
-            ? {
-                OR: [
-                  { title: { contains: search, mode: "insensitive" } },
-                  { nativeTitle: { contains: search, mode: "insensitive" } },
-                  { author: { contains: search, mode: "insensitive" } },
-                ],
-              }
-            : {},
-          genre ? { genres: { has: genre } } : {},
-        ],
-      },
+      where: genre ? { genres: { has: genre } } : undefined,
       orderBy: recent ? { createdAt: "desc" } : { title: "asc" },
       take: recent ? 10 : undefined,
     });
@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: sanitizeString(body.title),
         nativeTitle: body.nativeTitle ? sanitizeString(body.nativeTitle) : null,
+        altTitles: parseAltTitles(body.altTitles).map(sanitizeString),
         mediaType: body.mediaType,
         author: body.author ? sanitizeString(body.author) : null,
         description: body.description ? sanitizeString(body.description) : null,

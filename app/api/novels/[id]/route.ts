@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
+import { parseAltTitles } from "@/lib/alt-titles";
 import { sanitizeString, isValidUrl, containsSuspiciousContent } from "@/lib/sanitize";
 import { isMediaType } from "@/lib/media-types";
 
@@ -85,6 +86,7 @@ export async function PUT(
       data: {
         title: sanitizeString(body.title),
         nativeTitle: body.nativeTitle ? sanitizeString(body.nativeTitle) : null,
+        altTitles: parseAltTitles(body.altTitles).map(sanitizeString),
         mediaType: body.mediaType,
         author: body.author ? sanitizeString(body.author) : null,
         authorId: body.authorId ?? null,

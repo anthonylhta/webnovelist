@@ -32,6 +32,7 @@ export default function EditNovelPage() {
   const [form, setForm] = useState({
     title: "",
     nativeTitle: "",
+    altTitles: "",
     mediaType: "webnovel",
     author: "",
     authorId: null as number | null,
@@ -61,6 +62,7 @@ export default function EditNovelPage() {
         setForm({
           title: novel.title || "",
           nativeTitle: novel.nativeTitle || "",
+          altTitles: (novel.altTitles ?? []).join("\n"),
           mediaType: novel.mediaType || "webnovel",
           author: novel.author || "",
           authorId: novel.authorId ?? null,
@@ -145,6 +147,7 @@ export default function EditNovelPage() {
         body: JSON.stringify({
           title: form.title.trim(),
           nativeTitle: form.nativeTitle.trim() || null,
+          altTitles: form.altTitles,
           mediaType: form.mediaType,
           author: form.author.trim() || null,
           authorId: form.authorId,
@@ -224,6 +227,17 @@ export default function EditNovelPage() {
               onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
               className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
                          text-muted font-cjk focus:outline-none focus:border-gold-dim"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Alternative Titles <span className="normal-case tracking-normal text-faint">(one per line — romaji, acronyms)</span></label>
+            <textarea
+              rows={2}
+              value={form.altTitles}
+              onChange={(e) => setForm({ ...form, altTitles: e.target.value })}
+              placeholder={"LOTM\nGuimi Zhi Zhu"}
+              className="w-full resize-none rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px]
+                         text-paper focus:outline-none focus:border-gold-dim"
             />
           </div>
 

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { canManageNovels } from "@/lib/roles";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { sanitizeString } from "@/lib/sanitize";
+import { findNovelIdByAnyTitle } from "@/lib/search";
 import {
   fetchAniListEntries,
   AniListUserNotFoundError,
@@ -67,23 +68,38 @@ export async function POST(request: NextRequest) {
       try {
         // Match by AniList id first, then by title so novels already in the
         // catalog get linked instead of duplicated
+        // Match by AniList id, then MAL id, then title / any alternative title
+        // (romaji, acronyms), so novels already in the catalog get linked
+        // instead of duplicated
         let novel = await prisma.novel.findFirst({
           where: {
             OR: [
               { anilistId: entry.media.id },
               ...(entry.media.idMal ? [{ malId: entry.media.idMal }] : []),
-              { title: { equals: title, mode: "insensitive" } },
             ],
           },
         });
+        if (!novel) {
+          const id = await findNovelIdByAnyTitle(title);
+          if (id !== null) novel = await prisma.novel.findUnique({ where: { id } });
+        }
+
+        // The romaji title is what MAL and most aggregators use — keep it as an
+        // alternative title so later imports and searches find the same row.
+        const romaji = entry.media.title.romaji?.trim();
+        const romajiIsNew =
+          !!romaji &&
+          romaji.toLowerCase() !== title.toLowerCase() &&
+          !(novel?.altTitles ?? []).some((t) => t.toLowerCase() === romaji.toLowerCase());
 
         if (novel) {
-          if (!novel.anilistId || (!novel.malId && entry.media.idMal)) {
+          if (!novel.anilistId || (!novel.malId && entry.media.idMal) || romajiIsNew) {
             novel = await prisma.novel.update({
               where: { id: novel.id },
               data: {
                 anilistId: novel.anilistId ?? entry.media.id,
                 malId: novel.malId ?? entry.media.idMal ?? null,
+                ...(romajiIsNew ? { altTitles: [...novel.altTitles, sanitizeString(romaji)] } : {}),
               },
             });
           }
@@ -93,6 +109,7 @@ export async function POST(request: NextRequest) {
             data: {
               title: sanitizeString(title),
               nativeTitle: entry.media.title.native ? sanitizeString(entry.media.title.native) : null,
+              altTitles: romajiIsNew ? [sanitizeString(romaji)] : [],
               mediaType: mediaTypeFromAniList(entry.media.format, entry.media.countryOfOrigin),
               author: author ? sanitizeString(author) : null,
               description: entry.media.description

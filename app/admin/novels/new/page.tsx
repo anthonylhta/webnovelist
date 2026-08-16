@@ -36,6 +36,7 @@ export default function AddNovelPage() {
   const [form, setForm] = useState({
     title: "",
     nativeTitle: "",
+    altTitles: "",
     mediaType: "webnovel",
     author: "",
     description: "",
@@ -135,6 +136,7 @@ export default function AddNovelPage() {
         body: JSON.stringify({
           title: form.title.trim(),
           nativeTitle: form.nativeTitle.trim() || null,
+          altTitles: form.altTitles,
           mediaType: form.mediaType,
           author: form.author.trim() || null,
           description: form.description.trim() || null,
@@ -207,6 +209,12 @@ export default function AddNovelPage() {
             <input type="text" value={form.nativeTitle} onChange={(e) => setForm({ ...form, nativeTitle: e.target.value })}
               placeholder="e.g., 蛊真人"
               className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 font-cjk text-[13.5px] text-muted focus:border-gold-dim focus:outline-none" />
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Alternative Titles <span className="normal-case tracking-normal text-faint">(one per line — romaji, acronyms)</span></label>
+            <textarea rows={2} value={form.altTitles} onChange={(e) => setForm({ ...form, altTitles: e.target.value })}
+              placeholder={"LOTM\nGuimi Zhi Zhu"}
+              className="w-full resize-none rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none" />
           </div>
 
           <div>

@@ -88,6 +88,11 @@ export default async function NovelPage({
           {novel.nativeTitle && (
             <p className="mt-1 font-cjk text-[15px] text-muted">{novel.nativeTitle}</p>
           )}
+          {novel.altTitles.length > 0 && (
+            <p className="mt-1 font-mono text-[10px] text-faint">
+              also · {novel.altTitles.join(" · ")}
+            </p>
+          )}
           {novel.author && (
             <p className="mt-2.5 font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted">
               by{" "}
