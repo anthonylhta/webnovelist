@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 
 interface AddToListModalProps {
@@ -110,47 +109,53 @@ export default function AddToListModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div className="bg-surface border border-hairline rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto border border-hairline bg-surface">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-hairline">
-            <h2 className="text-xl font-bold font-serif truncate pr-4">
-              {isEditing ? "Edit" : "Add"}: {novelTitle}
-            </h2>
-            <button onClick={onClose} className="text-muted hover:text-paper">
-              <X className="w-5 h-5" />
+          <div className="flex items-center justify-between gap-4 border-b border-hairline px-4 py-3">
+            <div className="min-w-0">
+              <p className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-gold-dim">
+                {isEditing ? "Edit entry" : "Add to library"}
+              </p>
+              <h2 className="mt-1 truncate font-serif text-[17px] text-paper">{novelTitle}</h2>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 font-mono text-[11px] text-muted transition hover:text-gold"
+            >
+              [close]
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 px-4 py-4">
             {error && (
-              <div className="bg-seal/10 border border-seal/40 text-seal-bright rounded-lg p-3 text-sm">
+              <p className="border-l-2 border-seal pl-3 font-mono text-[11px] text-seal-bright">
                 {error}
-              </div>
+              </p>
             )}
 
             {/* Status */}
             <div>
-              <label className="block text-sm text-muted mb-1">Status</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                           text-paper focus:outline-none focus:border-gold-dim"
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
               >
-                <option value="reading">📖 Reading</option>
-                <option value="completed">✅ Completed</option>
-                <option value="on_hold">⏸️ On Hold</option>
-                <option value="dropped">❌ Dropped</option>
-                <option value="plan_to_read">📋 Plan to Read</option>
+                <option value="reading">Reading</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On Hold</option>
+                <option value="dropped">Dropped</option>
+                <option value="plan_to_read">Plan to Read</option>
               </select>
             </div>
 
             {/* Rating and Chapter on same row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-muted mb-1">
+                <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                   Rating (0-10)
                 </label>
                 <input
@@ -161,12 +166,11 @@ export default function AddToListModal({
                   value={form.rating}
                   onChange={(e) => setForm({ ...form, rating: e.target.value })}
                   placeholder="—"
-                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                             text-paper focus:outline-none focus:border-gold-dim"
+                  className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm text-muted mb-1">
+                <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                   Chapter{totalChapters ? ` (of ${totalChapters})` : ""}
                 </label>
                 <input
@@ -177,15 +181,14 @@ export default function AddToListModal({
                   onChange={(e) =>
                     setForm({ ...form, currentChapter: parseInt(e.target.value) || 0 })
                   }
-                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                             text-paper focus:outline-none focus:border-gold-dim"
+                  className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Reading URL */}
             <div>
-              <label className="block text-sm text-muted mb-1">
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                 Reading Link
               </label>
               <input
@@ -193,42 +196,39 @@ export default function AddToListModal({
                 value={form.readingUrl}
                 onChange={(e) => setForm({ ...form, readingUrl: e.target.value })}
                 placeholder="https://www.novelupdates.com/..."
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                           text-paper focus:outline-none focus:border-gold-dim"
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
               />
             </div>
 
             {/* Dates on same row */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-muted mb-1">
+                <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                   Date Started
                 </label>
                 <input
                   type="date"
                   value={form.dateStarted}
                   onChange={(e) => setForm({ ...form, dateStarted: e.target.value })}
-                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                             text-paper focus:outline-none focus:border-gold-dim"
+                  className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm text-muted mb-1">
+                <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                   Date Finished
                 </label>
                 <input
                   type="date"
                   value={form.dateFinished}
                   onChange={(e) => setForm({ ...form, dateFinished: e.target.value })}
-                  className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                             text-paper focus:outline-none focus:border-gold-dim"
+                  className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Reread Count */}
             <div>
-              <label className="block text-sm text-muted mb-1">
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">
                 Times Re-read
               </label>
               <input
@@ -238,21 +238,19 @@ export default function AddToListModal({
                 onChange={(e) =>
                   setForm({ ...form, rereadCount: parseInt(e.target.value) || 0 })
                 }
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                           text-paper focus:outline-none focus:border-gold-dim"
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm text-muted mb-1">Notes</label>
+              <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted">Notes</label>
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 rows={3}
                 placeholder="Personal notes..."
-                className="w-full bg-surface border border-hairline rounded-lg px-4 py-3
-                           text-paper focus:outline-none focus:border-gold-dim resize-none"
+                className="w-full rounded-[2px] border border-hairline bg-transparent px-3 py-2 text-[13.5px] text-paper focus:border-gold-dim focus:outline-none resize-none"
               />
             </div>
 
@@ -261,8 +259,7 @@ export default function AddToListModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-gold text-ink hover:bg-gold-bright disabled:bg-gold/50
-                           font-semibold py-3 rounded-lg transition"
+                className="flex-1 rounded-[2px] bg-gold py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink transition hover:bg-gold-bright disabled:bg-gold/50"
               >
                 {loading ? "Saving..." : isEditing ? "Update" : "Add to List"}
               </button>
@@ -272,8 +269,7 @@ export default function AddToListModal({
                   type="button"
                   onClick={() => setShowConfirmDelete(true)}
                   disabled={loading}
-                  className="px-4 bg-seal/20 hover:bg-seal/40 text-seal-bright
-                             font-semibold py-3 rounded-lg transition"
+                  className="rounded-[2px] border border-seal/50 px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-seal-bright transition hover:bg-seal/10 disabled:opacity-50"
                 >
                   Remove
                 </button>

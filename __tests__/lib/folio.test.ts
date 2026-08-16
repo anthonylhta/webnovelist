@@ -9,6 +9,7 @@ import {
   ratingScore,
   buildWeekDigest,
   streakDays,
+  buildMonthLedger,
   type ActivityRow,
 } from "@/lib/folio";
 
@@ -150,5 +151,42 @@ describe("streakDays", () => {
   it("returns zero with no recent activity", () => {
     expect(streakDays([new Date(2026, 7, 1)], now)).toBe(0);
     expect(streakDays([], now)).toBe(0);
+  });
+});
+
+describe("buildMonthLedger", () => {
+  const now = new Date(2026, 7, 15, 12);
+
+  const rows: ActivityRow[] = [
+    { type: "chapter_update", novelId: 1, detail: "Lord of the Mysteries — Chapter 330 → 341", createdAt: new Date(2026, 7, 13) },
+    { type: "chapter_update", novelId: 1, detail: "Lord of the Mysteries — Chapter 325 → 330", createdAt: new Date(2026, 7, 13) },
+    { type: "chapter_update", novelId: 2, detail: "Vagabond — Chapter 195 → 198", createdAt: new Date(2026, 7, 2) },
+    { type: "chapter_update", novelId: 2, detail: "Vagabond — Corrected chapter to 198", createdAt: new Date(2026, 7, 2) },
+    { type: "status_change", novelId: 3, detail: "Reverend Insanity — Reading → Completed", createdAt: new Date(2026, 7, 9) },
+    { type: "status_change", novelId: 2, detail: "Vagabond — Reading → On Hold", createdAt: new Date(2026, 7, 9) },
+    { type: "rating", novelId: 3, detail: "Rated Reverend Insanity — 9.5/10", createdAt: new Date(2026, 7, 9) },
+    { type: "rating", novelId: 2, detail: "Removed rating from Vagabond", createdAt: new Date(2026, 7, 10) },
+    // Last month — must be ignored.
+    { type: "chapter_update", novelId: 1, detail: "Lord of the Mysteries — Chapter 300 → 325", createdAt: new Date(2026, 6, 31) },
+    { type: "status_change", novelId: 1, detail: "Solo Leveling — Reading → Completed", createdAt: new Date(2026, 6, 20) },
+  ];
+
+  it("lays chapters onto the days of the month so far", () => {
+    const ledger = buildMonthLedger(rows, now);
+    expect(ledger.days).toHaveLength(15);
+    expect(ledger.days[1]).toBe(3);
+    expect(ledger.days[12]).toBe(16);
+    expect(ledger.chapters).toBe(19);
+  });
+
+  it("counts completions and filed ratings, ignoring other moves and removals", () => {
+    const ledger = buildMonthLedger(rows, now);
+    expect(ledger.finished).toBe(1);
+    expect(ledger.ratings).toBe(1);
+  });
+
+  it("returns a blank ledger for a quiet month", () => {
+    const ledger = buildMonthLedger([], new Date(2026, 7, 1));
+    expect(ledger).toEqual({ days: [0], chapters: 0, finished: 0, ratings: 0 });
   });
 });

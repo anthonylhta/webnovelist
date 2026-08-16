@@ -132,3 +132,36 @@ export function streakDays(dates: Date[], now: Date): number {
   }
   return run;
 }
+
+export type MonthLedger = {
+  /** Chapters read on each day of the month so far, index 0 = the 1st. */
+  days: number[];
+  chapters: number;
+  /** Titles moved to Completed this month. */
+  finished: number;
+  /** Ratings filed this month (removals excluded). */
+  ratings: number;
+};
+
+/** Fold this month's activities into the library page's ledger strip. */
+export function buildMonthLedger(activities: ActivityRow[], now: Date): MonthLedger {
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const days = Array.from({ length: now.getDate() }, () => 0);
+  let finished = 0;
+  let ratings = 0;
+
+  for (const a of activities) {
+    if (a.createdAt < from) continue;
+    if (a.type === "chapter_update") {
+      const delta = chapterDelta(a.detail);
+      const day = a.createdAt.getDate() - 1;
+      if (delta > 0 && day < days.length) days[day] += delta;
+    } else if (a.type === "status_change") {
+      if (a.detail?.endsWith("→ Completed")) finished++;
+    } else if (a.type === "rating") {
+      if (ratingScore(a.detail) !== null) ratings++;
+    }
+  }
+
+  return { days, chapters: days.reduce((sum, n) => sum + n, 0), finished, ratings };
+}
