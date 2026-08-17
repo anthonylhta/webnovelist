@@ -12,12 +12,18 @@ const QUEUE_INCLUDE = {
 } as const;
 
 // GET — your own submissions; mods may ask for the queue with ?scope=queue[&status=pending|resolved]
+// or just the pending count with ?scope=count (the admin section row badge)
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) return apiError("Not logged in", 401);
 
     const scope = request.nextUrl.searchParams.get("scope");
+    if (scope === "count") {
+      if (!canManageNovels(user.role)) return apiError("Forbidden", 403);
+      const pending = await prisma.novelSubmission.count({ where: { status: "pending" } });
+      return NextResponse.json({ pending });
+    }
     if (scope === "queue") {
       if (!canManageNovels(user.role)) return apiError("Forbidden", 403);
       const status = request.nextUrl.searchParams.get("status") ?? "pending";

@@ -47,6 +47,18 @@ describe("GET /api/submissions", () => {
   });
 });
 
+describe("GET /api/submissions?scope=count", () => {
+  it("returns the pending count to mods only", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
+    expect((await GET(makeRequest("GET", undefined, "http://localhost/api/submissions?scope=count"))).status).toBe(403);
+    vi.mocked(getCurrentUser).mockResolvedValue(modUser as never);
+    vi.mocked(prisma.novelSubmission.count).mockResolvedValue(4);
+    const res = await GET(makeRequest("GET", undefined, "http://localhost/api/submissions?scope=count"));
+    expect(await res.json()).toEqual({ pending: 4 });
+    expect(vi.mocked(prisma.novelSubmission.count).mock.calls[0][0]?.where).toEqual({ status: "pending" });
+  });
+});
+
 describe("POST /api/submissions", () => {
   it("returns 401 when not logged in", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(null);

@@ -10,6 +10,7 @@ import { X, Check, Upload, AlertCircle } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import AdminSections from "@/components/AdminSections";
 
 interface AuthorData {
   id: number;
@@ -183,23 +184,11 @@ export default function AdminAuthorsPage() {
       statusRight={`${authors.length} author${authors.length !== 1 ? "s" : ""}`}
       footer="ink & gold · admin"
     >
-      {/* Sections */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
-        <Link href="/admin" className="text-faint transition hover:text-muted">
-          users
-        </Link>
-        <Link href="/admin/novels" className="text-faint transition hover:text-muted">
-          titles
-        </Link>
-        <span className="text-gold">authors</span>
-        <Link href="/admin/submissions" className="text-faint transition hover:text-muted">
-          submissions
-        </Link>
-        <span className="flex-1" />
-        <button onClick={openCreate} className="text-gold transition hover:text-gold-bright">
-          [+ new author]
-        </button>
-      </div>
+      <AdminSections active="authors" right={
+          <button onClick={openCreate} className="text-gold transition hover:text-gold-bright">
+            [+ new author]
+          </button>
+        } />
 
       {/* Search */}
       <div className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">

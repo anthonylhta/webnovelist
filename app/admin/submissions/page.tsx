@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { FolioSheet } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import AdminSections from "@/components/AdminSections";
 import { mediaTypeLabel } from "@/lib/media-types";
 import { SUBMISSION_STATUS_LABELS, type SubmissionStatus } from "@/lib/submissions";
 
@@ -142,17 +143,7 @@ export default function AdminSubmissionsPage() {
       statusRight={tab === "pending" ? `${rows.length} waiting` : `${rows.length} resolved`}
       footer="ink & gold · admin"
     >
-      {/* Sections */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
-        <Link href="/admin" className="text-faint transition hover:text-muted">users</Link>
-        <Link href="/admin/novels" className="text-faint transition hover:text-muted">titles</Link>
-        <Link href="/admin/authors" className="text-faint transition hover:text-muted">authors</Link>
-        <span className="text-gold">submissions</span>
-        <span className="flex-1" />
-        <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
-          [+ add title]
-        </Link>
-      </div>
+      <AdminSections active="submissions" />
 
       {/* Tabs */}
       <div className="flex items-center gap-4 border-b border-hairline px-4 py-2 font-mono text-[11px]">

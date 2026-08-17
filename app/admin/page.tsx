@@ -5,10 +5,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import ConfirmModal from "@/components/ConfirmModal";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import AdminSections from "@/components/AdminSections";
 
 interface UserData {
   id: string;
@@ -148,23 +148,7 @@ export default function AdminPage() {
       statusRight={`${users.length} reader${users.length !== 1 ? "s" : ""}`}
       footer="ink & gold · admin"
     >
-      {/* Sections */}
-      <div className="flex flex-wrap items-center gap-4 border-b border-hairline px-4 py-2.5 font-mono text-[11px]">
-        <span className="text-gold">users</span>
-        <Link href="/admin/novels" className="text-faint transition hover:text-muted">
-          titles
-        </Link>
-        <Link href="/admin/authors" className="text-faint transition hover:text-muted">
-          authors
-        </Link>
-        <Link href="/admin/submissions" className="text-faint transition hover:text-muted">
-          submissions
-        </Link>
-        <span className="flex-1" />
-        <Link href="/admin/novels/new" className="text-gold transition hover:text-gold-bright">
-          [+ add title]
-        </Link>
-      </div>
+      <AdminSections active="users" />
 
       {/* Counts */}
       <div className="grid grid-cols-2 divide-x divide-hairline border-b border-hairline sm:grid-cols-4">
