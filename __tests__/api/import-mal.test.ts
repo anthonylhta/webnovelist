@@ -3,7 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/current-user", () => ({ getCurrentUser: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    novel: { findFirst: vi.fn(), update: vi.fn() },
+    $queryRaw: vi.fn(),
+    novel: { findFirst: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
     userNovelList: { findUnique: vi.fn(), create: vi.fn() },
   },
 }));
@@ -26,7 +27,10 @@ const XML = `<myanimelist>
 <manga_chapters>12</manga_chapters><my_read_chapters>3</my_read_chapters><my_score>0</my_score><my_status>On-Hold</my_status></manga>
 </myanimelist>`;
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(prisma.$queryRaw).mockResolvedValue([] as never);
+});
 
 describe("POST /api/import/mal", () => {
   it("returns 401 when not logged in", async () => {
@@ -54,8 +58,7 @@ describe("POST /api/import/mal", () => {
     expect(summary).toMatchObject({ total: 2, entriesAdded: 1, entriesSkipped: 0 });
     expect(summary.unmatched).toEqual([{ malId: 555, title: "Nowhere To Be Found", chapters: 12 }]);
 
-    const where = vi.mocked(prisma.novel.findFirst).mock.calls[0][0]?.where as { OR: unknown[] };
-    expect(where.OR[0]).toEqual({ malId: 121496 });
+    expect(vi.mocked(prisma.novel.findFirst).mock.calls[0][0]?.where).toEqual({ malId: 121496 });
     expect(vi.mocked(prisma.userNovelList.create).mock.calls[0][0].data).toMatchObject({
       userId: regularUser.id,
       novelId: 1,
@@ -67,6 +70,19 @@ describe("POST /api/import/mal", () => {
     });
     // Regular readers never touch the catalog.
     expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
+  it("falls back to a title / alternative-title lookup when the MAL id is unknown", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(regularUser as never);
+    vi.mocked(prisma.novel.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([{ id: 7 }] as never).mockResolvedValueOnce([] as never);
+    vi.mocked(prisma.novel.findUnique).mockResolvedValue({ id: 7, malId: null } as never);
+    vi.mocked(prisma.userNovelList.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.userNovelList.create).mockResolvedValue({} as never);
+    const summary = await (await POST(makeRequest("POST", { xml: XML }))).json();
+    expect(summary).toMatchObject({ entriesAdded: 1 });
+    expect(summary.unmatched.map((u: { malId: number }) => u.malId)).toEqual([555]);
+    expect(vi.mocked(prisma.userNovelList.create).mock.calls[0][0].data).toMatchObject({ novelId: 7 });
   });
 
   it("skips entries already on the list", async () => {

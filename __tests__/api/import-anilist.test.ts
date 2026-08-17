@@ -3,7 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/current-user", () => ({ getCurrentUser: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    novel: { findFirst: vi.fn(), create: vi.fn(), update: vi.fn() },
+    $queryRaw: vi.fn(),
+    novel: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     userNovelList: { findUnique: vi.fn(), create: vi.fn() },
   },
 }));
@@ -45,7 +46,10 @@ const aniListEntry = {
 };
 
 describe("POST /api/import/anilist", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(prisma.$queryRaw).mockResolvedValue([] as never);
+});
 
   it("returns 401 when not logged in", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(null);
@@ -99,6 +103,7 @@ describe("POST /api/import/anilist", () => {
     expect(novelData.author).toBe("Singsyong");
     expect(novelData.status).toBe("Ongoing");
     expect(novelData.description).not.toContain("<i>");
+    expect(novelData.altTitles).toEqual(["Jeonjijeok Dokja Sijeom"]);
 
     const entryData = vi.mocked(prisma.userNovelList.create).mock.calls[0][0].data;
     expect(entryData.status).toBe("reading");
@@ -115,7 +120,7 @@ describe("POST /api/import/anilist", () => {
   it("links an existing catalog novel instead of duplicating it", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
     vi.mocked(fetchAniListEntries).mockResolvedValue([aniListEntry]);
-    vi.mocked(prisma.novel.findFirst).mockResolvedValue({ ...novelFixture, anilistId: null } as never);
+    vi.mocked(prisma.novel.findFirst).mockResolvedValue({ ...novelFixture, anilistId: null, altTitles: ["ORV"] } as never);
     vi.mocked(prisma.novel.update).mockResolvedValue({ ...novelFixture, anilistId: 119257 } as never);
     vi.mocked(prisma.userNovelList.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.userNovelList.create).mockResolvedValue({} as never);
@@ -124,9 +129,27 @@ describe("POST /api/import/anilist", () => {
     const summary = await res.json();
 
     expect(prisma.novel.create).not.toHaveBeenCalled();
-    expect(vi.mocked(prisma.novel.update).mock.calls[0][0].data.anilistId).toBe(119257);
+    const data = vi.mocked(prisma.novel.update).mock.calls[0][0].data;
+    expect(data.anilistId).toBe(119257);
+    expect(data.altTitles).toEqual(["ORV", "Jeonjijeok Dokja Sijeom"]);
     expect(summary.novelsCreated).toBe(0);
     expect(summary.entriesAdded).toBe(1);
+  });
+
+  it("links by title or alternative title when neither id is known", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(adminUser as never);
+    vi.mocked(fetchAniListEntries).mockResolvedValue([aniListEntry]);
+    vi.mocked(prisma.novel.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.$queryRaw).mockResolvedValue([{ id: 3 }] as never);
+    vi.mocked(prisma.novel.findUnique).mockResolvedValue({ ...novelFixture, id: 3, anilistId: 119257, malId: 121496, altTitles: ["Jeonjijeok Dokja Sijeom"] } as never);
+    vi.mocked(prisma.userNovelList.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.userNovelList.create).mockResolvedValue({} as never);
+
+    const summary = await (await POST(makeRequest("POST", { username: "mmando" }))).json();
+    expect(prisma.novel.create).not.toHaveBeenCalled();
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+    expect(summary).toMatchObject({ novelsCreated: 0, entriesAdded: 1 });
+    expect(vi.mocked(prisma.userNovelList.create).mock.calls[0][0].data).toMatchObject({ novelId: 3 });
   });
 
   it("skips entries already on the reading list", async () => {

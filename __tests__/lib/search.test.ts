@@ -5,7 +5,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 import { prisma } from "@/lib/prisma";
-import { normalizeQuery, searchNovelIds } from "@/lib/search";
+import { normalizeQuery, searchNovelIds, findNovelIdByAnyTitle } from "@/lib/search";
 
 describe("normalizeQuery", () => {
   it("trims, collapses whitespace and caps length", () => {
@@ -44,6 +44,21 @@ describe("searchNovelIds", () => {
     expect(values).toEqual(expect.arrayContaining(["%solo%", "solo", 20, 20]));
     expect(fragments.map((f) => f.sql).join(" ")).toContain("ANY(n.genres)");
     expect(fragments.map((f) => f.sql).join(" ")).toContain("n.media_type =");
+    const [strings] = vi.mocked(prisma.$queryRaw).mock.calls[0] as unknown as [TemplateStringsArray];
+    expect(strings.join("?")).toContain("unnest(n.alt_titles)");
     expect(fragments.flatMap((f) => f.values)).toEqual(expect.arrayContaining(["Action", "manhwa"]));
+  });
+});
+
+describe("findNovelIdByAnyTitle", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns the first id, or null when nothing (or a blank title) matches", async () => {
+    vi.mocked(prisma.$queryRaw).mockResolvedValue([{ id: 12 }] as never);
+    expect(await findNovelIdByAnyTitle(" Lord of the Mysteries ")).toBe(12);
+    vi.mocked(prisma.$queryRaw).mockResolvedValue([] as never);
+    expect(await findNovelIdByAnyTitle("nope")).toBeNull();
+    expect(await findNovelIdByAnyTitle("   ")).toBeNull();
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(2);
   });
 });

@@ -6,6 +6,7 @@ import { canManageNovels } from "@/lib/roles";
 import { rateLimit, getIP } from "@/lib/rate-limit";
 import { parseMalXml } from "@/lib/mal";
 import { sanitizeString } from "@/lib/sanitize";
+import { findNovelIdByAnyTitle } from "@/lib/search";
 
 const MAX_XML_BYTES = 5 * 1024 * 1024;
 
@@ -40,12 +41,17 @@ export async function POST(request: NextRequest) {
     const summary: MalImportSummary = { total: entries.length, entriesAdded: 0, entriesSkipped: 0, unmatched: [] };
 
     for (const entry of entries) {
-      const novel = await prisma.novel.findFirst({
-        where: {
-          OR: [{ malId: entry.malId }, { title: { equals: entry.title, mode: "insensitive" } }],
-        },
+      // Match by MAL id, then by title or any alternative title (romaji, acronyms).
+      let novel = await prisma.novel.findFirst({
+        where: { malId: entry.malId },
         select: { id: true, malId: true },
       });
+      if (!novel) {
+        const id = await findNovelIdByAnyTitle(entry.title);
+        if (id !== null) {
+          novel = await prisma.novel.findUnique({ where: { id }, select: { id: true, malId: true } });
+        }
+      }
 
       if (!novel) {
         summary.unmatched.push({ malId: entry.malId, title: entry.title, chapters: entry.chapters });

@@ -49,6 +49,7 @@ export const adminUser = {
 export const novelFixture = {
   id: 1,
   title: "Test Novel",
+  altTitles: [] as string[],
   nativeTitle: null,
   mediaType: "webnovel",
   author: "Test Author",

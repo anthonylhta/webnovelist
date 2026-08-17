@@ -57,6 +57,7 @@ model Novel {
   id             Int       @id @default(autoincrement())
   title          String
   nativeTitle    String?   @map("native_title")
+  altTitles      String[]  @default([]) @map("alt_titles") // romaji, acronyms, other English renderings
   mediaType      String    @default("webnovel") @map("media_type")
   author         String?
   authorId       Int?      @map("author_id")
