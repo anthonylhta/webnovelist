@@ -6,6 +6,8 @@ import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
 import FolioPlusOne from "@/components/FolioPlusOne";
 import { chaptersBehind, type WeekDigest } from "@/lib/folio";
+import type { Recommendation } from "@/lib/recommendations";
+import { mediaTypeLabel } from "@/lib/media-types";
 
 interface ReadingEntry {
   id: number;
@@ -34,6 +36,7 @@ export default function LoggedInHome({
   digest,
   streak,
   finishedThisYear,
+  suggestions,
   initialReading,
 }: {
   folio: string;
@@ -41,6 +44,7 @@ export default function LoggedInHome({
   digest: WeekDigest;
   streak: number;
   finishedThisYear: number;
+  suggestions: Recommendation[];
   initialReading: ReadingEntry[];
 }) {
   const [reading, setReading] = useState<ReadingEntry[]>(initialReading);
@@ -191,6 +195,52 @@ export default function LoggedInHome({
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Suggested — drawn from the shelf: ratings, authors, continuations, co-readers */}
+      <div className="border-b border-hairline px-4 py-4">
+        <FolioLabel
+          right={
+            <Link
+              href="/browse"
+              className="normal-case tracking-normal text-gold transition hover:text-gold-bright"
+            >
+              [catalog]
+            </Link>
+          }
+        >
+          Suggested
+        </FolioLabel>
+        {suggestions.length === 0 ? (
+          <p className="font-serif text-[15px] text-muted">
+            Track and rate a few titles and suggestions will appear here.
+          </p>
+        ) : (
+          <div className="divide-y divide-hairline">
+            {suggestions.map((s) => (
+              <div key={s.novel.id} className="py-2 first:pt-0.5 last:pb-0.5">
+                <div className="flex items-baseline gap-2.5">
+                  <Link
+                    href={`/novel/${s.novel.id}`}
+                    className="min-w-0 truncate font-serif text-[15px] text-paper transition hover:text-gold"
+                  >
+                    {s.novel.title}
+                  </Link>
+                  {s.novel.nativeTitle && (
+                    <span className="hidden min-w-0 shrink truncate font-cjk text-[11px] text-faint sm:inline">
+                      {s.novel.nativeTitle}
+                    </span>
+                  )}
+                  <span aria-hidden className="leader-dots flex-1" />
+                  <span className="shrink-0 font-mono text-[9.5px] uppercase tracking-[0.12em] text-muted">
+                    {mediaTypeLabel(s.novel.mediaType).toLowerCase()}
+                  </span>
+                </div>
+                <p className="mt-0.5 truncate font-mono text-[10px] text-gold-dim">{s.reason}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>
