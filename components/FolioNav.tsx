@@ -56,6 +56,7 @@ export default function FolioNav() {
     ...(currentUser
       ? [
           { href: "/list", label: "library" },
+          { href: "/feed", label: "feed" },
           { href: "/stats", label: "stats" },
           { href: `/user/${currentUser.username}`, label: "profile" },
         ]

@@ -1,9 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/current-user";
 import CopyLinkButton from "@/components/CopyLinkButton";
+import FollowButton from "@/components/FollowButton";
 import ActivityHeatmap from "@/components/ActivityHeatmap";
 import ProfileImageUpload from "@/components/ProfileImageUpload";
 import BannerColorPicker from "@/components/BannerColorPicker";
@@ -64,8 +66,20 @@ export default async function PublicProfilePage({
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
+  const readerSelect = { id: true, username: true, avatarUrl: true } as const;
+
   // Batch 1 — everything that depends only on user.id (or nothing). One round trip.
-  const [me, list, activities, favoriteAuthorRows, userFavoriteCharacters] =
+  const [
+    me,
+    list,
+    activities,
+    favoriteAuthorRows,
+    userFavoriteCharacters,
+    followerRows,
+    followingRows,
+    followerCount,
+    followingCount,
+  ] =
     await Promise.all([
       getCurrentUser(),
       prisma.userNovelList.findMany({
@@ -95,6 +109,20 @@ export default async function PublicProfilePage({
         },
         orderBy: { createdAt: "asc" },
       }),
+      prisma.follow.findMany({
+        where: { followingId: user.id },
+        select: { follower: { select: readerSelect } },
+        orderBy: { createdAt: "desc" },
+        take: 24,
+      }),
+      prisma.follow.findMany({
+        where: { followerId: user.id },
+        select: { following: { select: readerSelect } },
+        orderBy: { createdAt: "desc" },
+        take: 24,
+      }),
+      prisma.follow.count({ where: { followingId: user.id } }),
+      prisma.follow.count({ where: { followerId: user.id } }),
     ]);
 
   const isOwner = me?.id === user.id;
@@ -109,7 +137,7 @@ export default async function PublicProfilePage({
 
   // Batch 2 — depends on batch-1 results. The full-table author/character lists
   // only feed the owner's editor dropdowns, so visitors skip those scans entirely.
-  const [activityNovels, allAuthors, availableCharactersRaw] = await Promise.all([
+  const [activityNovels, allAuthors, availableCharactersRaw, myFollowEdge] = await Promise.all([
     prisma.novel.findMany({
       where: { id: { in: activityNovelIds } },
       select: { id: true, coverImageUrl: true },
@@ -134,7 +162,16 @@ export default async function PublicProfilePage({
             >
           >
         ),
+    me && !isOwner
+      ? prisma.follow.findUnique({
+          where: { followerId_followingId: { followerId: me.id, followingId: user.id } },
+          select: { id: true },
+        })
+      : Promise.resolve(null),
   ]);
+
+  const followers = followerRows.map((r) => r.follower);
+  const following = followingRows.map((r) => r.following);
 
   const novelCovers: Record<number, string | null> = {};
   activityNovels.forEach((n) => {
@@ -242,9 +279,13 @@ export default async function PublicProfilePage({
           <h1 className="mt-1 font-serif text-2xl font-semibold text-paper sm:text-[26px]">
             {user.username}
           </h1>
-          <p className="mt-1.5 font-mono text-[10px] text-faint">joined {joined.toLowerCase()}</p>
+          <p className="mt-1.5 font-mono text-[10px] text-faint tabular-nums">
+            joined {joined.toLowerCase()} · {followerCount} follower{followerCount !== 1 ? "s" : ""} ·{" "}
+            {followingCount} following
+          </p>
         </div>
 
+        <FollowButton username={user.username} initialFollowing={myFollowEdge !== null} />
         <CopyLinkButton username={user.username} />
         <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
       </div>
@@ -328,6 +369,36 @@ export default async function PublicProfilePage({
         availableAuthors={allAuthors}
         isOwner={!!isOwner}
       />
+
+      {/* Circle — who follows whom */}
+      <div className="grid grid-cols-1 border-b border-hairline sm:grid-cols-2 sm:divide-x sm:divide-hairline">
+        {[
+          { label: "Following", count: followingCount, readers: following, empty: isOwner ? "Follow readers from their profiles; their marks show up in your feed." : "Not following anyone yet." },
+          { label: "Followers", count: followerCount, readers: followers, empty: "No followers yet." },
+        ].map((col) => (
+          <div key={col.label} className="px-4 py-4 first:border-b first:border-hairline sm:first:border-b-0">
+            <FolioLabel right={String(col.count)}>{col.label}</FolioLabel>
+            {col.readers.length === 0 ? (
+              <p className="font-serif text-[14.5px] text-muted">{col.empty}</p>
+            ) : (
+              <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px]">
+                {col.readers.map((r) => (
+                  <Link
+                    key={r.id}
+                    href={`/user/${r.username}`}
+                    className="text-body transition hover:text-gold"
+                  >
+                    {r.username}
+                  </Link>
+                ))}
+                {col.count > col.readers.length && (
+                  <span className="text-faint">+{col.count - col.readers.length} more</span>
+                )}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Activity feed */}
       <div className="border-b border-hairline px-4 py-4">

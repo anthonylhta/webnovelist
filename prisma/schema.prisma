@@ -33,8 +33,27 @@ model User {
   reviewedSubmissions NovelSubmission[] @relation("ReviewedBy")
 
   favoriteCharacters UserFavoriteCharacter[]
+  following          Follow[] @relation("Follower")  // rows where this user follows someone
+  followers          Follow[] @relation("Following") // rows where someone follows this user
 
   @@map("users")
+}
+
+// ============== FOLLOWS ==============
+// One row per follower → following edge; the feed reads the activities of
+// the readers a user follows.
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
 }
 
 // ============== AUTHORS ==============
@@ -173,6 +192,7 @@ model Activity {
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
   @@map("activities")
 }
 
