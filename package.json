@@ -23,7 +23,7 @@
     "seed": "npx tsx --tsconfig tsconfig.json prisma/seed.ts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.6.3",
+    "@clerk/nextjs": "^7.7.5",
     "@prisma/client": "^6.19.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
