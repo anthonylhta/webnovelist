@@ -1,59 +1,62 @@
 // app/stats/page.tsx
-"use client";
-
-import { useState, useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/current-user";
 import { FolioSheet, FolioLabel, StatusSeal, LedgerBar } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import { buildPaceStats, daysToFinish } from "@/lib/pace";
+import PaceModule, { type FinishEstimate } from "./PaceModule";
 
-interface ListEntry {
-  id: number;
-  status: string;
-  rating: number | null;
-  currentChapter: number;
-  dateStarted: string | null;
-  dateFinished: string | null;
-  novel: {
-    id: number;
-    title: string;
-    totalChapters: number | null;
-    genres: string[];
-    author: string | null;
-  };
-}
+export default async function StatsPage() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/sign-in");
 
-export default function StatsPage() {
-  const { isLoaded, isSignedIn } = useAuth();
-  const router = useRouter();
-  const [list, setList] = useState<ListEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const now = new Date();
+  const oneYearAgo = new Date(now);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push("/sign-in");
-      return;
-    }
+  // One round trip: the whole list feeds the ledger modules, a year of
+  // activity feeds the pace module.
+  const [list, activities] = await Promise.all([
+    prisma.userNovelList.findMany({
+      where: { userId: currentUser.id },
+      select: {
+        id: true,
+        status: true,
+        rating: true,
+        currentChapter: true,
+        novel: {
+          select: {
+            id: true,
+            title: true,
+            totalChapters: true,
+            latestChapter: true,
+            genres: true,
+            author: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.activity.findMany({
+      where: { userId: currentUser.id, createdAt: { gte: oneYearAgo } },
+      select: { type: true, novelId: true, detail: true, createdAt: true },
+    }),
+  ]);
 
-    if (isLoaded && isSignedIn) {
-      fetch("/api/list")
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data)) setList(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
-  }, [isLoaded, isSignedIn, router]);
-
-  if (!isLoaded || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="font-mono text-xs text-muted">totting up the ledger…</div>
-      </div>
-    );
-  }
+  const pace = buildPaceStats(activities, now);
+  const estimates: FinishEstimate[] = list
+    .filter((e) => e.status === "reading")
+    .flatMap((e) => {
+      const target = e.novel.totalChapters ?? e.novel.latestChapter;
+      const days = daysToFinish(e.currentChapter, target, pace.perDay);
+      return days === null || target === null
+        ? []
+        : [{ novelId: e.novel.id, title: e.novel.title, remaining: target - e.currentChapter, days }];
+    })
+    .sort((a, b) => a.days - b.days)
+    .slice(0, 5);
 
   // Calculate stats
   const totalNovels = list.length;
@@ -201,6 +204,9 @@ export default function StatsPage() {
           </div>
         ))}
       </div>
+
+      {/* Pace + streaks + finish estimates */}
+      <PaceModule pace={pace} estimates={estimates} />
 
       {/* Rating distribution */}
       <div className="border-b border-hairline px-4 py-4">
