@@ -13,6 +13,7 @@ import FavoriteCharactersEditor from "@/components/FavoriteCharactersEditor";
 import NovelCard from "@/components/NovelCard";
 import { FolioSheet, FolioLabel, LedgerBar } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
+import { streakDays } from "@/lib/folio";
 
 export const dynamic = "force-dynamic";
 
@@ -190,6 +191,10 @@ export default async function PublicProfilePage({
 
   // Recent activities
   const recentActivities = activities.slice(0, 25);
+  const streak = streakDays(
+    activities.map((a) => a.createdAt),
+    new Date()
+  );
 
   const joined = new Date(user.createdAt).toLocaleDateString("en-US", {
     month: "long",
@@ -267,7 +272,11 @@ export default async function PublicProfilePage({
 
       {/* Activity heatmap */}
       <div className="border-b border-hairline px-4 py-4">
-        <FolioLabel right={`${activities.length} marks this year`}>Ledger</FolioLabel>
+        <FolioLabel
+          right={`${activities.length} marks this year${streak > 0 ? ` · ${streak}-day streak` : ""}`}
+        >
+          Ledger
+        </FolioLabel>
         <div className="overflow-x-auto scrollbar-hide">
           <ActivityHeatmap activities={activities} />
         </div>
