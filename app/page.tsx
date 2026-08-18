@@ -7,6 +7,7 @@ import LoggedInHome from "./LoggedInHome";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
 import { buildWeekDigest, folioLine, streakDays, weekStart } from "@/lib/folio";
+import { getRecommendations } from "@/lib/recommendations";
 
 // Genre breakdown + novel count is a full-table scan; it changes rarely, so cache
 // it for an hour rather than re-scanning on every home-page request.
@@ -37,7 +38,7 @@ export default async function Home() {
     since.setDate(since.getDate() - 90);
 
     // One 90-day activity query feeds both the week digest and the streak.
-    const [readingEntries, activities, finishedThisYear] = await Promise.all([
+    const [readingEntries, activities, finishedThisYear, suggestions] = await Promise.all([
       prisma.userNovelList.findMany({
         where: { userId: currentUser.id, status: "reading" },
         include: {
@@ -66,6 +67,7 @@ export default async function Home() {
           dateFinished: { gte: new Date(now.getFullYear(), 0, 1) },
         },
       }),
+      getRecommendations(currentUser.id, 5),
     ]);
 
     const digestIds = [
@@ -95,6 +97,7 @@ export default async function Home() {
         digest={buildWeekDigest(activities, titleOf, weekStart(now))}
         streak={streakDays(activities.map((a) => a.createdAt), now)}
         finishedThisYear={finishedThisYear}
+        suggestions={suggestions}
         initialReading={readingEntries.map((e) => ({
           id: e.id,
           currentChapter: e.currentChapter,
