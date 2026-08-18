@@ -16,7 +16,8 @@
     "postinstall": "prisma generate",
     "prepare": "husky",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "prisma": {
     "seed": "npx tsx --tsconfig tsconfig.json prisma/seed.ts"
@@ -40,6 +41,8 @@
     "*.{ts,tsx}": "eslint"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.24",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^26",
     "@types/react": "^19",
