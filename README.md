@@ -73,7 +73,8 @@
 ## Quality
 
 - **Tests** - Vitest unit/integration tests covering lib utilities and all major API routes (`__tests__/`). Run with `npm test`.
-- **CI** - GitHub Actions runs lint, typecheck, and tests on every push and PR to `main`.
+- **E2E** - Playwright specs in `e2e/` drive the real app in Chromium: the signed-out journey (home → browse → search → title, protected-route redirects, anonymous API refusals) always; the signed-in sheets when `E2E_CLERK_USER_EMAIL` names a Clerk dev-instance user (Clerk testing token, no password). Run with `npm run test:e2e` against a dev server.
+- **CI** - GitHub Actions runs lint, typecheck, and tests on every push and PR to `main`; a second job builds the app against a throwaway Postgres and runs the Playwright suite when the Clerk test keys are configured as repository secrets.
 - **Pre-commit** - Husky + lint-staged runs ESLint on staged `.ts`/`.tsx` files before every commit.
 - **Branch protection** - PRs required on `main`; CI must pass before merge.
 - **Dependency updates** - Dependabot checks for npm updates weekly.
