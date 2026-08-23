@@ -275,6 +275,9 @@ export default async function Home() {
         >
           discord/
         </a>
+        <Link href="/privacy" className="text-muted transition hover:text-gold">
+          privacy/
+        </Link>
       </div>
 
       <FolioNav />

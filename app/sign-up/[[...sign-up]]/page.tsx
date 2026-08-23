@@ -13,6 +13,13 @@ export default function SignUpPage() {
         </span>
       </Link>
       <SignUp />
+      <p className="font-mono text-[9.5px] text-faint">
+        creating an account means the{" "}
+        <Link href="/privacy" className="text-gold-dim transition hover:text-gold">
+          privacy page
+        </Link>{" "}
+        applies.
+      </p>
     </div>
   );
 }
