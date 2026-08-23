@@ -240,7 +240,6 @@ export default async function PublicProfilePage({
 
   return (
     <FolioSheet
-      wide
       statusLeft={`webnovelist · readers · ${user.username}`}
       statusRight={`${totalNovels} title${totalNovels !== 1 ? "s" : ""}`}
       footer={`ink & gold · reading since ${joined.toLowerCase()}`}
@@ -251,8 +250,8 @@ export default async function PublicProfilePage({
         className={`h-1.5 bg-gradient-to-r ${getBannerGradient(user.bannerColor)}`}
       />
 
-      {/* Nameplate */}
-      <div className="relative flex items-center gap-5 border-b border-hairline px-4 py-6">
+      {/* Nameplate — the action cluster drops to its own row below sm */}
+      <div className="relative flex flex-wrap items-center gap-x-5 gap-y-3 border-b border-hairline px-4 py-6">
         <ProfileImageUpload
           type="avatar"
           currentUrl={user.avatarUrl}
@@ -290,9 +289,11 @@ export default async function PublicProfilePage({
           </p>
         </div>
 
-        <FollowButton username={user.username} initialFollowing={myFollowEdge !== null} />
-        <CopyLinkButton username={user.username} />
-        <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
+        <div className="flex w-full shrink-0 items-center gap-4 sm:ml-auto sm:w-auto">
+          <FollowButton username={user.username} initialFollowing={myFollowEdge !== null} />
+          <CopyLinkButton username={user.username} />
+          <BannerColorPicker currentColor={user.bannerColor} isOwner={!!isOwner} />
+        </div>
       </div>
 
       {/* Key numbers */}
@@ -302,11 +303,11 @@ export default async function PublicProfilePage({
           { label: "chapters read", value: totalChaptersRead.toLocaleString() },
           { label: "mean score", value: meanScore === "—" ? "—" : `★ ${meanScore}` },
         ].map((cell) => (
-          <div key={cell.label} className="px-4 py-3">
-            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+          <div key={cell.label} className="px-4 py-3 text-center">
+            <p className="font-mono text-base text-paper tabular-nums">{cell.value}</p>
+            <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
               {cell.label}
             </p>
-            <p className="mt-1.5 font-mono text-base text-paper tabular-nums">{cell.value}</p>
           </div>
         ))}
       </div>
@@ -318,9 +319,7 @@ export default async function PublicProfilePage({
         >
           Ledger
         </FolioLabel>
-        <div className="overflow-x-auto scrollbar-hide">
-          <ActivityHeatmap activities={activities} />
-        </div>
+        <ActivityHeatmap activities={activities} />
       </div>
 
       {/* Genre overview */}
@@ -329,10 +328,10 @@ export default async function PublicProfilePage({
         {sortedGenres.length === 0 ? (
           <p className="font-serif text-[14.5px] text-muted">No genre data yet.</p>
         ) : (
-          <div className="space-y-1.5">
+          <div className="grid gap-x-8 gap-y-1.5 sm:grid-cols-2">
             {sortedGenres.slice(0, 10).map(([genre, count]) => (
               <div key={genre} className="flex items-center gap-3">
-                <span className="w-28 truncate font-mono text-[10.5px] text-muted">
+                <span className="w-24 truncate font-mono text-[10.5px] text-muted">
                   {genre.toLowerCase()}
                 </span>
                 <LedgerBar value={count} max={maxGenreCount} />
@@ -360,7 +359,7 @@ export default async function PublicProfilePage({
                 id={novel.id}
                 title={novel.title}
                 coverImageUrl={novel.coverImageUrl}
-                size="sm"
+                size="md"
               />
             ))}
           </div>

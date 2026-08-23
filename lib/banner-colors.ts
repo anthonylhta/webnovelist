@@ -1,7 +1,7 @@
 const BANNER_OPTIONS = [
   {
     name: "default",
-    gradient: "from-blue-600/40 via-purple-600/30 to-blue-800/40",
+    gradient: "from-yellow-900/40 via-amber-700/25 to-yellow-950/40",
   },
   {
     name: "blue",
