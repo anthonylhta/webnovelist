@@ -90,41 +90,30 @@ export default function FavoriteAuthorsEditor({
         <p className="text-faint text-sm">No favourite authors yet.</p>
       )}
 
-      {/* Author avatars */}
+      {/* Author links — flowing mono text, matching the Circle module */}
       {favorites.length > 0 && (
-        <div className="flex flex-wrap gap-4 mb-1">
+        <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px]">
           {favorites.map((author) => (
-            <div key={author.id} className="relative group">
-              <Link href={`/author/${author.id}`} className="block text-center w-16">
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-full overflow-hidden border-2 border-hairline
-                                hover:border-gold/60 transition bg-elevated">
-                  <Image
-                    fill
-                    sizes="64px"
-                    src={author.imageUrl || "/default-avatar.svg"}
-                    alt={author.name}
-                    className="object-cover"
-                  />
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted mt-1.5 truncate hover:text-gold transition">
-                  {author.name}
-                </p>
+            <span key={author.id} className="inline-flex items-baseline gap-1.5">
+              <Link
+                href={`/author/${author.id}`}
+                className="text-body transition hover:text-gold"
+              >
+                {author.name}
               </Link>
-
               {isOwner && (
                 <button
                   onClick={() => removeAuthor(author.id)}
                   disabled={loading}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-seal hover:bg-seal-bright rounded-full
-                             flex items-center justify-center opacity-0 group-hover:opacity-100 transition
-                             disabled:opacity-50"
+                  aria-label={`Remove ${author.name}`}
+                  className="text-faint transition hover:text-seal-bright disabled:opacity-50"
                 >
-                  <X className="w-3 h-3 text-paper" />
+                  ×
                 </button>
               )}
-            </div>
+            </span>
           ))}
-        </div>
+        </p>
       )}
 
       {/* Picker */}

@@ -104,44 +104,30 @@ export default function FavoriteCharactersEditor({
         <p className="text-faint text-sm">No favorite characters yet.</p>
       )}
 
-      {/* Character avatars */}
+      {/* Character links — flowing mono text, matching the Circle module */}
       {favorites.length > 0 && (
-        <div className="flex flex-wrap gap-4 mb-1">
+        <p className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px]">
           {favorites.map((char) => (
-            <div key={char.id} className="relative group">
-              <Link href={`/character/${char.id}`} className="block text-center w-16">
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 mx-auto bg-elevated rounded-full border border-hairline
-                                flex items-center justify-center overflow-hidden hover:border-gold/60 transition">
-                  <Image
-                    fill
-                    sizes="64px"
-                    src={char.imageUrl || "/default-avatar.svg"}
-                    alt={char.name}
-                    className="object-cover"
-                  />
-                </div>
-                <p className="text-[10px] sm:text-xs text-muted mt-1.5 truncate hover:text-gold transition">
-                  {char.name}
-                </p>
-                <p className="text-[9px] text-faint truncate">
-                  {char.novel.title}
-                </p>
+            <span key={char.id} className="inline-flex items-baseline gap-1.5">
+              <Link
+                href={`/character/${char.id}`}
+                className="text-body transition hover:text-gold"
+              >
+                {char.name} <span className="text-faint">· {char.novel.title}</span>
               </Link>
-
               {isOwner && (
                 <button
                   onClick={() => removeCharacter(char.id)}
                   disabled={loading}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-seal hover:bg-seal-bright rounded-full
-                             flex items-center justify-center opacity-0 group-hover:opacity-100 transition
-                             disabled:opacity-50"
+                  aria-label={`Remove ${char.name}`}
+                  className="text-faint transition hover:text-seal-bright disabled:opacity-50"
                 >
-                  <X className="w-3 h-3 text-paper" />
+                  ×
                 </button>
               )}
-            </div>
+            </span>
           ))}
-        </div>
+        </p>
       )}
 
       {/* Picker */}
