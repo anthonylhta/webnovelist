@@ -1,6 +1,8 @@
 // Pure helpers for the Folio redesign: the masthead's folio line (volume =
 // years since the reader joined, number = ISO week) and the week-digest math
 // that turns Activity rows into the home page's "This week" module.
+// Days are Sydney calendar days keyed by lib/time.ts.
+import { calendar, dayKey, formatDate, shiftDay, startOfDay, toKey, weekday } from "@/lib/time";
 
 /** Roman numeral for the masthead volume (small numbers only — years). */
 export function romanNumeral(n: number): string {
@@ -24,30 +26,29 @@ export function romanNumeral(n: number): string {
 
 /** ISO 8601 week number (weeks start Monday; week 1 holds the year's first Thursday). */
 export function isoWeek(date: Date): number {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const c = calendar(date);
+  const d = new Date(Date.UTC(c.year, c.month - 1, c.day));
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
-/** Local midnight on the Monday of `date`'s week. */
+/** Sydney midnight on the Monday of `date`'s week. */
 export function weekStart(date: Date): Date {
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = d.getDay();
-  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
-  return d;
+  const key = dayKey(date);
+  const day = weekday(key);
+  return startOfDay(shiftDay(key, -(day === 0 ? 6 : day - 1)));
 }
 
 /** "Week of August 10, 2026 · Vol. II · No. 33" — the masthead's folio line. */
 export function folioLine(joinedAt: Date, now: Date): string {
-  const monday = weekStart(now);
-  const week = monday.toLocaleDateString("en-US", {
+  const week = formatDate(weekStart(now), {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
-  const vol = romanNumeral(now.getFullYear() - joinedAt.getFullYear() + 1);
+  const vol = romanNumeral(calendar(now).year - calendar(joinedAt).year + 1);
   return `Week of ${week} · Vol. ${vol} · No. ${isoWeek(now)}`;
 }
 
@@ -121,14 +122,13 @@ export function buildWeekDigest(
  * reported as zero before the day's first chapter.
  */
 export function streakDays(dates: Date[], now: Date): number {
-  const key = (d: Date) => d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-  const days = new Set(dates.map(key));
-  const cursor = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if (!days.has(key(cursor))) cursor.setDate(cursor.getDate() - 1);
+  const days = new Set(dates.map(dayKey));
+  let cursor = dayKey(now);
+  if (!days.has(cursor)) cursor = shiftDay(cursor, -1);
   let run = 0;
-  while (days.has(key(cursor))) {
+  while (days.has(cursor)) {
     run++;
-    cursor.setDate(cursor.getDate() - 1);
+    cursor = shiftDay(cursor, -1);
   }
   return run;
 }
@@ -145,16 +145,18 @@ export type MonthLedger = {
 
 /** Fold this month's activities into the library page's ledger strip. */
 export function buildMonthLedger(activities: ActivityRow[], now: Date): MonthLedger {
-  const from = new Date(now.getFullYear(), now.getMonth(), 1);
-  const days = Array.from({ length: now.getDate() }, () => 0);
+  const { year, month, day: today } = calendar(now);
+  const from = toKey(year, month, 1);
+  const days = Array.from({ length: today }, () => 0);
   let finished = 0;
   let ratings = 0;
 
   for (const a of activities) {
-    if (a.createdAt < from) continue;
+    const key = dayKey(a.createdAt);
+    if (key < from) continue;
     if (a.type === "chapter_update") {
       const delta = chapterDelta(a.detail);
-      const day = a.createdAt.getDate() - 1;
+      const day = (key % 100) - 1; // the key's day of month
       if (delta > 0 && day < days.length) days[day] += delta;
     } else if (a.type === "status_change") {
       if (a.detail?.endsWith("→ Completed")) finished++;

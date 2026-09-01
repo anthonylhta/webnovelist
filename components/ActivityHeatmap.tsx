@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { dayKey, shiftDay, weekday } from "@/lib/time";
 
 interface Activity {
   createdAt: string | Date;
@@ -13,31 +14,32 @@ interface ActivityHeatmapProps {
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
+/** Zero-based month of a day key (see lib/time.ts). */
+const monthOf = (key: number) => Math.floor((key % 10000) / 100) - 1;
+/** "2026-08-15" for a day key. */
+const isoDay = (key: number) => String(key).replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+
 export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
   const { weeks, monthLabels, maxCount } = useMemo(() => {
-    const counts: Record<string, number> = {};
+    const counts: Record<number, number> = {};
 
     activities.forEach((activity) => {
-      const date = new Date(activity.createdAt).toISOString().split("T")[0];
-      counts[date] = (counts[date] || 0) + 1;
+      const key = dayKey(new Date(activity.createdAt));
+      counts[key] = (counts[key] || 0) + 1;
     });
 
-    const today = new Date();
-    const days: { date: string; count: number; dayOfWeek: number }[] = [];
+    const today = dayKey(new Date());
+    const days: { key: number; count: number; dayOfWeek: number }[] = [];
 
-    const start = new Date(today);
-    start.setDate(start.getDate() - 363);
-    start.setDate(start.getDate() - start.getDay());
+    const yearAgo = shiftDay(today, -363);
+    const start = shiftDay(yearAgo, -weekday(yearAgo));
 
-    const current = new Date(start);
-    while (current <= today) {
-      const dateStr = current.toISOString().split("T")[0];
+    for (let key = start; key <= today; key = shiftDay(key, 1)) {
       days.push({
-        date: dateStr,
-        count: counts[dateStr] || 0,
-        dayOfWeek: current.getDay(),
+        key,
+        count: counts[key] || 0,
+        dayOfWeek: weekday(key),
       });
-      current.setDate(current.getDate() + 1);
     }
 
     const weekGroups: typeof days[] = [];
@@ -47,9 +49,9 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
 
     // One label per calendar month, on the first week that starts inside it.
     const labels: (string | null)[] = weekGroups.map((week, i) => {
-      const month = new Date(week[0].date).getUTCMonth();
+      const month = monthOf(week[0].key);
       if (i === 0) return null; // the year-ago edge is usually a partial month
-      const prevMonth = new Date(weekGroups[i - 1][0].date).getUTCMonth();
+      const prevMonth = monthOf(weekGroups[i - 1][0].key);
       return month !== prevMonth ? MONTHS[month] : null;
     });
 
@@ -97,9 +99,9 @@ export default function ActivityHeatmap({ activities }: ActivityHeatmapProps) {
               <div key={weekIndex} className="flex flex-col gap-0.5">
                 {week.map((day) => (
                   <div
-                    key={day.date}
+                    key={day.key}
                     className={`w-[11px] h-[11px] rounded-sm ${getColor(day.count)} transition-colors`}
-                    title={`${day.date}: ${day.count} update${day.count !== 1 ? "s" : ""}`}
+                    title={`${isoDay(day.key)}: ${day.count} update${day.count !== 1 ? "s" : ""}`}
                   />
                 ))}
                 {week.length < 7 &&

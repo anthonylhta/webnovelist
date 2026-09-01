@@ -1,5 +1,6 @@
 // app/feed/page.tsx — the marks of the readers you follow, newest first.
 import Link from "next/link";
+import { formatDate, formatTime } from "@/lib/time";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
@@ -75,12 +76,11 @@ export default async function FeedPage() {
             rows.map((u) => ({
               id: u.id,
               username: u.username,
-              note: `joined ${u.createdAt.toLocaleDateString("en-US", { month: "short", year: "numeric" }).toLowerCase()}`,
+              note: `joined ${formatDate(u.createdAt, { month: "short", year: "numeric" }).toLowerCase()}`,
             }))
           );
 
-  const dayOf = (d: Date) =>
-    d.toLocaleDateString("en-US", { month: "short", day: "numeric" }).toLowerCase();
+  const dayOf = (d: Date) => formatDate(d, { month: "short", day: "numeric" }).toLowerCase();
 
   return (
     <FolioSheet
@@ -132,9 +132,7 @@ export default async function FeedPage() {
                       <span className="min-w-0 flex-1 truncate text-[12.5px] text-body">{a.detail}</span>
                     )}
                     <span className="shrink-0 font-mono text-[9.5px] text-faint tabular-nums">
-                      {a.createdAt
-                        .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-                        .toLowerCase()}
+                      {formatTime(a.createdAt)}
                     </span>
                   </div>
                 </div>

@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDate } from "@/lib/time";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
@@ -162,13 +163,7 @@ export default function SettingsPage() {
           <div className="flex items-baseline justify-between gap-4">
             <span className="text-muted">member since</span>
             <span className="text-body tabular-nums">
-              {new Date(settings.createdAt)
-                .toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-                .toLowerCase()}
+              {formatDate(settings.createdAt, { month: "short", day: "numeric", year: "numeric" }).toLowerCase()}
             </span>
           </div>
         </div>
@@ -286,13 +281,7 @@ export default function SettingsPage() {
         {settings.usernameChangedAt && (
           <p className="mt-3 font-mono text-[9.5px] text-faint">
             last changed{" "}
-            {new Date(settings.usernameChangedAt)
-              .toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-              .toLowerCase()}
+            {formatDate(settings.usernameChangedAt, { month: "short", day: "numeric", year: "numeric" }).toLowerCase()}
           </p>
         )}
       </div>

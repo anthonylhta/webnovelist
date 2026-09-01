@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { calendar, formatDate } from "@/lib/time";
 import Link from "next/link";
 import { FolioSheet, FolioLabel } from "@/components/FolioKit";
 import FolioNav from "@/components/FolioNav";
@@ -24,9 +25,7 @@ interface ReadingEntry {
 }
 
 function shortDate(iso: string): string {
-  return new Date(iso)
-    .toLocaleDateString("en-US", { month: "short", day: "numeric" })
-    .toLowerCase();
+  return formatDate(iso, { month: "short", day: "numeric" }).toLowerCase();
 }
 
 /** The signed-in home — the Weekly Edition sheet. */
@@ -59,7 +58,7 @@ export default function LoggedInHome({
 
   const pace =
     digest.totalChapters > 0 ? (digest.totalChapters / 7).toFixed(1) : "0";
-  const yearShort = String(new Date().getFullYear()).slice(2);
+  const yearShort = String(calendar(new Date()).year).slice(2);
   const [top, second] = digest.titles;
   const rating = digest.ratings[0];
 

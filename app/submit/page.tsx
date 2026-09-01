@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatDate } from "@/lib/time";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -122,8 +123,7 @@ export default function SubmitPage() {
     if (res.ok) setSubmissions((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const shortDate = (iso: string) =>
-    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" }).toLowerCase();
+  const shortDate = (iso: string) => formatDate(iso, { month: "short", day: "numeric" }).toLowerCase();
 
   if (!isLoaded || loading) {
     return (

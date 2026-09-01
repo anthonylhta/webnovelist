@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDate } from "@/lib/time";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -189,10 +190,7 @@ export default function LibraryList({
     </button>
   );
 
-  const shortDate = (iso: string) =>
-    new Date(iso)
-      .toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      .toLowerCase();
+  const shortDate = (iso: string) => formatDate(iso, { month: "short", day: "numeric" }).toLowerCase();
 
   return (
     <FolioSheet

@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
 
-import {
-  dayKey,
-  longestStreak,
-  chaptersByDay,
-  buildPaceStats,
-  daysToFinish,
-} from "@/lib/pace";
+import { longestStreak, chaptersByDay, buildPaceStats, daysToFinish } from "@/lib/pace";
 import type { ActivityRow } from "@/lib/folio";
+
+// Sydney wall-clock instants (AEST +10 in winter, AEDT +11 in summer) so the
+// suite means the same thing under any process timezone.
+const aest = (local: string) => new Date(`${local}+10:00`);
+const aedt = (local: string) => new Date(`${local}+11:00`);
 
 const ch = (novelId: number, from: number, to: number, createdAt: Date): ActivityRow => ({
   type: "chapter_update",
@@ -16,64 +15,75 @@ const ch = (novelId: number, from: number, to: number, createdAt: Date): Activit
   createdAt,
 });
 
-describe("dayKey", () => {
-  it("encodes the local calendar day", () => {
-    expect(dayKey(new Date(2026, 7, 15, 23, 59))).toBe(20260815);
-    expect(dayKey(new Date(2026, 0, 1, 0, 0))).toBe(20260101);
-  });
-});
-
 describe("longestStreak", () => {
   it("finds the longest run of consecutive days", () => {
     const dates = [
-      new Date(2026, 7, 1),
-      new Date(2026, 7, 2),
-      new Date(2026, 7, 2, 18), // same day twice
-      new Date(2026, 7, 3),
-      new Date(2026, 7, 10),
-      new Date(2026, 7, 11),
+      aest("2026-08-01T00:00:00"),
+      aest("2026-08-02T00:00:00"),
+      aest("2026-08-02T18:00:00"), // same day twice
+      aest("2026-08-03T00:00:00"),
+      aest("2026-08-10T00:00:00"),
+      aest("2026-08-11T00:00:00"),
     ];
     expect(longestStreak(dates)).toBe(3);
   });
 
   it("crosses month and year boundaries", () => {
-    const dates = [new Date(2025, 11, 30), new Date(2025, 11, 31), new Date(2026, 0, 1), new Date(2026, 0, 2)];
+    const dates = [
+      aedt("2025-12-30T00:00:00"),
+      aedt("2025-12-31T00:00:00"),
+      aedt("2026-01-01T00:00:00"),
+      aedt("2026-01-02T00:00:00"),
+    ];
     expect(longestStreak(dates)).toBe(4);
+  });
+
+  it("counts Sydney days, not UTC ones", () => {
+    // 23:00 UTC on Aug 1 is 09:00 on Aug 2 in Sydney — it runs into Aug 3.
+    const dates = [new Date("2026-08-01T23:00:00Z"), aest("2026-08-03T00:00:00")];
+    expect(longestStreak(dates)).toBe(2);
   });
 
   it("is zero with no marks and one for a lone day", () => {
     expect(longestStreak([])).toBe(0);
-    expect(longestStreak([new Date(2026, 7, 1)])).toBe(1);
+    expect(longestStreak([aest("2026-08-01T00:00:00")])).toBe(1);
   });
 });
 
 describe("chaptersByDay", () => {
   it("sums forward chapter deltas per day and ignores corrections and other types", () => {
     const rows: ActivityRow[] = [
-      ch(1, 10, 15, new Date(2026, 7, 1, 9)),
-      ch(2, 3, 4, new Date(2026, 7, 1, 21)),
-      { type: "chapter_update", novelId: 1, detail: "Title — Corrected chapter to 12", createdAt: new Date(2026, 7, 1) },
-      { type: "rating", novelId: 1, detail: "Rated Title — 8/10", createdAt: new Date(2026, 7, 1) },
-      ch(1, 15, 16, new Date(2026, 7, 2)),
+      ch(1, 10, 15, aest("2026-08-01T09:00:00")),
+      ch(2, 3, 4, aest("2026-08-01T21:00:00")),
+      { type: "chapter_update", novelId: 1, detail: "Title — Corrected chapter to 12", createdAt: aest("2026-08-01T00:00:00") },
+      { type: "rating", novelId: 1, detail: "Rated Title — 8/10", createdAt: aest("2026-08-01T00:00:00") },
+      ch(1, 15, 16, aest("2026-08-02T00:00:00")),
     ];
     const days = chaptersByDay(rows);
     expect(days.get(20260801)).toBe(6);
     expect(days.get(20260802)).toBe(1);
     expect(days.size).toBe(2);
   });
+
+  it("buckets by Sydney day, not UTC", () => {
+    // 22:00 UTC on the 15th is 08:00 on the 16th in Sydney.
+    const days = chaptersByDay([ch(1, 1, 2, new Date("2026-08-15T22:00:00Z"))]);
+    expect(days.get(20260816)).toBe(1);
+    expect(days.has(20260815)).toBe(false);
+  });
 });
 
 describe("buildPaceStats", () => {
-  const now = new Date(2026, 7, 15, 20); // Saturday
+  const now = aest("2026-08-15T20:00:00"); // Saturday
 
   const rows: ActivityRow[] = [
-    ch(1, 100, 110, new Date(2026, 7, 15, 8)), // today, Sat: 10
-    ch(1, 90, 100, new Date(2026, 7, 14)), // Fri: 10
-    ch(2, 1, 21, new Date(2026, 7, 13)), // Thu: 20
-    { type: "rating", novelId: 2, detail: "Rated Title — 9/10", createdAt: new Date(2026, 7, 12) }, // a mark, no chapters
-    ch(1, 50, 60, new Date(2026, 6, 20)), // last month, inside 30d: 10
-    ch(1, 20, 50, new Date(2026, 5, 1)), // ~75 days ago, inside 90d: 30 — best day
-    ch(1, 0, 20, new Date(2025, 10, 1)), // last November, inside the year: 20
+    ch(1, 100, 110, aest("2026-08-15T08:00:00")), // today, Sat: 10
+    ch(1, 90, 100, aest("2026-08-14T00:00:00")), // Fri: 10
+    ch(2, 1, 21, aest("2026-08-13T00:00:00")), // Thu: 20
+    { type: "rating", novelId: 2, detail: "Rated Title — 9/10", createdAt: aest("2026-08-12T00:00:00") }, // a mark, no chapters
+    ch(1, 50, 60, aest("2026-07-20T00:00:00")), // last month, inside 30d: 10
+    ch(1, 20, 50, aest("2026-06-01T00:00:00")), // ~75 days ago, inside 90d: 30 — best day
+    ch(1, 0, 20, aedt("2025-11-01T00:00:00")), // last November, inside the year: 20
   ];
 
   const stats = buildPaceStats(rows, now);
@@ -93,7 +103,7 @@ describe("buildPaceStats", () => {
   });
 
   it("finds the best day", () => {
-    expect(stats.bestDay).toEqual({ date: new Date(2026, 5, 1), chapters: 30 });
+    expect(stats.bestDay).toEqual({ day: 20260601, chapters: 30 });
   });
 
   it("lays chapters onto weekdays, Monday first", () => {
