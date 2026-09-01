@@ -1,5 +1,6 @@
 // app/page.tsx
 import { unstable_cache } from "next/cache";
+import { calendar, formatDate, startOfDay, toKey } from "@/lib/time";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
 import Link from "next/link";
@@ -64,7 +65,7 @@ export default async function Home() {
         where: {
           userId: currentUser.id,
           status: "completed",
-          dateFinished: { gte: new Date(now.getFullYear(), 0, 1) },
+          dateFinished: { gte: startOfDay(toKey(calendar(now).year, 1, 1)) },
         },
       }),
       getRecommendations(currentUser.id, 5),
@@ -85,8 +86,7 @@ export default async function Home() {
       : [];
     const titleOf = Object.fromEntries(digestNovels.map((n) => [n.id, n.title]));
 
-    const statusDate = now
-      .toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+    const statusDate = formatDate(now, { weekday: "short", month: "short", day: "numeric" })
       .toLowerCase()
       .replace(",", "");
 

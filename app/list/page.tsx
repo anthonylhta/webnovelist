@@ -1,5 +1,6 @@
 // app/list/page.tsx
 import { redirect } from "next/navigation";
+import { calendar, formatDate, startOfDay, toKey } from "@/lib/time";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/current-user";
 import { buildMonthLedger } from "@/lib/folio";
@@ -10,10 +11,11 @@ export default async function ListPage() {
   if (!currentUser) redirect("/sign-in");
 
   const now = new Date();
+  const { year, month } = calendar(now);
   const activities = await prisma.activity.findMany({
     where: {
       userId: currentUser.id,
-      createdAt: { gte: new Date(now.getFullYear(), now.getMonth(), 1) },
+      createdAt: { gte: startOfDay(toKey(year, month, 1)) },
     },
     select: { type: true, novelId: true, detail: true, createdAt: true },
   });
@@ -21,7 +23,7 @@ export default async function ListPage() {
   return (
     <LibraryList
       ledger={buildMonthLedger(activities, now)}
-      monthLabel={now.toLocaleDateString("en-US", { month: "long" })}
+      monthLabel={formatDate(now, { month: "long" })}
     />
   );
 }

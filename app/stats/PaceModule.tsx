@@ -1,5 +1,6 @@
 // app/stats/PaceModule.tsx
 import Link from "next/link";
+import { formatDay } from "@/lib/time";
 import { FolioLabel } from "@/components/FolioKit";
 import type { PaceStats } from "@/lib/pace";
 
@@ -102,9 +103,7 @@ export default function PaceModule({
           <p className="mt-3 font-mono text-[10.5px] text-muted tabular-nums">
             best day ·{" "}
             <span className="text-body">
-              {pace.bestDay.date
-                .toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                .toLowerCase()}
+              {formatDay(pace.bestDay.day, { month: "short", day: "numeric", year: "numeric" }).toLowerCase()}
             </span>{" "}
             · <span className="text-gold">{pace.bestDay.chapters} chapters</span>
           </p>

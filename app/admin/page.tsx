@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDate } from "@/lib/time";
 import { useAuth } from "@clerk/nextjs";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useRouter } from "next/navigation";
@@ -188,7 +189,7 @@ export default function AdminPage() {
                 {user._count.novelList}
               </span>
               <span className="hidden w-20 shrink-0 text-right font-mono text-[9.5px] text-faint tabular-nums lg:block">
-                {new Date(user.createdAt).toLocaleDateString()}
+                {formatDate(user.createdAt, { year: "numeric", month: "numeric", day: "numeric" })}
               </span>
               <div className="flex w-40 shrink-0 items-center justify-end gap-3">
                 {user.id === currentUserId ? (

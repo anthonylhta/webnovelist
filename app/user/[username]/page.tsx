@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { formatDate, formatTime } from "@/lib/time";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -233,10 +234,7 @@ export default async function PublicProfilePage({
     new Date()
   );
 
-  const joined = new Date(user.createdAt).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
+  const joined = formatDate(user.createdAt, { month: "long", year: "numeric" });
 
   return (
     <FolioSheet
@@ -417,15 +415,9 @@ export default async function PublicProfilePage({
           <div className="max-h-[480px] overflow-y-auto scrollbar-hide">
             {recentActivities.map((activity, i) => {
               const prevActivity = recentActivities[i - 1];
-              const currentDate = new Date(activity.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              });
+              const currentDate = formatDate(activity.createdAt, { month: "short", day: "numeric" });
               const prevDate = prevActivity
-                ? new Date(prevActivity.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })
+                ? formatDate(prevActivity.createdAt, { month: "short", day: "numeric" })
                 : null;
               const showDateHeader = currentDate !== prevDate;
 
@@ -441,9 +433,7 @@ export default async function PublicProfilePage({
                       {activity.detail}
                     </span>
                     <span className="shrink-0 font-mono text-[9.5px] text-faint tabular-nums">
-                      {new Date(activity.createdAt)
-                        .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-                        .toLowerCase()}
+                      {formatTime(activity.createdAt)}
                     </span>
                   </div>
                 </div>
